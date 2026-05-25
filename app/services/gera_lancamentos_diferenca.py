@@ -23,9 +23,8 @@ _CAMPOS_IMPOSTO = ('vl_pis', 'vl_cofins', 'vl_icms', 'vl_cbs', 'vl_ibs')
 
 def gerar_lancamentos_diferenca(
     resultado_comparacao: dict,
-    configuracao_contas: dict,
-    centro_custo: str = '',
     filial: str = '',
+    centro_custo: str = '',
 ) -> list[dict]:
     """
     Gera lançamentos de ajuste para as diferenças encontradas entre SAP e SPED.
@@ -90,14 +89,22 @@ def gerar_lancamentos_diferenca(
         diferenca = item['diferenca']
         chave_sap = item.get('chave_sap', chave)
 
+        # Prefere o centro_custo extraído da planilha; cai no parâmetro se vazio
+        cc = item.get('centro_custo') or centro_custo
+
+        # Contas extraídas automaticamente dos lançamentos SAP da nota
+        contas_nota = item.get('contas', {})
+
         for campo in _CAMPOS_IMPOSTO:
             diff = diferenca.get(campo, 0.0) or 0.0
             if diff == 0.0:
                 continue
 
-            config = configuracao_contas.get(campo)
+            config = contas_nota.get(campo)
             if not config:
-                continue  # campo sem conta configurada: ignora
+                continue  # contas não identificadas para esse imposto: ignora
+            if 'conta_debito' not in config or 'conta_credito' not in config:
+                continue  # par incompleto (só um lado do lançamento extraído)
 
             valor = round(abs(diff), 2)
 
@@ -110,7 +117,7 @@ def gerar_lancamentos_diferenca(
                     debito=valor,
                     credito=None,
                     descricao=config['desc_debito'],
-                    centro_custo=centro_custo,
+                    centro_custo=cc,
                     filial=filial,
                 )
                 linha_credito = _linha(
@@ -120,7 +127,7 @@ def gerar_lancamentos_diferenca(
                     debito=None,
                     credito=valor,
                     descricao=config['desc_credito'],
-                    centro_custo=centro_custo,
+                    centro_custo=cc,
                     filial=filial,
                 )
             else:
@@ -132,7 +139,7 @@ def gerar_lancamentos_diferenca(
                     debito=valor,
                     credito=None,
                     descricao=config['desc_credito'],
-                    centro_custo=centro_custo,
+                    centro_custo=cc,
                     filial=filial,
                 )
                 linha_credito = _linha(
@@ -142,7 +149,7 @@ def gerar_lancamentos_diferenca(
                     debito=None,
                     credito=valor,
                     descricao=config['desc_debito'],
-                    centro_custo=centro_custo,
+                    centro_custo=cc,
                     filial=filial,
                 )
 

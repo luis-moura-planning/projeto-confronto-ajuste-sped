@@ -1,9 +1,16 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-
-from app.routers.compara_planilha_sped import router as comparar_router
+from routers.compara_planilha_sped import router as comparar_router
 
 app = FastAPI(title='Confronto SAP × SPED', version='1.0.0')
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['http://localhost:5173'],
+    allow_methods=['*'],
+    allow_headers=['*'],
+)
 
 app.include_router(comparar_router)
 

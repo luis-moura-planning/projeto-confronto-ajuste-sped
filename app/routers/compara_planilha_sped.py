@@ -4,10 +4,10 @@ import os
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
-from app.services.compara_valores_diario_sped import comparar_por_nota
-from app.services.extrai_dados_planilha_sap import extrair_por_nota as sap_extrai
-from app.services.extrai_dados_sped import extrair_por_nota as sped_extrai
-from app.services.gera_lancamentos_diferenca import gerar_lancamentos_diferenca
+from services.compara_valores_diario_sped import comparar_por_nota
+from services.extrai_dados_planilha_sap import extrair_por_nota as sap_extrai
+from services.extrai_dados_sped import extrair_por_nota as sped_extrai
+from services.gera_lancamentos_diferenca import gerar_lancamentos_diferenca
 
 router = APIRouter(prefix='/comparar', tags=['Comparação SAP × SPED'])
 
@@ -16,30 +16,16 @@ router = APIRouter(prefix='/comparar', tags=['Comparação SAP × SPED'])
 async def comparar(
     planilha_sap: UploadFile = File(..., description='Diário SAP (.xlsx)'),
     sped_contribuicoes: UploadFile = File(..., description='SPED Contribuições (.txt)'),
-    centro_custo: str = Form(default=''),
     filial: str = Form(default=''),
     mapeamento: str = Form(
         default='{}',
         description='JSON {chave_sap: chave_sped} para casos onde a normalização automática não basta',
-    ),
-    configuracao_contas: str = Form(
-        default='{}',
-        description=(
-            'JSON com configuração de contas por imposto. Exemplo: '
-            '{"vl_pis": {"conta_credito": "2.01.01.04.0002", "desc_credito": "PIS a Recolher", '
-            '"conta_debito": "2.01.01.04.0003", "desc_debito": "Pagamento PIS"}}'
-        ),
     ),
 ):
     try:
         mapeamento_dict: dict = json.loads(mapeamento)
     except json.JSONDecodeError as exc:
         raise HTTPException(status_code=422, detail=f'mapeamento JSON inválido: {exc}') from exc
-
-    try:
-        config_contas: dict = json.loads(configuracao_contas)
-    except json.JSONDecodeError as exc:
-        raise HTTPException(status_code=422, detail=f'configuracao_contas JSON inválido: {exc}') from exc
 
     # Salva arquivos em disco temporário para as funções de serviço que lêem por caminho
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -63,11 +49,7 @@ async def comparar(
 
     comparacao = comparar_por_nota(notas_sap, notas_sped, mapeamento_dict)
 
-    lancamentos = (
-        gerar_lancamentos_diferenca(comparacao, config_contas, centro_custo, filial)
-        if config_contas
-        else []
-    )
+    lancamentos = gerar_lancamentos_diferenca(comparacao, filial=filial)
 
     encontrados = sum(1 for v in comparacao.values() if v['status'] == 'encontrado')
     sem_sped    = sum(1 for v in comparacao.values() if v['status'] == 'sem_sped')

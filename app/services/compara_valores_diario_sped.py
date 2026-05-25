@@ -66,6 +66,61 @@ def _valores_sap(lancamentos: list) -> dict:
     }
 
 
+def _centro_custo_sap(lancamentos: list) -> str:
+    """Retorna o primeiro centro de custo não-vazio dos lançamentos da nota."""
+    for lanc in lancamentos:
+        cc = str(lanc.get('centro_custo') or '').strip()
+        if cc:
+            return cc
+    return ''
+
+
+def _contas_imposto_sap(lancamentos: list) -> dict:
+    """
+    Extrai o par de contas (débito/crédito) por tipo de imposto a partir
+    dos lançamentos double-entry do SAP.
+
+    No diário SAP:
+      debito_credito > 0  → lançamento a débito  → conta de despesa/ativo  (conta_debito)
+      debito_credito < 0  → lançamento a crédito → conta a pagar/passivo   (conta_credito)
+
+    Retorna um dict com chaves 'vl_pis', 'vl_cofins', etc.:
+      {
+        'vl_pis': {
+          'conta_debito': '3.03.02.01.0001', 'desc_debito':  'PIS s/ Compras',
+          'conta_credito': '2.01.01.04.0002', 'desc_credito': 'PIS a Recolher',
+        },
+        ...
+      }
+    """
+    contas: dict = {}
+
+    for lanc in lancamentos:
+        cta  = str(lanc.get('cta_contabil') or '').strip()
+        nome = str(lanc.get('nome_pn')      or '').strip()
+        val  = float(lanc.get('debito_credito') or 0)
+
+        if _RE_CONTA_PARCEIRO.match(cta) or val == 0:
+            continue
+
+        tipo = _tipo_imposto(cta, nome)
+        if not tipo:
+            continue
+
+        chave = f'vl_{tipo}'
+        if chave not in contas:
+            contas[chave] = {}
+
+        if val > 0:
+            contas[chave]['conta_debito'] = cta
+            contas[chave]['desc_debito']  = nome
+        else:
+            contas[chave]['conta_credito'] = cta
+            contas[chave]['desc_credito']  = nome
+
+    return contas
+
+
 def _valores_sped(nota: dict) -> dict:
     """Extrai os campos comparáveis de uma nota do SPED."""
     return {
@@ -134,7 +189,9 @@ def comparar_por_nota(
         chave_sped = mapeamento.get(chave_sap, _normalizar_chave_sap(chave_sap))
         nota_sped  = notas_sped.get(chave_sped)
 
-        sap_vals = _valores_sap(nota_sap['lancamentos'])
+        sap_vals     = _valores_sap(nota_sap['lancamentos'])
+        centro_custo = _centro_custo_sap(nota_sap['lancamentos'])
+        contas       = _contas_imposto_sap(nota_sap['lancamentos'])
 
         if nota_sped is not None:
             sped_vals  = _valores_sped(nota_sped)
@@ -148,12 +205,14 @@ def comparar_por_nota(
 
         chave_result = chave_sped if nota_sped is not None else chave_sap
         resultado[chave_result] = {
-            'chave_sap':  chave_sap,
-            'chave_sped': chave_sped if nota_sped is not None else None,
-            'status':     status,
-            'sap':        sap_vals,
-            'sped':       sped_vals,
-            'diferenca':  diferenca,
+            'chave_sap':    chave_sap,
+            'chave_sped':   chave_sped if nota_sped is not None else None,
+            'status':       status,
+            'sap':          sap_vals,
+            'sped':         sped_vals,
+            'diferenca':    diferenca,
+            'centro_custo': centro_custo,
+            'contas':       contas,
         }
 
     # ── Notas do SPED sem contraparte no SAP ──────────────────────────────────
