@@ -29,11 +29,11 @@ function temDif(row) {
 
 function exportarXLSX(lancamentos) {
   const dados = lancamentos.map((l) => ({
-    Nota: l.nota ?? "",
-    "Código Conta": l.codigo_conta ?? "",
-    Descrição: l.descricao_conta ?? "",
+    "Código da Conta": l.codigo_conta ?? "",
+    "Descrição da Conta": l.descricao_conta ?? "",
     Débito: l.debito ?? "",
     Crédito: l.credito ?? "",
+    Descrição: l.descricao ?? "",
     "Centro de Custo": l.centro_custo ?? "",
     Filial: l.filial ?? "",
   }));
@@ -365,19 +365,18 @@ export default function App() {
                   <table className="g-table">
                     <thead>
                       <tr>
-                        <th>Nota</th>
-                        <th>Conta</th>
-                        <th>Descrição</th>
+                        <th>Código da Conta</th>
+                        <th>Descrição da Conta</th>
                         <th>Débito</th>
                         <th>Crédito</th>
-                        <th>Centro Custo</th>
+                        <th>Descrição</th>
+                        <th>Centro de Custo</th>
                         <th>Filial</th>
                       </tr>
                     </thead>
                     <tbody>
                       {resultado.lancamentos.map((l, i) => (
                         <tr key={i}>
-                          <td>{l.nota}</td>
                           <td>
                             <code className="g-mono">{l.codigo_conta}</code>
                           </td>
@@ -394,6 +393,7 @@ export default function App() {
                           >
                             {fmt(l.credito)}
                           </td>
+                          <td>{l.descricao}</td>
                           <td>{l.centro_custo}</td>
                           <td>{l.filial}</td>
                         </tr>
