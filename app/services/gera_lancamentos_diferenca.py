@@ -2,22 +2,46 @@
 Gera lançamentos contábeis de ajuste com base nas diferenças
 calculadas por compara_valores_diario_sped.comparar_por_nota().
 
-Para cada diferença não-nula por tipo de imposto, produz um par
-débito/crédito no formato:
-
-    Código da Conta | Descrição da Conta | Débito | Crédito |
-    Descrição | Centro de Custo | Filial
-
 Sinal da diferença (sap - sped):
-  > 0 → SAP tem mais imposto que o SPED:
-        Débito  na conta de ajuste     (aumenta despesa/ativo)
-        Crédito na conta "a Recolher"  (aumenta o passivo)
-  < 0 → SAP tem menos imposto que o SPED:
-        Débito  na conta "a Recolher"  (reduz o passivo)
-        Crédito na conta de ajuste     (reduz despesa/ativo)
+  > 0 → SAP tem mais imposto que o SPED → débito ajuste / crédito "a Recolher"
+  < 0 → SAP tem menos imposto que o SPED → débito "a Recolher" / crédito ajuste
 """
 
-# Campos de impostos reconhecidos
+# Contas padrão por campo de imposto — usadas quando não extraídas do diário
+# Fonte: sped_comparador.py (Central Irrigação)
+CONTAS_TRIBUTOS = {
+    'vl_pis': {
+        'conta_debito':  '3.01.01.03.0003',
+        'desc_debito':   '( - ) PIS/PASEP',
+        'conta_credito': '2.01.01.04.0002',
+        'desc_credito':  'PIS a Recolher',
+    },
+    'vl_cofins': {
+        'conta_debito':  '3.01.01.03.0004',
+        'desc_debito':   '( - ) COFINS',
+        'conta_credito': '2.01.01.04.0003',
+        'desc_credito':  'COFINS a Recolher',
+    },
+    'vl_icms': {
+        'conta_debito':  '2.01.01.04.0001',
+        'desc_debito':   'ICMS a Recolher',
+        'conta_credito': '2.01.01.04.0001',
+        'desc_credito':  'ICMS a Recolher',
+    },
+    'vl_cbs': {
+        'conta_debito':  '3.01.01.03.0009',
+        'desc_debito':   '(-) CBS',
+        'conta_credito': '3.01.01.03.0009',
+        'desc_credito':  '(-) CBS',
+    },
+    'vl_ibs': {
+        'conta_debito':  '3.01.01.03.0010',
+        'desc_debito':   '(-) IBS UF',
+        'conta_credito': '3.01.01.03.0010',
+        'desc_credito':  '(-) IBS UF',
+    },
+}
+
 _CAMPOS_IMPOSTO = ('vl_pis', 'vl_cofins', 'vl_icms', 'vl_cbs', 'vl_ibs')
 
 
@@ -30,54 +54,23 @@ def gerar_lancamentos_diferenca(
     Gera lançamentos de ajuste para as diferenças encontradas entre SAP e SPED.
 
     Parâmetros:
-        resultado_comparacao:
-            Retorno de compara_valores_diario_sped.comparar_por_nota().
-
-        configuracao_contas:
-            Mapeamento de campo → contas débito/crédito. Exemplo:
-            {
-                'vl_pis': {
-                    'conta_credito': '2.01.01.04.0002',
-                    'desc_credito':  'PIS a Recolher',
-                    'conta_debito':  '2.01.01.04.0003',
-                    'desc_debito':   'Pagamento Pis',
-                },
-                'vl_cofins': {
-                    'conta_credito': '2.01.01.04.0004',
-                    'desc_credito':  'COFINS a Recolher',
-                    'conta_debito':  '2.01.01.04.0005',
-                    'desc_debito':   'Pagamento COFINS',
-                },
-                # vl_icms, vl_cbs, vl_ibs ...
-            }
-
-        centro_custo : Centro de custo a preencher nos lançamentos.
-        filial       : Filial/empresa a preencher nos lançamentos.
+        resultado_comparacao : retorno de comparar_por_nota()
+        filial               : filial/empresa (preenchida se não vier do diário)
+        centro_custo         : centro de custo fallback
 
     Retorno:
-        Lista de dicts, cada um representando uma linha do lançamento:
+        Lista de dicts no formato:
         [
             {
-                'nota':           '5882',
-                'codigo_conta':   '2.01.01.04.0002',
-                'descricao_conta':'PIS a Recolher',
-                'debito':         None,
-                'credito':        700.33,
-                'descricao':      'PIS a Recolher',
-                'centro_custo':   'OBRAS',
-                'filial':         'CENTRAL IRRIGACAO LTDA - Goiania',
-            },
-            {
-                'nota':           '5882',
-                'codigo_conta':   '2.01.01.04.0003',
-                'descricao_conta':'Pagamento Pis',
-                'debito':         700.33,
-                'credito':        None,
-                'descricao':      'Pagamento Pis',
-                'centro_custo':   'OBRAS',
-                'filial':         'CENTRAL IRRIGACAO LTDA - Goiania',
-            },
-            ...
+                'nota':            '38639',
+                'codigo_conta':    '2.01.01.04.0002',
+                'descricao_conta': 'PIS a Recolher',
+                'debito':          700.33,
+                'credito':         None,
+                'descricao':       'PIS a Recolher',
+                'centro_custo':    'OBRAS',
+                'filial':          'CENTRAL IRRIGACAO LTDA - Goiania',
+            }, ...
         ]
     """
     lancamentos = []
@@ -88,11 +81,7 @@ def gerar_lancamentos_diferenca(
 
         diferenca = item['diferenca']
         chave_sap = item.get('chave_sap', chave)
-
-        # Prefere o centro_custo extraído da planilha; cai no parâmetro se vazio
-        cc = item.get('centro_custo') or centro_custo
-
-        # Contas extraídas automaticamente dos lançamentos SAP da nota
+        cc        = item.get('centro_custo') or centro_custo
         contas_nota = item.get('contas', {})
 
         for campo in _CAMPOS_IMPOSTO:
@@ -100,75 +89,29 @@ def gerar_lancamentos_diferenca(
             if diff == 0.0:
                 continue
 
-            config = contas_nota.get(campo)
-            if not config:
-                continue  # contas não identificadas para esse imposto: ignora
-            if 'conta_debito' not in config or 'conta_credito' not in config:
-                continue  # par incompleto (só um lado do lançamento extraído)
+            # Usa contas extraídas do diário; cai em CONTAS_TRIBUTOS se incompleto
+            config = dict(contas_nota.get(campo) or {})
+            fallback = CONTAS_TRIBUTOS.get(campo, {})
+            for lado in ('conta_debito', 'desc_debito', 'conta_credito', 'desc_credito'):
+                if lado not in config:
+                    config[lado] = fallback.get(lado, '')
+
+            if not config.get('conta_debito') or not config.get('conta_credito'):
+                continue
 
             valor = round(abs(diff), 2)
 
             if diff > 0:
-                # SAP > SPED: aumenta passivo → débito ajuste / crédito "a Recolher"
-                linha_debito = _linha(
-                    nota=chave_sap,
-                    codigo=config['conta_debito'],
-                    descricao_conta=config['desc_debito'],
-                    debito=valor,
-                    credito=None,
-                    descricao=config['desc_debito'],
-                    centro_custo=cc,
-                    filial=filial,
-                )
-                linha_credito = _linha(
-                    nota=chave_sap,
-                    codigo=config['conta_credito'],
-                    descricao_conta=config['desc_credito'],
-                    debito=None,
-                    credito=valor,
-                    descricao=config['desc_credito'],
-                    centro_custo=cc,
-                    filial=filial,
-                )
+                lancamentos.append(_linha(chave_sap, config['conta_debito'],  config['desc_debito'],  valor, None,  config['desc_debito'],  cc, filial))
+                lancamentos.append(_linha(chave_sap, config['conta_credito'], config['desc_credito'], None,  valor, config['desc_credito'], cc, filial))
             else:
-                # SAP < SPED: reduz passivo → débito "a Recolher" / crédito ajuste
-                linha_debito = _linha(
-                    nota=chave_sap,
-                    codigo=config['conta_credito'],
-                    descricao_conta=config['desc_credito'],
-                    debito=valor,
-                    credito=None,
-                    descricao=config['desc_credito'],
-                    centro_custo=cc,
-                    filial=filial,
-                )
-                linha_credito = _linha(
-                    nota=chave_sap,
-                    codigo=config['conta_debito'],
-                    descricao_conta=config['desc_debito'],
-                    debito=None,
-                    credito=valor,
-                    descricao=config['desc_debito'],
-                    centro_custo=cc,
-                    filial=filial,
-                )
-
-            lancamentos.append(linha_debito)
-            lancamentos.append(linha_credito)
+                lancamentos.append(_linha(chave_sap, config['conta_credito'], config['desc_credito'], valor, None,  config['desc_credito'], cc, filial))
+                lancamentos.append(_linha(chave_sap, config['conta_debito'],  config['desc_debito'],  None,  valor, config['desc_debito'],  cc, filial))
 
     return lancamentos
 
 
-def _linha(
-    nota: str,
-    codigo: str,
-    descricao_conta: str,
-    debito,
-    credito,
-    descricao: str,
-    centro_custo: str,
-    filial: str,
-) -> dict:
+def _linha(nota, codigo, descricao_conta, debito, credito, descricao, centro_custo, filial) -> dict:
     return {
         'nota':            nota,
         'codigo_conta':    codigo,
@@ -179,54 +122,3 @@ def _linha(
         'centro_custo':    centro_custo,
         'filial':          filial,
     }
-
-
-# ── Exemplo de uso ────────────────────────────────────────────────────────────
-if __name__ == '__main__':
-    import json
-
-    # Simulação de resultado do comparar_por_nota
-    resultado_simulado = {
-        'NS 5882': {
-            'status':    'encontrado',
-            'chave_sap': 'NS 5882',
-            'diferenca': {
-                'vl_doc':    0.0,
-                'vl_icms':   0.0,
-                'vl_pis':    700.33,
-                'vl_cofins': 0.0,
-                'vl_cbs':    0.0,
-                'vl_ibs':    0.0,
-            },
-        }
-    }
-
-    CONTAS = {
-        'vl_pis': {
-            'conta_credito': '2.01.01.04.0002',
-            'desc_credito':  'PIS a Recolher',
-            'conta_debito':  '2.01.01.04.0003',
-            'desc_debito':   'Pagamento Pis',
-        },
-        'vl_cofins': {
-            'conta_credito': '2.01.01.04.0004',
-            'desc_credito':  'COFINS a Recolher',
-            'conta_debito':  '2.01.01.04.0005',
-            'desc_debito':   'Pagamento COFINS',
-        },
-        'vl_icms': {
-            'conta_credito': '2.01.01.04.0001',
-            'desc_credito':  'ICMS a Recolher',
-            'conta_debito':  '2.01.01.04.0006',
-            'desc_debito':   'Pagamento ICMS',
-        },
-    }
-
-    lancamentos = gerar_lancamentos_diferenca(
-        resultado_comparacao=resultado_simulado,
-        configuracao_contas=CONTAS,
-        centro_custo='OBRAS',
-        filial='CENTRAL IRRIGACAO LTDA - Goiania',
-    )
-
-    print(json.dumps(lancamentos, ensure_ascii=False, indent=2, default=str))

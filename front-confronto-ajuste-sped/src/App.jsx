@@ -4,6 +4,15 @@ import "./App.css";
 
 const CAMPOS = ["vl_doc", "vl_icms", "vl_pis", "vl_cofins", "vl_cbs", "vl_ibs"];
 
+const CAMPOS_LABELS = {
+  vl_doc:    "Vlr. Documento",
+  vl_icms:   "ICMS",
+  vl_pis:    "PIS",
+  vl_cofins: "COFINS",
+  vl_cbs:    "CBS",
+  vl_ibs:    "IBS",
+};
+
 const STATUS_LABELS = {
   encontrado: "Encontrado",
   sem_sped: "Sem SPED",
@@ -295,7 +304,7 @@ export default function App() {
                     <th>Chave SPED</th>
                     <th>Status</th>
                     {CAMPOS.map((c) => (
-                      <th key={c}>{c}</th>
+                      <th key={c}>{CAMPOS_LABELS[c]}</th>
                     ))}
                     <th>Dif. Total</th>
                   </tr>
