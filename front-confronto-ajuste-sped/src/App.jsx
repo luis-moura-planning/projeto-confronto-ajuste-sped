@@ -63,6 +63,7 @@ export default function App() {
   const [erro, setErro] = useState(null);
   const [resultado, setResultado] = useState(null);
   const [filtro, setFiltro] = useState("todos");
+  const [abaAtiva, setAbaAtiva] = useState("comparacao");
 
   const sapRef = useRef(null);
   const spedRef = useRef(null);
@@ -240,176 +241,162 @@ export default function App() {
               gap: "var(--g-space-5)",
             }}
           >
-            <div className="g-cluster g-cluster--end">
+            {/* Cards de resumo */}
+            <div className="g-grid g-grid--auto-160">
+              <ResumoCard label="Notas SAP"  valor={resultado.resumo.total_notas_sap}  cor="" />
+              <ResumoCard label="Notas SPED" valor={resultado.resumo.total_notas_sped} cor="" />
+              <ResumoCard label="Encontrados" valor={resultado.resumo.encontrados} cor="success" />
+              <ResumoCard label="Sem SPED"   valor={resultado.resumo.sem_sped}    cor="warn" />
+              <ResumoCard label="Sem SAP"    valor={resultado.resumo.sem_sap}     cor="danger" />
+            </div>
+
+            {/* Abas principais */}
+            <div className="g-tabs">
               <button
-                type="button"
-                className="g-btn"
-                disabled={!resultado.lancamentos?.length}
-                onClick={() => exportarXLSX(resultado.lancamentos)}
+                className={`g-tabs__item${abaAtiva === "comparacao" ? " g-tabs__item--active" : ""}`}
+                onClick={() => setAbaAtiva("comparacao")}
               >
-                Exportar Lançamentos XLSX
+                Comparação
+              </button>
+              <button
+                className={`g-tabs__item${abaAtiva === "lancamentos" ? " g-tabs__item--active" : ""}`}
+                onClick={() => setAbaAtiva("lancamentos")}
+              >
+                Lançamentos
+                {resultado.lancamentos?.length > 0 && (
+                  <span className="g-badge g-badge--neutral" style={{ marginLeft: 6 }}>
+                    {resultado.lancamentos.length}
+                  </span>
+                )}
               </button>
             </div>
 
-            <div className="g-grid g-grid--auto-160">
-              <ResumoCard
-                label="Notas SAP"
-                valor={resultado.resumo.total_notas_sap}
-                cor=""
-              />
-              <ResumoCard
-                label="Notas SPED"
-                valor={resultado.resumo.total_notas_sped}
-                cor=""
-              />
-              <ResumoCard
-                label="Encontrados"
-                valor={resultado.resumo.encontrados}
-                cor="success"
-              />
-              <ResumoCard
-                label="Sem SPED"
-                valor={resultado.resumo.sem_sped}
-                cor="warn"
-              />
-              <ResumoCard
-                label="Sem SAP"
-                valor={resultado.resumo.sem_sap}
-                cor="danger"
-              />
-            </div>
-
-            <div className="g-tabs">
-              {[
-                ["todos", "Todos"],
-                ["encontrado", "Encontrados"],
-                ["sem_sped", "Sem SPED"],
-                ["sem_sap", "Sem SAP"],
-              ].map(([val, label]) => (
-                <button
-                  key={val}
-                  className={`g-tabs__item${filtro === val ? " g-tabs__item--active" : ""}`}
-                  onClick={() => setFiltro(val)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            <div className="g-table-wrap">
-              <table className="g-table">
-                <thead>
-                  <tr>
-                    <th>Chave SAP</th>
-                    <th>Chave SPED</th>
-                    <th>Status</th>
-                    {CAMPOS.map((c) => (
-                      <th key={c}>{CAMPOS_LABELS[c]}</th>
-                    ))}
-                    <th>Dif. Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {linhas.length === 0 && (
-                    <tr>
-                      <td colSpan={CAMPOS.length + 4} className="g-empty">
-                        Nenhum resultado.
-                      </td>
-                    </tr>
-                  )}
-                  {linhas.map(([chave, row]) => {
-                    const difTotal = row.diferenca
-                      ? CAMPOS.reduce((s, c) => s + (row.diferenca[c] ?? 0), 0)
-                      : null;
-                    return (
-                      <tr
-                        key={chave}
-                        className={temDif(row) ? "app-row-diff" : ""}
-                      >
-                        <td>{row.chave_sap ?? "—"}</td>
-                        <td>{row.chave_sped ?? "—"}</td>
-                        <td>
-                          <span
-                            className={`g-badge ${STATUS_BADGE[row.status]}`}
-                          >
-                            {STATUS_LABELS[row.status]}
-                          </span>
-                        </td>
-                        {CAMPOS.map((c) => (
-                          <td
-                            key={c}
-                            className={
-                              row.diferenca?.[c] !== 0 ? "app-td-diff" : ""
-                            }
-                          >
-                            <span>{fmt(row.sap?.[c])}</span>
-                            {row.sped && (
-                              <>
-                                <br />
-                                <span className="g-helper">
-                                  {fmt(row.sped[c])}
-                                </span>
-                              </>
-                            )}
-                          </td>
-                        ))}
-                        <td
-                          className={
-                            difTotal && difTotal !== 0 ? "app-td-diff" : ""
-                          }
-                        >
-                          {fmt(difTotal)}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {resultado.lancamentos?.length > 0 && (
+            {/* Aba: Comparação */}
+            {abaAtiva === "comparacao" && (
               <>
-                <h2 className="g-h2">Lançamentos Gerados</h2>
+                <div className="g-tabs" style={{ borderBottom: "none", gap: "var(--g-space-1)" }}>
+                  {[
+                    ["todos", "Todos"],
+                    ["encontrado", "Encontrados"],
+                    ["sem_sped", "Sem SPED"],
+                    ["sem_sap", "Sem SAP"],
+                  ].map(([val, label]) => (
+                    <button
+                      key={val}
+                      className={`g-pill${filtro === val ? " g-pill--active" : ""}`}
+                      onClick={() => setFiltro(val)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
                 <div className="g-table-wrap">
                   <table className="g-table">
                     <thead>
                       <tr>
-                        <th>Código da Conta</th>
-                        <th>Descrição da Conta</th>
-                        <th>Débito</th>
-                        <th>Crédito</th>
-                        <th>Descrição</th>
-                        <th>Centro de Custo</th>
-                        <th>Filial</th>
+                        <th>Nota</th>
+                        <th>Chave SPED</th>
+                        <th>Status</th>
+                        {CAMPOS.map((c) => (
+                          <th key={c}>{CAMPOS_LABELS[c]}</th>
+                        ))}
+                        <th>Dif. Total</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {resultado.lancamentos.map((l, i) => (
-                        <tr key={i}>
-                          <td>
-                            <code className="g-mono">{l.codigo_conta}</code>
+                      {linhas.length === 0 && (
+                        <tr>
+                          <td colSpan={CAMPOS.length + 4} className="g-empty">
+                            Nenhum resultado.
                           </td>
-                          <td>{l.descricao_conta}</td>
-                          <td
-                            className={l.debito != null ? "app-td-debito" : ""}
-                          >
-                            {fmt(l.debito)}
-                          </td>
-                          <td
-                            className={
-                              l.credito != null ? "app-td-credito" : ""
-                            }
-                          >
-                            {fmt(l.credito)}
-                          </td>
-                          <td>{l.descricao}</td>
-                          <td>{l.centro_custo}</td>
-                          <td>{l.filial}</td>
                         </tr>
-                      ))}
+                      )}
+                      {linhas.map(([chave, row]) => {
+                        const difTotal = row.diferenca
+                          ? CAMPOS.reduce((s, c) => s + (row.diferenca[c] ?? 0), 0)
+                          : null;
+                        return (
+                          <tr key={chave} className={temDif(row) ? "app-row-diff" : ""}>
+                            <td>{row.chave_sap ?? "—"}</td>
+                            <td>{row.chave_sped ?? "—"}</td>
+                            <td>
+                              <span className={`g-badge ${STATUS_BADGE[row.status]}`}>
+                                {STATUS_LABELS[row.status]}
+                              </span>
+                            </td>
+                            {CAMPOS.map((c) => (
+                              <td
+                                key={c}
+                                className={row.diferenca?.[c] !== 0 ? "app-td-diff" : ""}
+                              >
+                                <span>{fmt(row.sap?.[c])}</span>
+                                {row.sped && (
+                                  <>
+                                    <br />
+                                    <span className="g-helper">{fmt(row.sped[c])}</span>
+                                  </>
+                                )}
+                              </td>
+                            ))}
+                            <td className={difTotal && difTotal !== 0 ? "app-td-diff" : ""}>
+                              {fmt(difTotal)}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
+              </>
+            )}
+
+            {/* Aba: Lançamentos */}
+            {abaAtiva === "lancamentos" && (
+              <>
+                <div className="g-cluster g-cluster--end">
+                  <button
+                    type="button"
+                    className="g-btn g-btn--orange"
+                    disabled={!resultado.lancamentos?.length}
+                    onClick={() => exportarXLSX(resultado.lancamentos)}
+                  >
+                    ↑ Exportar XLSX
+                  </button>
+                </div>
+
+                {resultado.lancamentos?.length === 0 ? (
+                  <p className="g-empty">Nenhum lançamento gerado — sem diferenças encontradas.</p>
+                ) : (
+                  <div className="g-table-wrap">
+                    <table className="g-table">
+                      <thead>
+                        <tr>
+                          <th>Código da Conta</th>
+                          <th>Descrição da Conta</th>
+                          <th>Débito</th>
+                          <th>Crédito</th>
+                          <th>Descrição</th>
+                          <th>Centro de Custo</th>
+                          <th>Filial</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {resultado.lancamentos.map((l, i) => (
+                          <tr key={i}>
+                            <td><code className="g-mono">{l.codigo_conta}</code></td>
+                            <td>{l.descricao_conta}</td>
+                            <td className={l.debito  != null ? "app-td-debito"  : ""}>{fmt(l.debito)}</td>
+                            <td className={l.credito != null ? "app-td-credito" : ""}>{fmt(l.credito)}</td>
+                            <td>{l.descricao}</td>
+                            <td>{l.centro_custo}</td>
+                            <td>{l.filial}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </>
             )}
           </section>
