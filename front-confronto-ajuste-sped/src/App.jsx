@@ -327,6 +327,7 @@ export default function App() {
                         <th>Nota</th>
                         <th>Chave SPED</th>
                         <th>Status</th>
+                        <th></th>
                         {CAMPOS.map((c) => (
                           <th key={c}>{CAMPOS_LABELS[c]}</th>
                         ))}
@@ -336,7 +337,7 @@ export default function App() {
                     <tbody>
                       {linhasPag.length === 0 && (
                         <tr>
-                          <td colSpan={CAMPOS.length + 4} className="g-empty">
+                          <td colSpan={CAMPOS.length + 5} className="g-empty">
                             Nenhum resultado.
                           </td>
                         </tr>
@@ -353,6 +354,11 @@ export default function App() {
                               <span className={`g-badge ${STATUS_BADGE[row.status]}`}>
                                 {STATUS_LABELS[row.status]}
                               </span>
+                            </td>
+                            <td className="app-td-origem">
+                              <span>Planilha</span>
+                              <br />
+                              <span className="g-helper">SPED</span>
                             </td>
                             {CAMPOS.map((c) => (
                               <td key={c} className={row.diferenca?.[c] !== 0 ? "app-td-diff" : ""}>

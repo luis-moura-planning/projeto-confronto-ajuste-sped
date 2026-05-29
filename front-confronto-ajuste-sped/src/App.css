@@ -49,6 +49,15 @@
 .app-row-diff td          { background: var(--g-amber-50); }
 .app-row-diff:hover td    { background: var(--g-amber-100); }
 
+.app-td-origem {
+  font-size: var(--g-fs-12);
+  font-weight: var(--g-fw-semi);
+  color: var(--g-fg-2);
+  white-space: nowrap;
+  border-right: 1px solid var(--g-border);
+  padding-right: 14px !important;
+}
+
 .app-td-diff    { color: var(--g-warn-fg);   font-weight: var(--g-fw-semi); }
 .app-td-debito  { color: var(--g-danger);    font-weight: var(--g-fw-semi); }
 .app-td-credito { color: var(--g-success);   font-weight: var(--g-fw-semi); }
