@@ -67,8 +67,8 @@ export default function App() {
   const [sapFile, setSapFile] = useState(null);
   const [spedFile, setSpedFile] = useState(null);
   const [filial, setFilial] = useState("");
-  const [mapJson, setMapJson] = useState("");
-  const [avancado, setAvancado] = useState(false);
+
+
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState(null);
   const [resultado, setResultado] = useState(null);
@@ -101,7 +101,7 @@ export default function App() {
     form.append("planilha_sap", sapFile);
     form.append("sped_contribuicoes", spedFile);
     form.append("filial", filial);
-    form.append("mapeamento", mapJson || "{}");
+
 
     try {
       const res = await fetch("/api/comparar/compara_planilha_sped", {
@@ -213,30 +213,6 @@ export default function App() {
             </div>
           </div>
 
-          <button
-            type="button"
-            className="g-btn g-btn--primary"
-            onClick={() => setAvancado((v) => !v)}
-          >
-            {avancado ? "▲ Ocultar opções avançadas" : "▼ Opções avançadas"}
-          </button>
-
-          {avancado && (
-            <div style={{ borderTop: "1px solid var(--g-border)", paddingTop: "var(--g-space-4)" }}>
-              <div className="g-field">
-                <label className="g-field__label">
-                  Mapeamento SAP → SPED <small className="g-helper">(JSON)</small>
-                </label>
-                <textarea
-                  className="g-textarea"
-                  rows={5}
-                  value={mapJson}
-                  onChange={(e) => setMapJson(e.target.value)}
-                  placeholder={'{\n  "NS 5882": "38676"\n}'}
-                />
-              </div>
-            </div>
-          )}
 
           {erro && <div className="app-alert-err">{erro}</div>}
 
