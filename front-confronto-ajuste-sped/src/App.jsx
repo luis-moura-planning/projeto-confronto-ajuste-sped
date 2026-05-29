@@ -26,6 +26,14 @@ const STATUS_BADGE = {
 
 const OPCOES_POR_PAGINA = [10, 20, 50, 100];
 
+const IMPOSTOS = [
+  { campo: "vl_pis",    label: "PIS" },
+  { campo: "vl_cofins", label: "COFINS" },
+  { campo: "vl_icms",   label: "ICMS" },
+  { campo: "vl_cbs",    label: "CBS" },
+  { campo: "vl_ibs",    label: "IBS" },
+];
+
 function fmt(val) {
   if (val == null) return "—";
   return val.toLocaleString("pt-BR", {
@@ -70,6 +78,9 @@ export default function App() {
   const [paginaLanc, setPaginaLanc] = useState(1);
   const [porPaginaComp, setPorPaginaComp] = useState(20);
   const [porPaginaLanc, setPorPaginaLanc] = useState(20);
+  const [impostosAtivos, setImpostosAtivos] = useState(
+    () => Object.fromEntries(IMPOSTOS.map((i) => [i.campo, true]))
+  );
 
   const sapRef = useRef(null);
   const spedRef = useRef(null);
@@ -121,9 +132,16 @@ export default function App() {
   const totalPagsComp = Math.max(1, Math.ceil(linhas.length / porPaginaComp));
   const linhasPag = linhas.slice((paginaComp - 1) * porPaginaComp, paginaComp * porPaginaComp);
 
-  const lancamentos = resultado?.lancamentos ?? [];
+  const lancamentos = (resultado?.lancamentos ?? []).filter(
+    (l) => impostosAtivos[l.imposto] !== false
+  );
   const totalPagsLanc = Math.max(1, Math.ceil(lancamentos.length / porPaginaLanc));
   const lancPag = lancamentos.slice((paginaLanc - 1) * porPaginaLanc, paginaLanc * porPaginaLanc);
+
+  function toggleImposto(campo) {
+    setImpostosAtivos((prev) => ({ ...prev, [campo]: !prev[campo] }));
+    setPaginaLanc(1);
+  }
 
   return (
     <div>
@@ -371,18 +389,33 @@ export default function App() {
             {/* ── Aba: Lançamentos ── */}
             {abaAtiva === "lancamentos" && (
               <>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "var(--g-space-2)" }}>
-                  <span className="g-helper">
-                    {lancamentos.length} lançamento{lancamentos.length !== 1 ? "s" : ""}
-                  </span>
-                  <button
-                    type="button"
-                    className="g-btn g-btn--orange"
-                    disabled={!lancamentos.length}
-                    onClick={() => exportarXLSX(lancamentos)}
-                  >
-                    ↑ Exportar XLSX
-                  </button>
+                {/* Filtros por imposto */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "var(--g-space-3)" }}>
+                  <div className="g-cluster" style={{ gap: "var(--g-space-4)" }}>
+                    {IMPOSTOS.map(({ campo, label }) => (
+                      <label key={campo} className="g-check">
+                        <input
+                          type="checkbox"
+                          checked={impostosAtivos[campo]}
+                          onChange={() => toggleImposto(campo)}
+                        />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
+                  <div className="g-cluster" style={{ gap: "var(--g-space-2)" }}>
+                    <span className="g-helper">
+                      {lancamentos.length} lançamento{lancamentos.length !== 1 ? "s" : ""}
+                    </span>
+                    <button
+                      type="button"
+                      className="g-btn g-btn--orange"
+                      disabled={!lancamentos.length}
+                      onClick={() => exportarXLSX(lancamentos)}
+                    >
+                      ↑ Exportar XLSX
+                    </button>
+                  </div>
                 </div>
 
                 {lancamentos.length === 0 ? (

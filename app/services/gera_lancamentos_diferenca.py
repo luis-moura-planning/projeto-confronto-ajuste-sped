@@ -101,19 +101,22 @@ def gerar_lancamentos_diferenca(
 
             valor = round(abs(diff), 2)
 
+            ref = f'NF {chave_sap}'
+
             if diff > 0:
-                lancamentos.append(_linha(chave_sap, config['conta_debito'],  config['desc_debito'],  valor, None,  config['desc_debito'],  cc, filial))
-                lancamentos.append(_linha(chave_sap, config['conta_credito'], config['desc_credito'], None,  valor, config['desc_credito'], cc, filial))
+                lancamentos.append(_linha(chave_sap, campo, config['conta_debito'],  config['desc_debito'],  valor, None,  f"{config['desc_debito']} - {ref}",  cc, filial))
+                lancamentos.append(_linha(chave_sap, campo, config['conta_credito'], config['desc_credito'], None,  valor, f"{config['desc_credito']} - {ref}", cc, filial))
             else:
-                lancamentos.append(_linha(chave_sap, config['conta_credito'], config['desc_credito'], valor, None,  config['desc_credito'], cc, filial))
-                lancamentos.append(_linha(chave_sap, config['conta_debito'],  config['desc_debito'],  None,  valor, config['desc_debito'],  cc, filial))
+                lancamentos.append(_linha(chave_sap, campo, config['conta_credito'], config['desc_credito'], valor, None,  f"{config['desc_credito']} - {ref}", cc, filial))
+                lancamentos.append(_linha(chave_sap, campo, config['conta_debito'],  config['desc_debito'],  None,  valor, f"{config['desc_debito']} - {ref}",  cc, filial))
 
     return lancamentos
 
 
-def _linha(nota, codigo, descricao_conta, debito, credito, descricao, centro_custo, filial) -> dict:
+def _linha(nota, imposto, codigo, descricao_conta, debito, credito, descricao, centro_custo, filial) -> dict:
     return {
         'nota':            nota,
+        'imposto':         imposto,
         'codigo_conta':    codigo,
         'descricao_conta': descricao_conta,
         'debito':          debito,
