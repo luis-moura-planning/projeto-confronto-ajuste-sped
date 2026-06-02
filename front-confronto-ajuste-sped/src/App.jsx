@@ -2,73 +2,58 @@ import { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
 
-const CAMPOS = ["vl_doc", "vl_icms", "vl_pis", "vl_cofins", "vl_cbs", "vl_ibs"];
-
-const CAMPOS_LABELS = {
-  vl_doc:    "Vlr. Documento",
-  vl_icms:   "ICMS",
-  vl_pis:    "PIS",
-  vl_cofins: "COFINS",
-  vl_cbs:    "CBS",
-  vl_ibs:    "IBS",
+const TAXAS = ["VL_ITEM", "VL_ICMS", "VL_PIS", "VL_COFINS"];
+const TAXA_LABELS = {
+  VL_ITEM:   "Vlr. Item",
+  VL_ICMS:   "ICMS",
+  VL_PIS:    "PIS",
+  VL_COFINS: "COFINS",
 };
 
-const STATUS_LABELS = {
-  encontrado: "Encontrado",
-  sem_sped: "Sem SPED",
-  sem_sap: "Sem SAP",
+const IMPOSTOS_LANC = [
+  { campo: "ITEM",   label: "Item" },
+  { campo: "ICMS",   label: "ICMS" },
+  { campo: "PIS",    label: "PIS" },
+  { campo: "COFINS", label: "COFINS" },
+];
+
+const TIPO_BADGE = {
+  divergencia: "g-badge--warn",
+  so_sped:     "g-badge--danger",
+  so_sap:      "g-badge--neutral",
 };
-const STATUS_BADGE = {
-  encontrado: "g-badge--success",
-  sem_sped: "g-badge--warn",
-  sem_sap: "g-badge--danger",
+const TIPO_LABELS = {
+  divergencia: "Divergência",
+  so_sped:     "Só SPED",
+  so_sap:      "Só SAP",
 };
 
 const OPCOES_POR_PAGINA = [10, 20, 50, 100];
 
-const IMPOSTOS = [
-  { campo: "vl_pis",    label: "PIS" },
-  { campo: "vl_cofins", label: "COFINS" },
-  { campo: "vl_icms",   label: "ICMS" },
-  { campo: "vl_cbs",    label: "CBS" },
-  { campo: "vl_ibs",    label: "IBS" },
-];
-
 function fmt(val) {
   if (val == null) return "—";
-  return val.toLocaleString("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
-
-function temDif(row) {
-  return row.diferenca && CAMPOS.some((c) => row.diferenca[c] !== 0);
+  const n = Number(val);
+  if (isNaN(n)) return "—";
+  return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function exportarXLSX(lancamentos) {
-  const dados = lancamentos.map((l) => ({
-    "Código da Conta": l.codigo_conta ?? "",
-    "Descrição da Conta": l.descricao_conta ?? "",
-    Débito: l.debito ?? "",
-    Crédito: l.credito ?? "",
-    Descrição: l.descricao ?? "",
-    "Centro de Custo": l.centro_custo ?? "",
-    Filial: l.filial ?? "",
-  }));
-
+  const cols = [
+    "Código da Conta", "Descrição da Conta", "Débito", "Crédito",
+    "Descrição", "Centro de Custo", "Filial", "Imposto", "Sentido",
+  ];
+  const dados = lancamentos.map(l =>
+    Object.fromEntries(cols.map(k => [k, l[k] ?? ""]))
+  );
   const ws = XLSX.utils.json_to_sheet(dados);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Lançamentos");
-  XLSX.writeFile(wb, "lancamentos_diferenca.xlsx");
+  XLSX.writeFile(wb, "lancamentos_ajuste.xlsx");
 }
 
 export default function App() {
   const [sapFile, setSapFile] = useState(null);
   const [spedFile, setSpedFile] = useState(null);
-  const [filial, setFilial] = useState("");
-
-
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState(null);
   const [resultado, setResultado] = useState(null);
@@ -79,7 +64,7 @@ export default function App() {
   const [porPaginaComp, setPorPaginaComp] = useState(20);
   const [porPaginaLanc, setPorPaginaLanc] = useState(20);
   const [impostosAtivos, setImpostosAtivos] = useState(
-    () => Object.fromEntries(IMPOSTOS.map((i) => [i.campo, true]))
+    () => Object.fromEntries(IMPOSTOS_LANC.map(i => [i.campo, true]))
   );
 
   const sapRef = useRef(null);
@@ -100,8 +85,6 @@ export default function App() {
     const form = new FormData();
     form.append("planilha_sap", sapFile);
     form.append("sped_contribuicoes", spedFile);
-    form.append("filial", filial);
-
 
     try {
       const res = await fetch("/api/comparar/compara_planilha_sped", {
@@ -123,23 +106,35 @@ export default function App() {
     setPaginaComp(1);
   }
 
-  const linhas = resultado
-    ? Object.entries(resultado.comparacao).filter(
-        ([, v]) => filtro === "todos" || v.status === filtro,
-      )
+  const todasLinhas = resultado
+    ? [
+        ...(resultado.divergencias ?? []).map(r => ({ ...r, _tipo: "divergencia" })),
+        ...(resultado.so_sped ?? []).map(r => ({ ...r, _tipo: "so_sped" })),
+        ...(resultado.so_sap ?? []).map(r => ({ ...r, _tipo: "so_sap" })),
+      ]
     : [];
 
-  const totalPagsComp = Math.max(1, Math.ceil(linhas.length / porPaginaComp));
-  const linhasPag = linhas.slice((paginaComp - 1) * porPaginaComp, paginaComp * porPaginaComp);
+  const linhasFiltradas = todasLinhas.filter(
+    r => filtro === "todos" || r._tipo === filtro
+  );
+
+  const totalPagsComp = Math.max(1, Math.ceil(linhasFiltradas.length / porPaginaComp));
+  const linhasPag = linhasFiltradas.slice(
+    (paginaComp - 1) * porPaginaComp,
+    paginaComp * porPaginaComp
+  );
 
   const lancamentos = (resultado?.lancamentos ?? []).filter(
-    (l) => impostosAtivos[l.imposto] !== false
+    l => impostosAtivos[l["Imposto"]] !== false
   );
   const totalPagsLanc = Math.max(1, Math.ceil(lancamentos.length / porPaginaLanc));
-  const lancPag = lancamentos.slice((paginaLanc - 1) * porPaginaLanc, paginaLanc * porPaginaLanc);
+  const lancPag = lancamentos.slice(
+    (paginaLanc - 1) * porPaginaLanc,
+    paginaLanc * porPaginaLanc
+  );
 
   function toggleImposto(campo) {
-    setImpostosAtivos((prev) => ({ ...prev, [campo]: !prev[campo] }));
+    setImpostosAtivos(prev => ({ ...prev, [campo]: !prev[campo] }));
     setPaginaLanc(1);
   }
 
@@ -200,20 +195,6 @@ export default function App() {
             />
           </div>
 
-          <div className="g-form-grid">
-            <div className="g-field">
-              <label className="g-field__label">Filial</label>
-              <input
-                className="g-input"
-                type="text"
-                value={filial}
-                onChange={(e) => setFilial(e.target.value)}
-                placeholder="ex: CENTRAL IRRIGACAO LTDA"
-              />
-            </div>
-          </div>
-
-
           {erro && <div className="app-alert-err">{erro}</div>}
 
           <div className="g-form-actions">
@@ -234,11 +215,10 @@ export default function App() {
           >
             {/* Cards de resumo */}
             <div className="g-grid g-grid--auto-160">
-              <ResumoCard label="Notas SAP"   valor={resultado.resumo.total_notas_sap}  cor="" />
-              <ResumoCard label="Notas SPED"  valor={resultado.resumo.total_notas_sped} cor="" />
-              <ResumoCard label="Encontrados" valor={resultado.resumo.encontrados}       cor="success" />
-              <ResumoCard label="Sem SPED"    valor={resultado.resumo.sem_sped}          cor="warn" />
-              <ResumoCard label="Sem SAP"     valor={resultado.resumo.sem_sap}           cor="danger" />
+              <ResumoCard label="Divergências"  valor={(resultado.divergencias ?? []).length} cor="warn" />
+              <ResumoCard label="Só no SPED"    valor={(resultado.so_sped ?? []).length}       cor="danger" />
+              <ResumoCard label="Só no SAP"     valor={(resultado.so_sap ?? []).length}         cor="" />
+              <ResumoCard label="Lançamentos"   valor={(resultado.lancamentos ?? []).length}    cor="success" />
             </div>
 
             {/* Abas principais */}
@@ -268,10 +248,10 @@ export default function App() {
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "var(--g-space-2)" }}>
                   <div className="g-cluster" style={{ gap: "var(--g-space-1)" }}>
                     {[
-                      ["todos", "Todos"],
-                      ["encontrado", "Encontrados"],
-                      ["sem_sped", "Sem SPED"],
-                      ["sem_sap", "Sem SAP"],
+                      ["todos",       "Todos"],
+                      ["divergencia", "Divergências"],
+                      ["so_sped",     "Só SPED"],
+                      ["so_sap",      "Só SAP"],
                     ].map(([val, label]) => (
                       <button
                         key={val}
@@ -283,7 +263,7 @@ export default function App() {
                     ))}
                   </div>
                   <span className="g-helper">
-                    {linhas.length} registro{linhas.length !== 1 ? "s" : ""}
+                    {linhasFiltradas.length} registro{linhasFiltradas.length !== 1 ? "s" : ""}
                   </span>
                 </div>
 
@@ -291,9 +271,9 @@ export default function App() {
                   pagina={paginaComp}
                   total={totalPagsComp}
                   porPagina={porPaginaComp}
-                  totalItens={linhas.length}
+                  totalItens={linhasFiltradas.length}
                   onPagina={setPaginaComp}
-                  onPorPagina={(v) => { setPorPaginaComp(v); setPaginaComp(1); }}
+                  onPorPagina={v => { setPorPaginaComp(v); setPaginaComp(1); }}
                 />
 
                 <div className="g-table-wrap">
@@ -301,58 +281,78 @@ export default function App() {
                     <thead>
                       <tr>
                         <th>Nota</th>
-                        <th>Chave SPED</th>
-                        <th>Status</th>
+                        <th>Chave NF-e</th>
+                        <th>Tipo</th>
                         <th></th>
-                        {CAMPOS.map((c) => (
-                          <th key={c}>{CAMPOS_LABELS[c]}</th>
-                        ))}
-                        <th>Dif. Total</th>
+                        {TAXAS.map(t => <th key={t}>{TAXA_LABELS[t]}</th>)}
                       </tr>
                     </thead>
                     <tbody>
                       {linhasPag.length === 0 && (
                         <tr>
-                          <td colSpan={CAMPOS.length + 5} className="g-empty">
+                          <td colSpan={TAXAS.length + 4} className="g-empty">
                             Nenhum resultado.
                           </td>
                         </tr>
                       )}
-                      {linhasPag.map(([chave, row]) => {
-                        const difTotal = row.diferenca
-                          ? CAMPOS.reduce((s, c) => s + (row.diferenca[c] ?? 0), 0)
-                          : null;
-                        return (
-                          <tr key={chave} className={temDif(row) ? "app-row-diff" : ""}>
-                            <td>{row.chave_sap ?? "—"}</td>
-                            <td>{row.chave_sped ?? "—"}</td>
-                            <td>
-                              <span className={`g-badge ${STATUS_BADGE[row.status]}`}>
-                                {STATUS_LABELS[row.status]}
-                              </span>
-                            </td>
-                            <td className="app-td-origem">
-                              <span>Planilha</span>
-                              <br />
-                              <span className="g-helper">SPED</span>
-                            </td>
-                            {CAMPOS.map((c) => (
-                              <td key={c} className={row.diferenca?.[c] !== 0 ? "app-td-diff" : ""}>
-                                <span>{fmt(row.sap?.[c])}</span>
-                                {row.sped && (
+                      {linhasPag.map((row, i) => (
+                        <tr key={i} className={row._tipo === "divergencia" ? "app-row-diff" : ""}>
+                          <td>{row.NUM_DOC ?? "—"}</td>
+                          <td>
+                            <code className="g-mono" style={{ fontSize: 11 }}>
+                              {row.CHV_NFE ?? "—"}
+                            </code>
+                          </td>
+                          <td>
+                            <span className={`g-badge ${TIPO_BADGE[row._tipo]}`}>
+                              {TIPO_LABELS[row._tipo]}
+                            </span>
+                          </td>
+                          <td className="app-td-origem">
+                            {row._tipo === "so_sap" ? (
+                              <span>SAP</span>
+                            ) : row._tipo === "so_sped" ? (
+                              <span>SPED</span>
+                            ) : (
+                              <>
+                                <span>SPED</span>
+                                <br />
+                                <span className="g-helper">SAP</span>
+                              </>
+                            )}
+                          </td>
+                          {TAXAS.map(taxa => {
+                            const spedKey  = taxa;
+                            const sapKey   = taxa + "_SAP";
+                            const deltaKey = taxa.replace("VL_", "DELTA_");
+                            const delta    = row[deltaKey];
+                            const hasDelta = delta != null && Math.abs(delta) > 0.05;
+                            return (
+                              <td key={taxa} className={hasDelta ? "app-td-diff" : ""}>
+                                {row._tipo === "so_sap" ? (
+                                  <span>{fmt(row[sapKey])}</span>
+                                ) : row._tipo === "so_sped" ? (
+                                  <span>{fmt(row[spedKey])}</span>
+                                ) : (
                                   <>
+                                    <span>{fmt(row[spedKey])}</span>
                                     <br />
-                                    <span className="g-helper">{fmt(row.sped[c])}</span>
+                                    <span className="g-helper">{fmt(row[sapKey])}</span>
+                                    {hasDelta && (
+                                      <>
+                                        <br />
+                                        <span style={{ fontSize: 10, color: "var(--g-warn-fg)" }}>
+                                          Δ {fmt(delta)}
+                                        </span>
+                                      </>
+                                    )}
                                   </>
                                 )}
                               </td>
-                            ))}
-                            <td className={difTotal && difTotal !== 0 ? "app-td-diff" : ""}>
-                              {fmt(difTotal)}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                            );
+                          })}
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -361,9 +361,9 @@ export default function App() {
                   pagina={paginaComp}
                   total={totalPagsComp}
                   porPagina={porPaginaComp}
-                  totalItens={linhas.length}
+                  totalItens={linhasFiltradas.length}
                   onPagina={setPaginaComp}
-                  onPorPagina={(v) => { setPorPaginaComp(v); setPaginaComp(1); }}
+                  onPorPagina={v => { setPorPaginaComp(v); setPaginaComp(1); }}
                 />
               </>
             )}
@@ -371,10 +371,9 @@ export default function App() {
             {/* ── Aba: Lançamentos ── */}
             {abaAtiva === "lancamentos" && (
               <>
-                {/* Filtros por imposto */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "var(--g-space-3)" }}>
                   <div className="g-cluster" style={{ gap: "var(--g-space-4)" }}>
-                    {IMPOSTOS.map(({ campo, label }) => (
+                    {IMPOSTOS_LANC.map(({ campo, label }) => (
                       <label key={campo} className="g-check">
                         <input
                           type="checkbox"
@@ -410,7 +409,7 @@ export default function App() {
                       porPagina={porPaginaLanc}
                       totalItens={lancamentos.length}
                       onPagina={setPaginaLanc}
-                      onPorPagina={(v) => { setPorPaginaLanc(v); setPaginaLanc(1); }}
+                      onPorPagina={v => { setPorPaginaLanc(v); setPaginaLanc(1); }}
                     />
 
                     <div className="g-table-wrap">
@@ -422,20 +421,30 @@ export default function App() {
                             <th>Débito</th>
                             <th>Crédito</th>
                             <th>Descrição</th>
-                            <th>Centro de Custo</th>
+                            <th>C.Custo</th>
                             <th>Filial</th>
+                            <th>Imposto</th>
+                            <th>Sentido</th>
                           </tr>
                         </thead>
                         <tbody>
                           {lancPag.map((l, i) => (
                             <tr key={i}>
-                              <td><code className="g-mono">{l.codigo_conta}</code></td>
-                              <td>{l.descricao_conta}</td>
-                              <td className={l.debito  != null ? "app-td-debito"  : ""}>{fmt(l.debito)}</td>
-                              <td className={l.credito != null ? "app-td-credito" : ""}>{fmt(l.credito)}</td>
-                              <td>{l.descricao}</td>
-                              <td>{l.centro_custo}</td>
-                              <td>{l.filial}</td>
+                              <td><code className="g-mono">{l["Código da Conta"]}</code></td>
+                              <td>{l["Descrição da Conta"]}</td>
+                              <td className={l["Débito"] != null ? "app-td-debito" : ""}>
+                                {l["Débito"] ?? "—"}
+                              </td>
+                              <td className={l["Crédito"] != null ? "app-td-credito" : ""}>
+                                {l["Crédito"] ?? "—"}
+                              </td>
+                              <td>{l["Descrição"]}</td>
+                              <td>{l["Centro de Custo"]}</td>
+                              <td>{l["Filial"]}</td>
+                              <td>
+                                <span className="g-badge g-badge--neutral">{l["Imposto"]}</span>
+                              </td>
+                              <td className="g-helper">{l["Sentido"]}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -448,7 +457,7 @@ export default function App() {
                       porPagina={porPaginaLanc}
                       totalItens={lancamentos.length}
                       onPagina={setPaginaLanc}
-                      onPorPagina={(v) => { setPorPaginaLanc(v); setPaginaLanc(1); }}
+                      onPorPagina={v => { setPorPaginaLanc(v); setPaginaLanc(1); }}
                     />
                   </>
                 )}
@@ -476,7 +485,6 @@ function BarraPaginacao({ pagina, total, porPagina, totalItens, onPagina, onPorP
 
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "var(--g-space-2)" }}>
-      {/* Contador + select */}
       <div className="g-cluster" style={{ gap: "var(--g-space-2)" }}>
         <span className="g-helper">
           {inicio}–{fim} de {totalItens}
@@ -485,15 +493,14 @@ function BarraPaginacao({ pagina, total, porPagina, totalItens, onPagina, onPorP
           className="g-select"
           style={{ width: "auto", padding: "4px 8px" }}
           value={porPagina}
-          onChange={(e) => onPorPagina(Number(e.target.value))}
+          onChange={e => onPorPagina(Number(e.target.value))}
         >
-          {OPCOES_POR_PAGINA.map((n) => (
+          {OPCOES_POR_PAGINA.map(n => (
             <option key={n} value={n}>{n} por página</option>
           ))}
         </select>
       </div>
 
-      {/* Botões de página */}
       {total > 1 && (
         <div className="g-cluster" style={{ gap: "var(--g-space-1)" }}>
           <button className="g-btn g-btn--sm" disabled={pagina === 1} onClick={() => onPagina(pagina - 1)}>‹</button>
@@ -526,8 +533,8 @@ function DropField({ label, required, accept, file, inputRef, onChange, hint }) 
       </label>
       <div
         className={`app-drop-zone${file ? " app-drop-zone--filled" : ""}`}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => { e.preventDefault(); onChange(e.dataTransfer.files[0]); }}
+        onDragOver={e => e.preventDefault()}
+        onDrop={e => { e.preventDefault(); onChange(e.dataTransfer.files[0]); }}
         onClick={() => inputRef.current?.click()}
       >
         {file ? file.name : hint}
@@ -537,7 +544,7 @@ function DropField({ label, required, accept, file, inputRef, onChange, hint }) 
         type="file"
         accept={accept}
         hidden
-        onChange={(e) => onChange(e.target.files[0])}
+        onChange={e => onChange(e.target.files[0])}
       />
     </div>
   );
