@@ -69,7 +69,10 @@ def _propagar_num_doc(df_sap: pd.DataFrame) -> pd.DataFrame:
         if pd.notna(row["Nº seq."]):
             current_ref = None
         if pd.notna(row["Ref.3 (Linha)"]):
-            current_ref = str(int(row["Ref.3 (Linha)"]))
+            try:
+                current_ref = str(int(float(str(row["Ref.3 (Linha)"]).replace(".", "").replace(",", "").strip())))
+            except (ValueError, TypeError):
+                pass  # ignora CNPJs e outros valores não numéricos
         df.at[idx, "NUM_DOC"] = current_ref
     return df
 
@@ -149,18 +152,22 @@ def _extrair_contrapartidas(df_sap: pd.DataFrame) -> dict:
 
         for campo in campos_presentes:
             if campo in campos_saida:
-                # Contrapartida: cliente (código C seguido de dígitos)
-                clientes = grupo[
-                    grupo["Cta.contáb./cód.PN"].astype(str).str.match(r'^C\d', na=False)
+                # Contrapartida de Vendas de Mercadorias (sempre a C):
+                # busca a primeira conta não mapeada que esteja a Débito no grupo,
+                # excluindo contas de custo/estoque que são contrapartidas internas
+                EXCLUIR_CONTRAPARTIDA = {"Mercadorias para Revenda - Peças", "Custo dos Produtos Vendidos"}
+                nao_mapeadas_d = grupo[
+                    ~grupo["Cta.cont./Nome PN"].isin(MAPA_CONTAS_SAP) &
+                    ~grupo["Cta.cont./Nome PN"].isin(EXCLUIR_CONTRAPARTIDA) &
+                    grupo["Débito (MC)"].apply(lambda v: _limpar_valor_sap(v) > 0)
                 ]
-                if clientes.empty:
+                if nao_mapeadas_d.empty:
                     continue
-                r = clientes.iloc[0]
-                deb = _limpar_valor_sap(r["Débito (MC)"])
+                r = nao_mapeadas_d.iloc[0]
                 resultado[(num_doc, campo)] = {
                     "cod_conta":  str(r["Cta.contáb./cód.PN"]).strip(),
                     "nome_conta": str(r["Cta.cont./Nome PN"]).strip(),
-                    "lado":       "D" if deb > 0 else "C",
+                    "lado":       "D",
                     "cc":         _cc(r),
                     "filial":     _filial(r),
                     "obs":        _obs(r),
@@ -210,16 +217,17 @@ def _extrair_metadados_contas(df_sap: pd.DataFrame) -> dict:
         campo   = MAPA_CONTAS_SAP[conta]
         num_doc = r["NUM_DOC"]
         cod     = str(r["Cta.contáb./cód.PN"]).strip()
-        key     = (num_doc, campo, cod)
+        deb     = _limpar_valor_sap(r["Débito (MC)"])
+        lado    = "D" if deb > 0 else "C"
+        key     = (num_doc, campo, cod, lado)
         if key in vistos:
             continue
         vistos.add(key)
 
-        deb = _limpar_valor_sap(r["Débito (MC)"])
         idx[(num_doc, campo)].append({
             "cod_conta":  cod,
             "nome_conta": conta,
-            "lado":       "D" if deb > 0 else "C",
+            "lado":       lado,
             "cc":         str(r["Centro de Custo"]) if pd.notna(r["Centro de Custo"]) else "",
             "filial":     str(r["Nome da filial"])  if pd.notna(r["Nome da filial"])  else "",
             "obs":        str(r["Observações"])      if pd.notna(r["Observações"])      else "",
@@ -418,7 +426,7 @@ def gera_lancamentos_ajuste(df_divergencias: pd.DataFrame, df_sap_raw: pd.DataFr
                     "Descrição da Conta": c["nome_conta"],
                     "Débito":             valor if lado_ajuste == "D" else None,
                     "Crédito":            valor if lado_ajuste == "C" else None,
-                    "Descrição":          c["obs"],
+                    "Descrição":          f"NF {num_doc} - {c['obs']}" if c["obs"] else f"NF {num_doc}",
                     "Centro de Custo":    c["cc"],
                     "Filial":             c["filial"],
                     "NUM_DOC":            num_doc,
