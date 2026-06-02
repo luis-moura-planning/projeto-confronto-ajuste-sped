@@ -59,10 +59,6 @@ def _limpar_valor_sap(v) -> float:
         return 0.0
 
 
-def _formatar_br(v: float) -> str:
-    """Formata número no padrão brasileiro: 1.234,56"""
-    return f"{abs(v):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-
 
 def _propagar_num_doc(df_sap: pd.DataFrame) -> pd.DataFrame:
     """Propaga o NUM_DOC (Ref.3) para cada linha de detalhe da planilha SAP."""
@@ -101,6 +97,94 @@ def _agregar_sap(df_sap: pd.DataFrame) -> pd.DataFrame:
                 row[campo] = row.get(campo, 0.0) + (deb if deb > 0 else cred)
         rows.append(row)
     return pd.DataFrame(rows).fillna(0)
+
+
+import re as _re
+
+# Padrão de código de parceiro de negócio (cliente C... / fornecedor F...)
+_COD_PN = _re.compile(r'^[CF]\d+', _re.IGNORECASE)
+
+
+def _extrair_contrapartidas(df_sap: pd.DataFrame) -> dict:
+    """
+    Para cada (num_doc, campo_imposto) que pode gerar lançamentos unilaterais
+    (Vendas de Mercadorias só a C; contas a Recuperar só a D), identifica
+    dinamicamente a conta de contrapartida na planilha SAP.
+
+    Lógica por tipo:
+    - VL_ITEM_SAP (Vendas de Mercadorias, saída):
+        contrapartida = conta do CLIENTE (Cx, qualquer lado — usa o primeiro encontrado)
+    - VL_ICMS_SAP / VL_PIS_SAP / VL_COFINS_SAP (a Recuperar, entrada):
+        contrapartida = "Mercadorias para Revenda - Peças"
+
+    A contrapartida é sempre registrada para esses campos, independente dos
+    lados presentes na planilha — a função gera_lancamentos_ajuste só a usa
+    quando o conjunto de contas mapeadas não produz D e C.
+
+    Retorna dict: (num_doc, campo_imposto) → dict de conta contrapartida.
+    """
+    df = _propagar_num_doc(df_sap)
+    if "Nome da filial" not in df.columns:
+        df["Nome da filial"] = ""
+
+    campos_saida   = {"VL_ITEM_SAP"}
+    campos_entrada = {"VL_ICMS_SAP", "VL_PIS_SAP", "VL_COFINS_SAP"}
+
+    resultado = {}
+
+    for num_doc, grupo in df[df["NUM_DOC"].notna()].groupby("NUM_DOC"):
+        def _cc(r):
+            return str(r["Centro de Custo"]) if pd.notna(r["Centro de Custo"]) else ""
+        def _filial(r):
+            return str(r["Nome da filial"]) if pd.notna(r["Nome da filial"]) else ""
+        def _obs(r):
+            return str(r["Observações"]) if pd.notna(r["Observações"]) else ""
+
+        # Campos de imposto presentes neste grupo
+        campos_presentes = {
+            MAPA_CONTAS_SAP[str(r["Cta.cont./Nome PN"]).strip()]
+            for _, r in grupo.iterrows()
+            if str(r["Cta.cont./Nome PN"]).strip() in MAPA_CONTAS_SAP
+        }
+
+        for campo in campos_presentes:
+            if campo in campos_saida:
+                # Contrapartida: cliente (código C seguido de dígitos)
+                clientes = grupo[
+                    grupo["Cta.contáb./cód.PN"].astype(str).str.match(r'^C\d', na=False)
+                ]
+                if clientes.empty:
+                    continue
+                r = clientes.iloc[0]
+                deb = _limpar_valor_sap(r["Débito (MC)"])
+                resultado[(num_doc, campo)] = {
+                    "cod_conta":  str(r["Cta.contáb./cód.PN"]).strip(),
+                    "nome_conta": str(r["Cta.cont./Nome PN"]).strip(),
+                    "lado":       "D" if deb > 0 else "C",
+                    "cc":         _cc(r),
+                    "filial":     _filial(r),
+                    "obs":        _obs(r),
+                }
+
+            elif campo in campos_entrada:
+                # Contrapartida: Mercadorias para Revenda - Peças
+                mercadorias = grupo[
+                    grupo["Cta.cont./Nome PN"].astype(str).str.strip() == "Mercadorias para Revenda - Peças"
+                ]
+                if mercadorias.empty:
+                    continue
+                r = mercadorias.iloc[0]
+                deb = _limpar_valor_sap(r["Débito (MC)"])
+                resultado[(num_doc, campo)] = {
+                    "cod_conta":  str(r["Cta.contáb./cód.PN"]).strip(),
+                    "nome_conta": str(r["Cta.cont./Nome PN"]).strip(),
+                    "lado":       "D" if deb > 0 else "C",
+                    "cc":         _cc(r),
+                    "filial":     _filial(r),
+                    "obs":        _obs(r),
+                }
+
+    return resultado
 
 
 def _extrair_metadados_contas(df_sap: pd.DataFrame) -> dict:
@@ -272,12 +356,19 @@ def gera_lancamentos_ajuste(df_divergencias: pd.DataFrame, df_sap_raw: pd.DataFr
       DELTA > 0 → SAP a menor → complemento: mantém o lado de cada lançamento
       Valor do lançamento = |DELTA|
 
+    Quando o conjunto de contas mapeadas para um imposto não produz débito E
+    crédito (ex: Vendas de Mercadorias só aparece a C; contas a Recuperar só a D),
+    a contrapartida é identificada dinamicamente na planilha SAP:
+      - Vendas de Mercadorias (saída) → conta do cliente (Cx)
+      - Contas a Recuperar (entrada)  → Mercadorias para Revenda - Peças
+
     Colunas do DataFrame retornado:
       Formato importação : Código da Conta, Descrição da Conta,
                            Débito, Crédito, Descrição, Centro de Custo, Filial
       Rastreabilidade    : NUM_DOC, CHV_NFE, Imposto, DELTA, Sentido
     """
-    idx_meta = _extrair_metadados_contas(df_sap_raw)
+    idx_meta         = _extrair_metadados_contas(df_sap_raw)
+    idx_contrapartida = _extrair_contrapartidas(df_sap_raw)
     linhas = []
 
     for _, row in df_divergencias.iterrows():
@@ -296,16 +387,33 @@ def gera_lancamentos_ajuste(df_divergencias: pd.DataFrame, df_sap_raw: pd.DataFr
                 continue
 
             sentido = "SAP a maior (estorno)" if delta < 0 else "SAP a menor (complemento)"
+            valor   = round(abs(delta), 2)
 
-            for c in contas:
-                # delta < 0 → estorno → inverter lado original
-                # delta > 0 → complemento → manter lado original
-                lado_ajuste = (
-                    ("C" if c["lado"] == "D" else "D") if delta < 0 else c["lado"]
-                )
-                valor = _formatar_br(delta)
+            # Calcular lado de ajuste de cada conta mapeada
+            lados_ajuste = [
+                ("C" if c["lado"] == "D" else "D") if delta < 0 else c["lado"]
+                for c in contas
+            ]
+
+            tem_debito  = any(l == "D" for l in lados_ajuste)
+            tem_credito = any(l == "C" for l in lados_ajuste)
+
+            # Se falta um lado, tentar obter a contrapartida dinâmica
+            if not tem_debito or not tem_credito:
+                cp = idx_contrapartida.get((num_doc, campo))
+                if cp:
+                    # A contrapartida deve ter o lado OPOSTO ao do campo principal
+                    # após aplicar o delta — independente do seu lado original na planilha.
+                    # Ex saída : campo=Vendas(C) após ajuste→D; contrapartida→C (cliente)
+                    # Ex entrada: campo=ICMS Rec(D) após ajuste→C; contrapartida→D (Mercadorias)
+                    lado_campo_principal = lados_ajuste[0] if lados_ajuste else ("C" if delta > 0 else "D")
+                    lado_cp_ajuste = "C" if lado_campo_principal == "D" else "D"
+                    contas       = list(contas) + [cp]
+                    lados_ajuste = lados_ajuste + [lado_cp_ajuste]
+
+            # Emitir uma linha por conta
+            for c, lado_ajuste in zip(contas, lados_ajuste):
                 linhas.append({
-                    # Colunas do modelo de importação SAP
                     "Código da Conta":    c["cod_conta"],
                     "Descrição da Conta": c["nome_conta"],
                     "Débito":             valor if lado_ajuste == "D" else None,
@@ -313,7 +421,6 @@ def gera_lancamentos_ajuste(df_divergencias: pd.DataFrame, df_sap_raw: pd.DataFr
                     "Descrição":          c["obs"],
                     "Centro de Custo":    c["cc"],
                     "Filial":             c["filial"],
-                    # Colunas de rastreabilidade
                     "NUM_DOC":            num_doc,
                     "CHV_NFE":            chv,
                     "Imposto":            delta_col.replace("DELTA_", ""),

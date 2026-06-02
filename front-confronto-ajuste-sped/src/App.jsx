@@ -433,10 +433,10 @@ export default function App() {
                               <td><code className="g-mono">{l["Código da Conta"]}</code></td>
                               <td>{l["Descrição da Conta"]}</td>
                               <td className={l["Débito"] != null ? "app-td-debito" : ""}>
-                                {l["Débito"] ?? "—"}
+                                {fmt(l["Débito"])}
                               </td>
                               <td className={l["Crédito"] != null ? "app-td-credito" : ""}>
-                                {l["Crédito"] ?? "—"}
+                                {fmt(l["Crédito"])}
                               </td>
                               <td>{l["Descrição"]}</td>
                               <td>{l["Centro de Custo"]}</td>
