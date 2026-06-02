@@ -2,8 +2,8 @@ import json
 from collections import defaultdict
 
 import pandas as pd
-from extrai_dados_planilha_sap import extrai_dados_planilha_sap
-from extrai_dados_sped import extrai_dados_sped
+from app.services.extrai_dados_planilha_sap import extrai_dados_planilha_sap
+from app.services.extrai_dados_sped import extrai_dados_sped
 
 # ─────────────────────────────────────────────────────────────────────────────
 # CONFIGURAÇÕES
@@ -155,7 +155,7 @@ def _df_para_json(df: pd.DataFrame) -> list:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def compara_gera_diferenca(arquivo_sped: str, planilha_diario: str) -> dict
+def compara_gera_diferenca(arquivo_sped: str, planilha_diario: str) -> dict:
     dfs = extrai_dados_sped(arquivo_sped)
     df_sap = extrai_dados_planilha_sap(planilha_diario)
 
