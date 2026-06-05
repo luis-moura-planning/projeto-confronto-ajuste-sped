@@ -2,6 +2,22 @@ import { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
 
+const TOLERANCIA = 0.05;
+
+function _reclas(r) {
+  const deltaPis    = (r.VL_PIS    ?? 0) - (r.VL_PIS_SAP    ?? 0);
+  const deltaCofins = (r.VL_COFINS ?? 0) - (r.VL_COFINS_SAP ?? 0);
+  const tipo = Math.abs(deltaPis) > TOLERANCIA || Math.abs(deltaCofins) > TOLERANCIA
+    ? "divergencia"
+    : "ok";
+  return {
+    ...r,
+    _tipo:        tipo,
+    DELTA_PIS:    Math.round(deltaPis    * 100) / 100,
+    DELTA_COFINS: Math.round(deltaCofins * 100) / 100,
+  };
+}
+
 const TAXAS = ["VL_PIS", "VL_COFINS"];
 const TAXA_LABELS = {
   VL_PIS: "PIS",
@@ -120,13 +136,16 @@ export default function App() {
 
   const todasLinhas = resultado
     ? [
-        ...(resultado.divergencias ?? []).map((r) => ({
-          ...r,
-          _tipo: "divergencia",
-        })),
-        ...(resultado.ok ?? []).map((r) => ({ ...r, _tipo: "ok" })),
-        ...(resultado.so_sped ?? []).map((r) => ({ ...r, _tipo: "so_sped" })),
-        ...(resultado.so_sap ?? []).map((r) => ({ ...r, _tipo: "so_sap" })),
+        // Reclassifica divergencias e ok do backend usando apenas PIS e COFINS
+        ...[...(resultado.divergencias ?? []), ...(resultado.ok ?? [])].map(_reclas),
+        // Só SPED: mantém apenas registros com PIS ou COFINS
+        ...(resultado.so_sped ?? [])
+          .filter((r) => (r.VL_PIS ?? 0) !== 0 || (r.VL_COFINS ?? 0) !== 0)
+          .map((r) => ({ ...r, _tipo: "so_sped" })),
+        // Só SAP: mantém apenas registros com PIS ou COFINS
+        ...(resultado.so_sap ?? [])
+          .filter((r) => (r.VL_PIS_SAP ?? 0) !== 0 || (r.VL_COFINS_SAP ?? 0) !== 0)
+          .map((r) => ({ ...r, _tipo: "so_sap" })),
       ]
     : [];
 

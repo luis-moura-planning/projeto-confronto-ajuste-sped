@@ -30,11 +30,11 @@ async def comparar(
             os.unlink(path_sped)
 
         return {
-            "divergencias": resultado["divergencias_json"],
-            "ok": resultado["ok_json"],
-            "so_sped": resultado["so_sped_json"],
-            "so_sap": resultado["so_sap_json"],
-            "lancamentos": resultado["lancamentos_json"],
+            "divergencias": resultado["divergencias_saida_json"] + resultado["divergencias_entrada_json"],
+            "ok":           resultado["ok_saida_json"]           + resultado["ok_entrada_json"],
+            "so_sped":      resultado["so_sped_saida_json"]      + resultado["so_sped_entrada_json"],
+            "so_sap":       resultado["so_sap_saida_json"]       + resultado["so_sap_entrada_json"],
+            "lancamentos":  resultado["lancamentos_json"],
         }
 
     except ValueError as exc:
