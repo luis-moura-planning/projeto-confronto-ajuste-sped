@@ -159,6 +159,12 @@ def _valor_sap_correto(row: pd.Series) -> float:
     return deb if deb > 0 else cred
 
 
+# CSTs que não geram crédito de PIS/COFINS — entradas com esses CSTs
+# em todos os itens não produzem lançamento de "a Recuperar" no SAP
+# e devem ser excluídas da comparação de entradas.
+CST_SEM_CREDITO = {"70", "71", "72", "73", "74", "75", "98", "99"}
+
+
 def _agregar_sped(dfs: dict) -> tuple:
     """
     Agrega valores do SPED separando saídas de entradas.
@@ -167,15 +173,13 @@ def _agregar_sped(dfs: dict) -> tuple:
 
     Correções aplicadas:
     [FIX-3] Separação por IND_OPER antes de agregar.
-        Antes: entradas e saídas eram somadas juntas, gerando deltas sem
-        sentido econômico (tributo apurado vs. crédito a recuperar).
-        Agora: cada fluxo segue para a comparação com a conta SAP correta.
-
     [FIX-4] VL_ITEM vem do C170, não do C100.
-        VL_MERC do C100 está disponível apenas quando a empresa emite a NF
-        completa (campos 12-28 presentes). Neste SPED, o C100 usa layout
-        resumido (9 campos) e VL_MERC fica em branco para parte das notas.
-        C170.VL_ITEM agregado por CHV_NFE é sempre confiável.
+    [FIX-8] Entradas agrupadas por CHV_NFE (chave única do fornecedor).
+            NUM_DOC de entrada não é único — fornecedores distintos podem
+            usar o mesmo número de documento.
+    [FIX-9] Entradas com todos os itens em CST sem crédito (70-75, 98-99)
+            são excluídas. O SAP só lança "a Recuperar" quando há crédito
+            efetivo, portanto essas notas gerariam falsos positivos.
     """
     c100 = dfs["C100"].copy()
     c170 = dfs["C170"].copy()
@@ -196,16 +200,28 @@ def _agregar_sped(dfs: dict) -> tuple:
     c100 = c100.merge(vl_item_por_chv, on="CHV_NFE", how="left")
     c100["VL_ITEM"] = c100["VL_ITEM"].fillna(0.0)
 
-    def _agg(df_sub):
-        return (
-            df_sub.groupby(["NUM_DOC", "CHV_NFE"])[COLS_SPED]
-            .sum()
-            .reset_index()
-        )
+    # [FIX-3] Saídas: agrupar por NUM_DOC (emissão própria, número único)
+    df_saidas = (
+        c100[c100["IND_OPER"] == "1"]
+        .groupby(["NUM_DOC", "CHV_NFE"])[COLS_SPED]
+        .sum()
+        .reset_index()
+    )
 
-    # [FIX-3] Separação por IND_OPER
-    df_saidas  = _agg(c100[c100["IND_OPER"] == "1"])
-    df_entradas = _agg(c100[c100["IND_OPER"] == "0"])
+    # [FIX-8] + [FIX-9] Entradas: filtrar notas sem crédito e agrupar por CHV_NFE
+    c170["_tem_credito"] = ~c170["CST_PIS"].isin(CST_SEM_CREDITO)
+    chvs_com_credito = set(c170[c170["_tem_credito"]]["CHV_NFE"])
+
+    c100_entradas = c100[
+        (c100["IND_OPER"] == "0") &
+        (c100["CHV_NFE"].isin(chvs_com_credito))
+    ]
+    df_entradas = (
+        c100_entradas
+        .groupby(["CHV_NFE", "NUM_DOC"])[COLS_SPED]
+        .sum()
+        .reset_index()
+    )
 
     return df_saidas, df_entradas
 
@@ -467,6 +483,14 @@ def compara_gera_diferenca(
     df_sped_saidas, df_sped_entradas  = _agregar_sped(dfs)
     df_sap_saidas,  df_sap_entradas   = _agregar_sap(df_sap, filtro_filial)
 
+    # Enriquece df_sap_entradas com CHV_NFE do SPED C100 para permitir
+    # o cruzamento por chave (evita colisão de NUM_DOC entre fornecedores)
+    _chv_lookup = (
+        dfs["C100"][dfs["C100"]["IND_OPER"] == "0"][["NUM_DOC", "CHV_NFE"]]
+        .drop_duplicates("NUM_DOC")
+    )
+    df_sap_entradas = df_sap_entradas.merge(_chv_lookup, on="NUM_DOC", how="left")
+
     comparacoes_saida = {
         "ICMS":   ("VL_ICMS",   "VL_ICMS_SAP"),
         "PIS":    ("VL_PIS",    "VL_PIS_SAP"),
@@ -479,20 +503,29 @@ def compara_gera_diferenca(
         "COFINS": ("VL_COFINS", "VL_COFINS_SAP"),
     }
 
-    def _processar_lado(df_sped_agg, df_sap_agg, comparacoes, nome_lado):
-        """Faz o merge, calcula deltas e separa divergências/ok/só-um-lado."""
-        df = pd.merge(df_sped_agg, df_sap_agg, on="NUM_DOC", how="outer", indicator=True)
+    def _processar_lado(df_sped_agg, df_sap_agg, comparacoes, chave="NUM_DOC"):
+        """
+        Faz o merge, calcula deltas e separa divergências/ok/só-um-lado.
 
-        sap_cols_pres = [c for c in df_sap_agg.columns if c != "NUM_DOC" and c in df.columns]
+        chave="NUM_DOC"  → saídas (emissão própria, número único por empresa)
+        chave="CHV_NFE"  → entradas (NF de fornecedor; NUM_DOC não é único pois
+                           fornecedores distintos podem usar o mesmo número)
+        [FIX-8] Entradas cruzadas por CHV_NFE para evitar colisão de NUM_DOC.
+        """
+        df = pd.merge(df_sped_agg, df_sap_agg, on=chave, how="outer", indicator=True)
+
+        sap_cols_pres = [c for c in df_sap_agg.columns if c != chave and c in df.columns]
+        id_cols       = [chave] + (["NUM_DOC"] if chave != "NUM_DOC" and "NUM_DOC" in df.columns else [])
+        chv_col       = ["CHV_NFE"] if "CHV_NFE" in df.columns and "CHV_NFE" != chave else []
 
         df_so_sped = (
             df[df["_merge"] == "left_only"]
-            [["NUM_DOC", "CHV_NFE"] + [c for c in COLS_SPED if c in df.columns]]
+            [id_cols + chv_col + [c for c in COLS_SPED if c in df.columns]]
             .reset_index(drop=True)
         )
         df_so_sap = (
             df[df["_merge"] == "right_only"]
-            [["NUM_DOC"] + sap_cols_pres]
+            [id_cols + sap_cols_pres]
             .reset_index(drop=True)
         )
 
@@ -509,26 +542,25 @@ def compara_gera_diferenca(
         sap_cols  = [v[1] for v in comparacoes.values() if v[1] in df_ambos.columns]
 
         mask = df_ambos[delta_cols].abs().max(axis=1) > TOLERANCIA
-        chv_col = ["CHV_NFE"] if "CHV_NFE" in df_ambos.columns else []
 
         df_div = (
             df_ambos[mask]
-            [["NUM_DOC"] + chv_col + sped_cols + sap_cols + delta_cols]
+            [id_cols + chv_col + sped_cols + sap_cols + delta_cols]
             .reset_index(drop=True)
         )
         df_ok = (
             df_ambos[~mask]
-            [["NUM_DOC"] + chv_col + sped_cols + sap_cols]
+            [id_cols + chv_col + sped_cols + sap_cols]
             .reset_index(drop=True)
         )
 
         return df_div, df_ok, df_so_sped, df_so_sap
 
     div_s, ok_s, so_sped_s, so_sap_s = _processar_lado(
-        df_sped_saidas, df_sap_saidas, comparacoes_saida, "saida"
+        df_sped_saidas, df_sap_saidas, comparacoes_saida, chave="NUM_DOC"
     )
     div_e, ok_e, so_sped_e, so_sap_e = _processar_lado(
-        df_sped_entradas, df_sap_entradas, comparacoes_entrada, "entrada"
+        df_sped_entradas, df_sap_entradas, comparacoes_entrada, chave="CHV_NFE"
     )
 
     # Lançamentos de ajuste (baseados nas divergências de saída, que têm CHV_NFE)
