@@ -138,11 +138,6 @@ def _valor_sap_correto(row: pd.Series) -> float:
     """
     Retorna o valor monetário correto de uma linha SAP com base na
     natureza da conta (saída → crédito; entrada → débito).
-
-    [FIX-2] Correção da lógica anterior que usava indiscriminadamente
-    'deb if deb > 0 else cred', sem considerar a natureza da conta.
-    Isso causava valores zero em contas de saída que lançam só a débito
-    (como "( - ) COFINS"), e também somava lados incorretos em entradas.
     """
     conta = str(row.get("Cta.cont./Nome PN", "")).strip()
     deb  = _limpar_valor_sap(row.get("Débito (MC)"))
@@ -170,21 +165,10 @@ def _agregar_sped(dfs: dict) -> tuple:
     Agrega valores do SPED separando saídas de entradas.
 
     Retorna (df_saidas, df_entradas).
-
-    Correções aplicadas:
-    [FIX-3] Separação por IND_OPER antes de agregar.
-    [FIX-4] VL_ITEM vem do C170, não do C100.
-    [FIX-8] Entradas agrupadas por CHV_NFE (chave única do fornecedor).
-            NUM_DOC de entrada não é único — fornecedores distintos podem
-            usar o mesmo número de documento.
-    [FIX-9] Entradas com todos os itens em CST sem crédito (70-75, 98-99)
-            são excluídas. O SAP só lança "a Recuperar" quando há crédito
-            efetivo, portanto essas notas gerariam falsos positivos.
     """
     c100 = dfs["C100"].copy()
     c170 = dfs["C170"].copy()
 
-    # [FIX-4] Agrega VL_ITEM do C170 por CHV_NFE
     c170["_VL_ITEM"] = c170["VL_ITEM"].apply(_to_float)
     vl_item_por_chv = (
         c170.groupby("CHV_NFE")["_VL_ITEM"]
@@ -200,7 +184,6 @@ def _agregar_sped(dfs: dict) -> tuple:
     c100 = c100.merge(vl_item_por_chv, on="CHV_NFE", how="left")
     c100["VL_ITEM"] = c100["VL_ITEM"].fillna(0.0)
 
-    # [FIX-3] Saídas: agrupar por NUM_DOC (emissão própria, número único)
     df_saidas = (
         c100[c100["IND_OPER"] == "1"]
         .groupby(["NUM_DOC", "CHV_NFE"])[COLS_SPED]
@@ -208,7 +191,6 @@ def _agregar_sped(dfs: dict) -> tuple:
         .reset_index()
     )
 
-    # [FIX-8] + [FIX-9] Entradas: filtrar notas sem crédito e agrupar por CHV_NFE
     c170["_tem_credito"] = ~c170["CST_PIS"].isin(CST_SEM_CREDITO)
     chvs_com_credito = set(c170[c170["_tem_credito"]]["CHV_NFE"])
 
@@ -240,14 +222,6 @@ def _agregar_sap(
     filtro_filial : substring do nome da filial a incluir (ex: 'Goiânia').
         Útil quando o SPED cobre apenas um estabelecimento e o diário
         consolida múltiplas filiais. Se None, usa todas as linhas.
-
-    Correções aplicadas:
-    [FIX-2] Valor correto por natureza de conta (veja _valor_sap_correto).
-    [FIX-5] Eliminação de duplicação por contas simétricas.
-        "( - ) COFINS" e "COFINS a Recolher" são os dois lados do mesmo
-        lançamento contábil. A versão anterior somava os dois, duplicando
-        o valor. Agora usamos apenas a conta canônica por campo/NF.
-    [FIX-6] Filtro opcional por filial para alinhar o escopo com o SPED.
     """
     df = _propagar_num_doc(df_sap)
 
@@ -260,8 +234,6 @@ def _agregar_sap(
     df = df[df["_campo"].notna()].copy()
     df["_valor"] = df.apply(_valor_sap_correto, axis=1)
 
-    # [FIX-5] Para cada (NUM_DOC, campo), usar apenas a conta canônica de saída.
-    # Prioridade definida em CONTA_CANONICA_SAIDA: "a Recolher" antes de "( - )".
     def _filtrar_canonico(grupo):
         campo = grupo["_campo"].iloc[0]
         conta_nome = grupo["Cta.cont./Nome PN"].iloc[0]
@@ -291,7 +263,6 @@ def _agregar_sap(
             for num_doc, grp_doc in df_linhas.groupby("NUM_DOC"):
                 row = {"NUM_DOC": num_doc}
                 for campo, grp_campo in grp_doc.groupby("_campo"):
-                    # [FIX-5] Usa apenas a conta canônica para evitar duplicação
                     if campo in CONTA_CANONICA_SAIDA:
                         prioridade = CONTA_CANONICA_SAIDA[campo]
                         contas_presentes = set(grp_campo["Cta.cont./Nome PN"].unique())
@@ -300,7 +271,6 @@ def _agregar_sap(
                                 grp_campo = grp_campo[grp_campo["Cta.cont./Nome PN"] == conta_pref]
                                 break
 
-                    # [FIX-7] Valor líquido (C − D ou D − C) para absorver estornos
                     total_deb  = grp_campo["Débito (MC)"].apply(_limpar_valor_sap).sum()
                     total_cred = grp_campo["Crédito (MC)"].apply(_limpar_valor_sap).sum()
                     if natureza == "saida":
@@ -469,12 +439,6 @@ def compara_gera_diferenca(
 
     Correções aplicadas nesta versão
     ---------------------------------
-    [FIX-2] Valor SAP extraído pelo lado correto por natureza de conta.
-    [FIX-3] SPED separado por IND_OPER antes de cruzar com SAP.
-    [FIX-4] VL_ITEM vem do C170, não de VL_MERC do C100.
-    [FIX-5] Contas simétricas (ex: "COFINS a Recolher" + "( - ) COFINS")
-            usadas apenas uma vez por nota, eliminando duplicação de 2×.
-    [FIX-6] Filtro opcional de filial no SAP.
     """
     dfs    = extrai_dados_sped(arquivo_sped)
     df_sap = extrai_dados_planilha_sap(planilha_diario)
@@ -510,7 +474,6 @@ def compara_gera_diferenca(
         chave="NUM_DOC"  → saídas (emissão própria, número único por empresa)
         chave="CHV_NFE"  → entradas (NF de fornecedor; NUM_DOC não é único pois
                            fornecedores distintos podem usar o mesmo número)
-        [FIX-8] Entradas cruzadas por CHV_NFE para evitar colisão de NUM_DOC.
         """
         df = pd.merge(df_sped_agg, df_sap_agg, on=chave, how="outer", indicator=True)
 

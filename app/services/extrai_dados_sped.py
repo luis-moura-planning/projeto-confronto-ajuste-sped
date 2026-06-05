@@ -1,37 +1,10 @@
 import pandas as pd
 
-
-# Situações de nota que devem ser excluídas da apuração fiscal.
-# 02 = cancelada, 08 = numeração inutilizada.
-# Referência: Manual EFD-Contribuições, Tabela de COD_SIT do C100.
 COD_SIT_EXCLUIR = {"02", "08"}
 
 
 def extrai_dados_sped(sped_txt: str) -> dict:
-    """
-    Lê um arquivo EFD-Contribuições (PIS/COFINS) e retorna um dict de DataFrames
-    com os registros 0000, C100 e C170.
 
-    Correções aplicadas em relação à versão anterior:
-    --------------------------------------------------
-    [FIX-1] Notas canceladas/inutilizadas excluídas do resultado.
-        COD_SIT em {02, 08} -> linhas C100 e seus C170 filhos são descartados.
-        Antes: todas as notas eram retornadas, inclusive canceladas.
-
-    [FIX-2] IND_OPER preservado explicitamente no C100.
-        O campo já existia no layout, mas agora é garantido que nunca seja
-        coercido ou descartado antes de chegar ao chamador, pois
-        compara_gera_diferenca precisa separar entradas (0) de saídas (1).
-
-    Campos retornados por registro
-    --------------------------------
-    0000 : metadados do arquivo (empresa, CNPJ, período).
-    C100 : cabeçalho de cada nota fiscal válida.
-           Inclui IND_OPER (0 = entrada, 1 = saída), NUM_DOC, CHV_NFE e
-           todos os campos financeiros (VL_MERC, VL_PIS, VL_COFINS, VL_ICMS).
-    C170 : itens das notas; CHV_NFE propagado a partir do C100 pai.
-           Inclui VL_ITEM, VL_PIS, VL_COFINS, VL_ICMS por item.
-    """
     layouts = {
         "0000": [
             "REG", "COD_VER", "TIPO_ESCRIT", "IND_SIT_ESP", "NUM_REC_ANTERIOR",
@@ -60,7 +33,7 @@ def extrai_dados_sped(sped_txt: str) -> dict:
 
     dados = {"0000": [], "C100": [], "C170": []}
     nota_atual_chv = ""
-    nota_atual_valida = True  # [FIX-1]
+    nota_atual_valida = True  
 
     try:
         with open(sped_txt, "r", encoding="latin1") as arquivo:
@@ -81,7 +54,7 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                 registro = dict(zip(nomes_campos, campos))
 
                 if reg == "C100":
-                    # [FIX-1] Verifica situação antes de aceitar a nota
+                    
                     cod_sit = registro.get("COD_SIT", "")
                     nota_atual_valida = cod_sit not in COD_SIT_EXCLUIR
                     nota_atual_chv = registro.get("CHV_NFE", "")
@@ -91,7 +64,7 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                     dados["C100"].append(registro)
 
                 elif reg == "C170":
-                    # [FIX-1] Descarta itens de notas canceladas
+                    
                     if not nota_atual_valida:
                         continue
                     registro["CHV_NFE"] = nota_atual_chv
