@@ -262,28 +262,40 @@ def _agregar_sap(
     df_saidas_linhas  = df[df["Cta.cont./Nome PN"].isin(CONTAS_SAIDA)]
     df_entradas_linhas = df[df["Cta.cont./Nome PN"].isin(CONTAS_ENTRADA)]
 
-    def _agg_sap(df_linhas: pd.DataFrame) -> pd.DataFrame:
-        if df_linhas.empty:
-            return pd.DataFrame(columns=["NUM_DOC"])
+    def _agg_sap(df_linhas: pd.DataFrame, natureza: str) -> pd.DataFrame:
+            """
+            natureza='saida'   → valor líquido = soma(Crédito) − soma(Débito)
+            natureza='entrada' → valor líquido = soma(Débito)  − soma(Crédito)
+            Estornos (lançamentos invertidos) se anulam automaticamente.
+            """
+            if df_linhas.empty:
+                return pd.DataFrame(columns=["NUM_DOC"])
 
-        rows = []
-        for num_doc, grp_doc in df_linhas.groupby("NUM_DOC"):
-            row = {"NUM_DOC": num_doc}
-            for campo, grp_campo in grp_doc.groupby("_campo"):
-                # [FIX-5] Aplica filtro canônico por campo dentro da nota
-                if campo in CONTA_CANONICA_SAIDA:
-                    prioridade = CONTA_CANONICA_SAIDA[campo]
-                    contas_presentes = set(grp_campo["Cta.cont./Nome PN"].unique())
-                    for conta_pref in prioridade:
-                        if conta_pref in contas_presentes:
-                            grp_campo = grp_campo[grp_campo["Cta.cont./Nome PN"] == conta_pref]
-                            break
-                row[campo] = grp_campo["_valor"].sum()
-            rows.append(row)
+            rows = []
+            for num_doc, grp_doc in df_linhas.groupby("NUM_DOC"):
+                row = {"NUM_DOC": num_doc}
+                for campo, grp_campo in grp_doc.groupby("_campo"):
+                    # [FIX-5] Usa apenas a conta canônica para evitar duplicação
+                    if campo in CONTA_CANONICA_SAIDA:
+                        prioridade = CONTA_CANONICA_SAIDA[campo]
+                        contas_presentes = set(grp_campo["Cta.cont./Nome PN"].unique())
+                        for conta_pref in prioridade:
+                            if conta_pref in contas_presentes:
+                                grp_campo = grp_campo[grp_campo["Cta.cont./Nome PN"] == conta_pref]
+                                break
 
-        return pd.DataFrame(rows).fillna(0)
+                    # [FIX-7] Valor líquido (C − D ou D − C) para absorver estornos
+                    total_deb  = grp_campo["Débito (MC)"].apply(_limpar_valor_sap).sum()
+                    total_cred = grp_campo["Crédito (MC)"].apply(_limpar_valor_sap).sum()
+                    if natureza == "saida":
+                        row[campo] = round(total_cred - total_deb, 2)
+                    else:
+                        row[campo] = round(total_deb - total_cred, 2)
+                rows.append(row)
 
-    return _agg_sap(df_saidas_linhas), _agg_sap(df_entradas_linhas)
+            return pd.DataFrame(rows).fillna(0)
+
+    return _agg_sap(df_saidas_linhas, "saida"), _agg_sap(df_entradas_linhas, "entrada")
 
 
 # =============================================================================
@@ -622,4 +634,3 @@ def gera_lancamentos_ajuste(
                 })
 
     return pd.DataFrame(linhas)
-d

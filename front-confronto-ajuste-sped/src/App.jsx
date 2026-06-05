@@ -170,7 +170,7 @@ export default function App() {
 
   const _buscaLanc = filtroLanc.trim().toLowerCase();
   const lancamentos = (resultado?.lancamentos ?? []).filter((l) => {
-    if (impostosAtivos[l["Imposto"]] === false) return false;
+    if (impostosAtivos[l["Imposto"]] !== true) return false;
     if (!_buscaLanc) return true;
     return (
       String(l["Código da Conta"] ?? "").toLowerCase().includes(_buscaLanc) ||
@@ -291,23 +291,22 @@ export default function App() {
             <div className="g-grid g-grid--auto-160">
               <ResumoCard
                 label="Divergências"
-                valor={(resultado.divergencias ?? []).length}
+                valor={todasLinhas.filter((r) => r._tipo === "divergencia").length}
                 cor="warn"
               />
-              {/* <ResumoCard label="Valores OK"    valor={(resultado.ok ?? []).length}            cor="success" /> */}
               <ResumoCard
                 label="Só no SPED"
-                valor={(resultado.so_sped ?? []).length}
+                valor={todasLinhas.filter((r) => r._tipo === "so_sped").length}
                 cor="danger"
               />
               <ResumoCard
                 label="Só no SAP"
-                valor={(resultado.so_sap ?? []).length}
+                valor={todasLinhas.filter((r) => r._tipo === "so_sap").length}
                 cor=""
               />
               <ResumoCard
                 label="Lançamentos"
-                valor={(resultado.lancamentos ?? []).length}
+                valor={lancamentos.length}
                 cor=""
               />
             </div>
