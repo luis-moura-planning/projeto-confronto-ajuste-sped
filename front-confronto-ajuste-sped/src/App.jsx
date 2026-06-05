@@ -74,6 +74,8 @@ export default function App() {
   const [impostosAtivos, setImpostosAtivos] = useState(() =>
     Object.fromEntries(IMPOSTOS_LANC.map((i) => [i.campo, true])),
   );
+  const [filtroTexto, setFiltroTexto] = useState("");
+  const [filtroLanc, setFiltroLanc] = useState("");
 
   const sapRef = useRef(null);
   const spedRef = useRef(null);
@@ -89,6 +91,8 @@ export default function App() {
     setPaginaLanc(1);
     setPorPaginaComp(20);
     setPorPaginaLanc(20);
+    setFiltroTexto("");
+    setFiltroLanc("");
 
     const form = new FormData();
     form.append("planilha_sap", sapFile);
@@ -126,9 +130,15 @@ export default function App() {
       ]
     : [];
 
-  const linhasFiltradas = todasLinhas.filter(
-    (r) => filtro === "todos" || r._tipo === filtro,
-  );
+  const _busca = filtroTexto.trim().toLowerCase();
+  const linhasFiltradas = todasLinhas.filter((r) => {
+    if (filtro !== "todos" && r._tipo !== filtro) return false;
+    if (!_busca) return true;
+    return (
+      String(r.NUM_DOC ?? "").toLowerCase().includes(_busca) ||
+      String(r.CHV_NFE ?? "").toLowerCase().includes(_busca)
+    );
+  });
 
   const totalPagsComp = Math.max(
     1,
@@ -139,9 +149,17 @@ export default function App() {
     paginaComp * porPaginaComp,
   );
 
-  const lancamentos = (resultado?.lancamentos ?? []).filter(
-    (l) => impostosAtivos[l["Imposto"]] !== false,
-  );
+  const _buscaLanc = filtroLanc.trim().toLowerCase();
+  const lancamentos = (resultado?.lancamentos ?? []).filter((l) => {
+    if (impostosAtivos[l["Imposto"]] === false) return false;
+    if (!_buscaLanc) return true;
+    return (
+      String(l["Código da Conta"] ?? "").toLowerCase().includes(_buscaLanc) ||
+      String(l["Descrição da Conta"] ?? "").toLowerCase().includes(_buscaLanc) ||
+      String(l["Descrição"] ?? "").toLowerCase().includes(_buscaLanc) ||
+      String(l["Centro de Custo"] ?? "").toLowerCase().includes(_buscaLanc)
+    );
+  });
   const totalPagsLanc = Math.max(
     1,
     Math.ceil(lancamentos.length / porPaginaLanc),
@@ -331,10 +349,28 @@ export default function App() {
                       </button>
                     ))}
                   </div>
-                  <span className="g-helper">
-                    {linhasFiltradas.length} registro
-                    {linhasFiltradas.length !== 1 ? "s" : ""}
-                  </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "var(--g-space-2)" }}>
+                    <input
+                      className="g-input"
+                      style={{ width: 260 }}
+                      placeholder="Buscar por nota ou chave NF-e…"
+                      value={filtroTexto}
+                      onChange={(e) => { setFiltroTexto(e.target.value); setPaginaComp(1); }}
+                    />
+                    {filtroTexto && (
+                      <button
+                        className="g-btn g-btn--sm"
+                        onClick={() => { setFiltroTexto(""); setPaginaComp(1); }}
+                        title="Limpar busca"
+                      >
+                        ×
+                      </button>
+                    )}
+                    <span className="g-helper">
+                      {linhasFiltradas.length} registro
+                      {linhasFiltradas.length !== 1 ? "s" : ""}
+                    </span>
+                  </div>
                 </div>
 
                 <BarraPaginacao
@@ -503,6 +539,22 @@ export default function App() {
                     className="g-cluster"
                     style={{ gap: "var(--g-space-2)" }}
                   >
+                    <input
+                      className="g-input"
+                      style={{ width: 280 }}
+                      placeholder="Buscar por conta, descrição ou C.Custo…"
+                      value={filtroLanc}
+                      onChange={(e) => { setFiltroLanc(e.target.value); setPaginaLanc(1); }}
+                    />
+                    {filtroLanc && (
+                      <button
+                        className="g-btn g-btn--sm"
+                        onClick={() => { setFiltroLanc(""); setPaginaLanc(1); }}
+                        title="Limpar busca"
+                      >
+                        ×
+                      </button>
+                    )}
                     <span className="g-helper">
                       {lancamentos.length} lançamento
                       {lancamentos.length !== 1 ? "s" : ""}
