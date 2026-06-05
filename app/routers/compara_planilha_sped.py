@@ -3,7 +3,6 @@ import os
 import tempfile
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
-
 from services.comparacao_planilha_sap_sped import compara_gera_diferenca
 
 router = APIRouter(prefix="/comparar", tags=["Comparação SAP × SPED"])
@@ -32,6 +31,7 @@ async def comparar(
 
         return {
             "divergencias": resultado["divergencias_json"],
+            "ok": resultado["ok_json"],
             "so_sped": resultado["so_sped_json"],
             "so_sap": resultado["so_sap_json"],
             "lancamentos": resultado["lancamentos_json"],

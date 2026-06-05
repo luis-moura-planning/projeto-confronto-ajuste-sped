@@ -70,20 +70,30 @@ def _propagar_num_doc(df_sap: pd.DataFrame) -> pd.DataFrame:
             current_ref = None
         if pd.notna(row["Ref.3 (Linha)"]):
             try:
-                current_ref = str(int(float(str(row["Ref.3 (Linha)"]).replace(".", "").replace(",", "").strip())))
+                # Tenta conversão direta (funciona para int e float como 38442.0)
+                current_ref = str(int(float(row["Ref.3 (Linha)"])))
             except (ValueError, TypeError):
-                pass  # ignora CNPJs e outros valores não numéricos
+                # Se falhar (ex: CNPJ "04.784.935/0001-67"), ignora o valor
+                pass
         df.at[idx, "NUM_DOC"] = current_ref
     return df
 
 
 def _agregar_sped(dfs: dict) -> pd.DataFrame:
-    df_c170 = dfs["C170"].copy()
-    for col in COLS_SPED:
-        df_c170[col] = df_c170[col].apply(_to_float)
-    df_agg = df_c170.groupby("CHV_NFE")[COLS_SPED].sum().reset_index()
-    df_c100 = dfs["C100"][["NUM_DOC", "CHV_NFE"]].drop_duplicates()
-    return df_agg.merge(df_c100, on="CHV_NFE", how="left")
+    """
+    Agrega valores do SPED por nota fiscal usando apenas o C100.
+    VL_MERC do C100 é mapeado para VL_ITEM.
+    """
+    df = dfs["C100"].copy()
+    df["VL_ITEM"] = df["VL_MERC"].apply(_to_float)
+    for col in ["VL_ICMS", "VL_IPI", "VL_PIS", "VL_COFINS"]:
+        df[col] = df[col].apply(_to_float)
+
+    return (
+        df.groupby(["NUM_DOC", "CHV_NFE"])[COLS_SPED]
+        .sum()
+        .reset_index()
+    )
 
 
 def _agregar_sap(df_sap: pd.DataFrame) -> pd.DataFrame:
@@ -255,7 +265,7 @@ def _df_para_json(df: pd.DataFrame) -> list:
 
 def compara_gera_diferenca(arquivo_sped: str, planilha_diario: str) -> dict:
     """
-    Compara valores de impostos entre SPED (C170 por nota) e planilha SAP.
+    Compara valores de impostos entre SPED (C100 por nota) e planilha SAP.
 
     Chave de cruzamento:
       SPED → C100.NUM_DOC  (C170 linkado via CHV_NFE)
