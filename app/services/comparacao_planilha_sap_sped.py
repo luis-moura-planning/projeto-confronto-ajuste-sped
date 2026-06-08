@@ -13,13 +13,19 @@ from services.extrai_dados_planilha_sap import extrai_dados_planilha_sap
 # CONFIGURAÇÕES
 # =============================================================================
 
-# Colunas SPED usadas na comparação
+# Colunas SPED usadas na comparação — Bloco C (NF-e)
 #   VL_ITEM  → agregado do C170 (VL_ITEM por item, somado por CHV_NFE)
 #   VL_ICMS  → do C100 (cabeçalho da nota)
 #   VL_IPI   → do C100
 #   VL_PIS   → do C100
 #   VL_COFINS→ do C100
 COLS_SPED = ["VL_ITEM", "VL_ICMS", "VL_IPI", "VL_PIS", "VL_COFINS"]
+
+# Colunas SPED usadas na comparação — Bloco D (CT-e / transporte)
+#   VL_SERV   → do D100 (valor do serviço de transporte)
+#   VL_PIS_D  → do D101 (PIS calculado no complemento)
+#   VL_COFINS_D → do D105 (Cofins calculada no complemento)
+COLS_SPED_D = ["VL_SERV", "VL_PIS_D", "VL_COFINS_D"]
 
 # Mapeamento nome-de-conta-SAP → campo interno de comparação.
 # Cada campo agrupa contas que representam o mesmo tributo, mas em
@@ -40,6 +46,10 @@ MAPA_CONTAS_SAP = {
     "COFINS a Recuperar":                "VL_COFINS_SAP",
     # Mercadorias (saída)
     "Vendas de Mercadorias":             "VL_ITEM_SAP",
+    # Transporte (fretes pagos — entradas do Bloco D)
+    "Fretes e Carretos":                 "VL_SERV_SAP",
+    "Frete sobre Compras":               "VL_SERV_SAP",
+    "Despesas com Fretes":               "VL_SERV_SAP",
 }
 
 # Contas que representam saídas (IND_OPER = 1).
@@ -62,6 +72,10 @@ CONTAS_ENTRADA = {
     "COFINS a Recuperar",
     "ICMS e Contribuições a Recuperar",
     "PIS a Recuperar",
+    # Fretes pagos (CT-e aquisição — Bloco D)
+    "Fretes e Carretos",
+    "Frete sobre Compras",
+    "Despesas com Fretes",
 }
 
 # Conta canônica de saída por campo — usada para evitar duplicação.
@@ -73,6 +87,8 @@ CONTA_CANONICA_SAIDA = {
     "VL_PIS_SAP":    ["PIS a Recolher",                    "( - ) PIS/PASEP"],
     "VL_ICMS_SAP":   ["ICMS e Contribuições a Recolher",   "( - ) ICMS"],
     "VL_ITEM_SAP":   ["Vendas de Mercadorias"],
+    # Frete: sem conta canônica (usa a primeira encontrada)
+    "VL_SERV_SAP":   ["Fretes e Carretos", "Frete sobre Compras", "Despesas com Fretes"],
 }
 
 # Mapeamento delta → campo SAP (usado em gera_lancamentos_ajuste)
@@ -81,6 +97,10 @@ DELTA_PARA_CAMPO = {
     "DELTA_PIS":    "VL_PIS_SAP",
     "DELTA_COFINS": "VL_COFINS_SAP",
     "DELTA_ITEM":   "VL_ITEM_SAP",
+    # Bloco D
+    "DELTA_SERV":       "VL_SERV_SAP",
+    "DELTA_PIS_D":      "VL_PIS_SAP",
+    "DELTA_COFINS_D":   "VL_COFINS_SAP",
 }
 
 TOLERANCIA = 0.05
@@ -206,6 +226,68 @@ def _agregar_sped(dfs: dict) -> tuple:
     )
 
     return df_saidas, df_entradas
+
+
+def _agregar_sped_d(dfs: dict) -> pd.DataFrame:
+    """
+    Agrega valores do Bloco D (aquisição de serviços de transporte).
+
+    Os registros D100 sempre representam entradas (IND_OPER = "0").
+    O valor do serviço vem do D100.VL_SERV; os créditos de PIS e Cofins
+    vêm dos filhos D101.VL_PIS e D105.VL_COFINS, respectivamente.
+
+    Retorna df com colunas: CHV_CTE, NUM_DOC, VL_SERV, VL_PIS_D, VL_COFINS_D.
+    CSTs sem crédito (D101/D105 com VL_PIS/VL_COFINS = 0) são incluídos
+    apenas para o valor do serviço; o crédito ficará zerado.
+    """
+    d100 = dfs.get("D100", pd.DataFrame())
+    d101 = dfs.get("D101", pd.DataFrame())
+    d105 = dfs.get("D105", pd.DataFrame())
+
+    if d100.empty:
+        return pd.DataFrame(columns=["CHV_CTE", "NUM_DOC"] + COLS_SPED_D)
+
+    d100 = d100.copy()
+    d100["VL_SERV"] = d100["VL_SERV"].apply(_to_float)
+
+    # Agrega PIS por CT-e (D101)
+    if not d101.empty:
+        d101 = d101.copy()
+        d101["_VL_PIS"] = d101["VL_PIS"].apply(_to_float)
+        pis_por_cte = (
+            d101.groupby("CHV_CTE")["_VL_PIS"]
+            .sum()
+            .reset_index()
+            .rename(columns={"_VL_PIS": "VL_PIS_D"})
+        )
+    else:
+        pis_por_cte = pd.DataFrame(columns=["CHV_CTE", "VL_PIS_D"])
+
+    # Agrega Cofins por CT-e (D105)
+    if not d105.empty:
+        d105 = d105.copy()
+        d105["_VL_COFINS"] = d105["VL_COFINS"].apply(_to_float)
+        cofins_por_cte = (
+            d105.groupby("CHV_CTE")["_VL_COFINS"]
+            .sum()
+            .reset_index()
+            .rename(columns={"_VL_COFINS": "VL_COFINS_D"})
+        )
+    else:
+        cofins_por_cte = pd.DataFrame(columns=["CHV_CTE", "VL_COFINS_D"])
+
+    df = (
+        d100[d100["IND_OPER"] == "0"]
+        .groupby(["CHV_CTE", "NUM_DOC"])["VL_SERV"]
+        .sum()
+        .reset_index()
+    )
+    df = df.merge(pis_por_cte,    on="CHV_CTE", how="left")
+    df = df.merge(cofins_por_cte, on="CHV_CTE", how="left")
+    df["VL_PIS_D"]    = df["VL_PIS_D"].fillna(0.0)
+    df["VL_COFINS_D"] = df["VL_COFINS_D"].fillna(0.0)
+
+    return df
 
 
 def _agregar_sap(
@@ -413,8 +495,8 @@ def compara_gera_diferenca(
     filtro_filial: Optional[str] = None,
 ) -> dict:
     """
-    Compara valores de impostos entre SPED (C100/C170) e planilha SAP,
-    separando saídas de entradas.
+    Compara valores de impostos entre SPED (C100/C170 e D100/D101/D105)
+    e planilha SAP, separando saídas, entradas NF-e e entradas CT-e.
 
     Parâmetros
     ----------
@@ -424,37 +506,62 @@ def compara_gera_diferenca(
         Use quando o SPED cobre apenas um estabelecimento e o diário
         consolida múltiplas filiais. Se None, usa todas as linhas SAP.
 
-    Chave de cruzamento
-    -------------------
-    SPED → C100.NUM_DOC
-    SAP  → Ref.3 (Linha) (= número da NF)
+    Chaves de cruzamento
+    --------------------
+    SPED Bloco C (saída)   → C100.NUM_DOC       × SAP Ref.3 (Linha)
+    SPED Bloco C (entrada) → C100.CHV_NFE        × SAP CHV_NFE (via lookup)
+    SPED Bloco D (CT-e)    → D100.CHV_CTE        × SAP CHV_CTE (via lookup NUM_DOC)
 
-    Retorna dict com dois grupos de chaves:
+    Retorna dict com grupos de chaves:
     - DataFrames: 'divergencias_saida', 'divergencias_entrada',
-                  'ok_saida', 'ok_entrada',
-                  'so_sped_saida', 'so_sped_entrada',
-                  'so_sap_saida', 'so_sap_entrada',
+                  'divergencias_transporte',
+                  'ok_saida', 'ok_entrada', 'ok_transporte',
+                  'so_sped_saida', 'so_sped_entrada', 'so_sped_transporte',
+                  'so_sap_saida', 'so_sap_entrada', 'so_sap_transporte',
                   'lancamentos'.
     - JSON equivalente: sufixo '_json' em cada chave acima.
-
-    Correções aplicadas nesta versão
-    ---------------------------------
     """
     dfs    = extrai_dados_sped(arquivo_sped)
     df_sap = extrai_dados_planilha_sap(planilha_diario)
 
-    # Agrega SPED e SAP separados por natureza
+    # ── Bloco C ──────────────────────────────────────────────────────────────
     df_sped_saidas, df_sped_entradas  = _agregar_sped(dfs)
     df_sap_saidas,  df_sap_entradas   = _agregar_sap(df_sap, filtro_filial)
 
-    # Enriquece df_sap_entradas com CHV_NFE do SPED C100 para permitir
-    # o cruzamento por chave (evita colisão de NUM_DOC entre fornecedores)
+    # Enriquece df_sap_entradas com CHV_NFE do SPED C100 para cruzamento
     _chv_lookup = (
         dfs["C100"][dfs["C100"]["IND_OPER"] == "0"][["NUM_DOC", "CHV_NFE"]]
         .drop_duplicates("NUM_DOC")
     )
     df_sap_entradas = df_sap_entradas.merge(_chv_lookup, on="NUM_DOC", how="left")
 
+    # ── Bloco D ──────────────────────────────────────────────────────────────
+    df_sped_transp = _agregar_sped_d(dfs)
+
+    # Agrega SAP para transporte: contas de frete (entradas) filtradas por
+    # NUM_DOC que também aparecem no D100, depois enriquecidas com CHV_CTE.
+    _chv_cte_lookup = pd.DataFrame()
+    if not dfs["D100"].empty:
+        _chv_cte_lookup = (
+            dfs["D100"][["NUM_DOC", "CHV_CTE"]]
+            .drop_duplicates("NUM_DOC")
+        )
+
+    # Usa _agregar_sap mas só com as contas de frete; depois faz lookup da chave
+    df_sap_transp_saida, df_sap_transp_entrada = _agregar_sap(df_sap, filtro_filial)
+    # Mantém apenas entradas com conta de frete (VL_SERV_SAP presente)
+    df_sap_transp = df_sap_transp_entrada.copy()
+    if "VL_SERV_SAP" not in df_sap_transp.columns:
+        df_sap_transp["VL_SERV_SAP"] = 0.0
+    # Remove linhas sem valor de frete
+    df_sap_transp = df_sap_transp[df_sap_transp.get("VL_SERV_SAP", 0) != 0].copy()
+
+    if not _chv_cte_lookup.empty:
+        df_sap_transp = df_sap_transp.merge(_chv_cte_lookup, on="NUM_DOC", how="left")
+    if "CHV_CTE" not in df_sap_transp.columns:
+        df_sap_transp["CHV_CTE"] = pd.Series(dtype=str)
+
+    # ── Comparações ──────────────────────────────────────────────────────────
     comparacoes_saida = {
         "ICMS":   ("VL_ICMS",   "VL_ICMS_SAP"),
         "PIS":    ("VL_PIS",    "VL_PIS_SAP"),
@@ -466,32 +573,33 @@ def compara_gera_diferenca(
         "PIS":    ("VL_PIS",    "VL_PIS_SAP"),
         "COFINS": ("VL_COFINS", "VL_COFINS_SAP"),
     }
+    comparacoes_transporte = {
+        "SERV":    ("VL_SERV",    "VL_SERV_SAP"),
+        "PIS_D":   ("VL_PIS_D",   "VL_PIS_SAP"),
+        "COFINS_D":("VL_COFINS_D","VL_COFINS_SAP"),
+    }
 
     def _processar_lado(df_sped_agg, df_sap_agg, comparacoes, chave="NUM_DOC"):
         """
         Faz o merge, calcula deltas e separa divergências/ok/só-um-lado.
 
         chave="NUM_DOC"  → saídas (emissão própria, número único por empresa)
-        chave="CHV_NFE"  → entradas (NF de fornecedor; NUM_DOC não é único pois
-                           fornecedores distintos podem usar o mesmo número)
+        chave="CHV_NFE"  → entradas NF-e
+        chave="CHV_CTE"  → entradas CT-e (Bloco D)
         """
         df = pd.merge(df_sped_agg, df_sap_agg, on=chave, how="outer", indicator=True)
 
-        # Quando ambos os lados têm NUM_DOC e o merge é por CHV_NFE, pandas
-        # renomeia para NUM_DOC_x/NUM_DOC_y. Coalescemos de volta para NUM_DOC
-        # (preferindo o valor do SPED) para que o frontend exiba o número da nota.
         if "NUM_DOC_x" in df.columns:
             df["NUM_DOC"] = df["NUM_DOC_x"].fillna(df["NUM_DOC_y"])
             df.drop(columns=["NUM_DOC_x", "NUM_DOC_y"], inplace=True)
 
         id_cols       = [chave] + (["NUM_DOC"] if chave != "NUM_DOC" and "NUM_DOC" in df.columns else [])
-        chv_col       = ["CHV_NFE"] if "CHV_NFE" in df.columns and "CHV_NFE" != chave else []
-        # sap_cols_pres calculado após id_cols para excluir colunas já presentes nele
+        chv_col       = [c for c in ["CHV_NFE", "CHV_CTE"] if c in df.columns and c != chave]
         sap_cols_pres = [c for c in df_sap_agg.columns if c != chave and c in df.columns and c not in id_cols]
 
         df_so_sped = (
             df[df["_merge"] == "left_only"]
-            [id_cols + chv_col + [c for c in COLS_SPED if c in df.columns]]
+            [id_cols + chv_col + [c for c in (COLS_SPED + COLS_SPED_D) if c in df.columns]]
             .reset_index(drop=True)
         )
         df_so_sap = (
@@ -533,31 +641,47 @@ def compara_gera_diferenca(
     div_e, ok_e, so_sped_e, so_sap_e = _processar_lado(
         df_sped_entradas, df_sap_entradas, comparacoes_entrada, chave="CHV_NFE"
     )
+    div_t, ok_t, so_sped_t, so_sap_t = _processar_lado(
+        df_sped_transp, df_sap_transp, comparacoes_transporte, chave="CHV_CTE"
+    )
 
-    # Lançamentos de ajuste (baseados nas divergências de saída, que têm CHV_NFE)
-    df_lanc = gera_lancamentos_ajuste(div_s, df_sap)
+    # Lançamentos de ajuste (baseados nas divergências de saída e transporte)
+    df_lanc = gera_lancamentos_ajuste(
+        pd.concat([div_s, div_t], ignore_index=True),
+        df_sap,
+    )
 
     return {
-        # DataFrames
-        "divergencias_saida":    div_s,
-        "divergencias_entrada":  div_e,
-        "ok_saida":              ok_s,
-        "ok_entrada":            ok_e,
-        "so_sped_saida":         so_sped_s,
-        "so_sped_entrada":       so_sped_e,
-        "so_sap_saida":          so_sap_s,
-        "so_sap_entrada":        so_sap_e,
-        "lancamentos":           df_lanc,
-        # JSON equivalente
-        "divergencias_saida_json":   _df_para_json(div_s),
-        "divergencias_entrada_json": _df_para_json(div_e),
-        "ok_saida_json":             _df_para_json(ok_s),
-        "ok_entrada_json":           _df_para_json(ok_e),
-        "so_sped_saida_json":        _df_para_json(so_sped_s),
-        "so_sped_entrada_json":      _df_para_json(so_sped_e),
-        "so_sap_saida_json":         _df_para_json(so_sap_s),
-        "so_sap_entrada_json":       _df_para_json(so_sap_e),
-        "lancamentos_json":          _df_para_json(df_lanc),
+        # DataFrames — Bloco C
+        "divergencias_saida":       div_s,
+        "divergencias_entrada":     div_e,
+        "ok_saida":                 ok_s,
+        "ok_entrada":               ok_e,
+        "so_sped_saida":            so_sped_s,
+        "so_sped_entrada":          so_sped_e,
+        "so_sap_saida":             so_sap_s,
+        "so_sap_entrada":           so_sap_e,
+        # DataFrames — Bloco D (CT-e / transporte)
+        "divergencias_transporte":  div_t,
+        "ok_transporte":            ok_t,
+        "so_sped_transporte":       so_sped_t,
+        "so_sap_transporte":        so_sap_t,
+        # Lançamentos consolidados
+        "lancamentos":              df_lanc,
+        # JSON equivalentes
+        "divergencias_saida_json":      _df_para_json(div_s),
+        "divergencias_entrada_json":    _df_para_json(div_e),
+        "ok_saida_json":                _df_para_json(ok_s),
+        "ok_entrada_json":              _df_para_json(ok_e),
+        "so_sped_saida_json":           _df_para_json(so_sped_s),
+        "so_sped_entrada_json":         _df_para_json(so_sped_e),
+        "so_sap_saida_json":            _df_para_json(so_sap_s),
+        "so_sap_entrada_json":          _df_para_json(so_sap_e),
+        "divergencias_transporte_json": _df_para_json(div_t),
+        "ok_transporte_json":           _df_para_json(ok_t),
+        "so_sped_transporte_json":      _df_para_json(so_sped_t),
+        "so_sap_transporte_json":       _df_para_json(so_sap_t),
+        "lancamentos_json":             _df_para_json(df_lanc),
     }
 
 

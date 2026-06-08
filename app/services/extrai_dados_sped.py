@@ -29,11 +29,33 @@ def extrai_dados_sped(sped_txt: str) -> dict:
             "VL_BC_COFINS", "ALIQ_COFINS", "QUANT_BC_COFINS", "ALIQ_COFINS_QUANT",
             "VL_COFINS", "COD_CTA",
         ],
+        # Bloco D — Serviços de Transporte
+        # D100: cabeçalho do documento (CT-e, CRT, etc.)
+        "D100": [
+            "REG", "IND_OPER", "IND_EMIT", "COD_PART", "COD_MOD", "COD_SIT",
+            "SER", "SUB", "NUM_DOC", "CHV_CTE", "DT_DOC", "DT_A_P",
+            "TP_CT-e", "CHV_CTE_REF", "VL_DOC", "VL_DESC", "IND_FRT",
+            "VL_SERV", "VL_BC_ICMS", "VL_ICMS", "VL_NT", "COD_INF",
+            "COD_CTA",
+        ],
+        # D101: complemento do D100 — PIS/Pasep
+        "D101": [
+            "REG", "IND_NAT_FRT", "VL_ITEM", "CST_PIS", "NAT_BC_CRED",
+            "VL_BC_PIS", "ALIQ_PIS", "VL_PIS", "COD_CTA",
+        ],
+        # D105: complemento do D100 — Cofins
+        "D105": [
+            "REG", "IND_NAT_FRT", "VL_ITEM", "CST_COFINS", "NAT_BC_CRED",
+            "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS", "COD_CTA",
+        ],
     }
 
-    dados = {"0000": [], "C100": [], "C170": []}
+    dados = {"0000": [], "C100": [], "C170": [], "D100": [], "D101": [], "D105": []}
     nota_atual_chv = ""
-    nota_atual_valida = True  
+    nota_atual_valida = True
+    # Controle de estado para o Bloco D
+    d100_atual_chv = ""
+    d100_atual_valida = True
 
     try:
         with open(sped_txt, "r", encoding="latin1") as arquivo:
@@ -54,7 +76,6 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                 registro = dict(zip(nomes_campos, campos))
 
                 if reg == "C100":
-                    
                     cod_sit = registro.get("COD_SIT", "")
                     nota_atual_valida = cod_sit not in COD_SIT_EXCLUIR
                     nota_atual_chv = registro.get("CHV_NFE", "")
@@ -64,11 +85,25 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                     dados["C100"].append(registro)
 
                 elif reg == "C170":
-                    
                     if not nota_atual_valida:
                         continue
                     registro["CHV_NFE"] = nota_atual_chv
                     dados["C170"].append(registro)
+
+                elif reg == "D100":
+                    cod_sit = registro.get("COD_SIT", "")
+                    d100_atual_valida = cod_sit not in COD_SIT_EXCLUIR
+                    d100_atual_chv = registro.get("CHV_CTE", "")
+                    if not d100_atual_valida:
+                        continue
+                    dados["D100"].append(registro)
+
+                elif reg in ("D101", "D105"):
+                    # Filhos do D100 — herdam a chave do CT-e pai
+                    if not d100_atual_valida:
+                        continue
+                    registro["CHV_CTE"] = d100_atual_chv
+                    dados[reg].append(registro)
 
                 else:
                     dados[reg].append(registro)
