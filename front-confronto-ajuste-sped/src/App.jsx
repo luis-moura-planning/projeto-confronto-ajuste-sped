@@ -155,7 +155,7 @@ export default function App() {
     if (!_busca) return true;
     return (
       String(r.NUM_DOC ?? "").toLowerCase().includes(_busca) ||
-      String(r.CHV_NFE ?? "").toLowerCase().includes(_busca)
+      String(r.CHV_NFE ?? r.CHV_CTE ?? "").toLowerCase().includes(_busca)
     );
   });
 
@@ -434,7 +434,7 @@ export default function App() {
                           <td>{row.NUM_DOC ?? "—"}</td>
                           <td>
                             <code className="g-mono" style={{ fontSize: 11 }}>
-                              {row.CHV_NFE ?? "—"}
+                              {row.CHV_NFE ?? row.CHV_CTE ?? "—"}
                             </code>
                           </td>
                           <td>
