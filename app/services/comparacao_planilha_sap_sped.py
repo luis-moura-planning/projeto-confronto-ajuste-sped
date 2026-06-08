@@ -477,9 +477,17 @@ def compara_gera_diferenca(
         """
         df = pd.merge(df_sped_agg, df_sap_agg, on=chave, how="outer", indicator=True)
 
-        sap_cols_pres = [c for c in df_sap_agg.columns if c != chave and c in df.columns]
+        # Quando ambos os lados têm NUM_DOC e o merge é por CHV_NFE, pandas
+        # renomeia para NUM_DOC_x/NUM_DOC_y. Coalescemos de volta para NUM_DOC
+        # (preferindo o valor do SPED) para que o frontend exiba o número da nota.
+        if "NUM_DOC_x" in df.columns:
+            df["NUM_DOC"] = df["NUM_DOC_x"].fillna(df["NUM_DOC_y"])
+            df.drop(columns=["NUM_DOC_x", "NUM_DOC_y"], inplace=True)
+
         id_cols       = [chave] + (["NUM_DOC"] if chave != "NUM_DOC" and "NUM_DOC" in df.columns else [])
         chv_col       = ["CHV_NFE"] if "CHV_NFE" in df.columns and "CHV_NFE" != chave else []
+        # sap_cols_pres calculado após id_cols para excluir colunas já presentes nele
+        sap_cols_pres = [c for c in df_sap_agg.columns if c != chave and c in df.columns and c not in id_cols]
 
         df_so_sped = (
             df[df["_merge"] == "left_only"]
