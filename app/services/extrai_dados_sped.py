@@ -48,9 +48,17 @@ def extrai_dados_sped(sped_txt: str) -> dict:
             "REG", "IND_NAT_FRT", "VL_ITEM", "CST_COFINS", "NAT_BC_CRED",
             "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS", "COD_CTA",
         ],
+        # Bloco F — Demais Documentos e Operações
+        # F100: demais receitas e operações geradoras de crédito
+        "F100": [
+            "REG", "IND_OPER", "COD_PART", "COD_ITEM", "DT_OPER", "VL_OPER",
+            "CST_PIS", "VL_BC_PIS", "ALIQ_PIS", "VL_PIS",
+            "CST_COFINS", "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS",
+            "NAT_BC_CRED", "IND_ORIG_CRED", "COD_CTA", "COD_CCUS", "DESC_DOC_OPER",
+        ],
     }
 
-    dados = {"0000": [], "C100": [], "C170": [], "D100": [], "D101": [], "D105": []}
+    dados = {"0000": [], "C100": [], "C170": [], "D100": [], "D101": [], "D105": [], "F100": []}
     nota_atual_chv = ""
     nota_atual_valida = True
     # Controle de estado para o Bloco D
@@ -104,6 +112,9 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                         continue
                     registro["CHV_CTE"] = d100_atual_chv
                     dados[reg].append(registro)
+
+                elif reg == "F100":
+                    dados["F100"].append(registro)
 
                 else:
                     dados[reg].append(registro)
