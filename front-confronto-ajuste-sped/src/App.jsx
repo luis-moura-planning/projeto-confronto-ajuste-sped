@@ -154,8 +154,10 @@ export default function App() {
     if (filtro !== "todos" && r._tipo !== filtro) return false;
     if (!_busca) return true;
     return (
-      String(r.NUM_DOC ?? "").toLowerCase().includes(_busca) ||
-      String(r.CHV_NFE ?? r.CHV_CTE ?? "").toLowerCase().includes(_busca)
+      String(r.NUM_DOC   ?? "").toLowerCase().includes(_busca) ||
+      String(r.CHV_NFE   ?? r.CHV_CTE ?? "").toLowerCase().includes(_busca) ||
+      String(r.COD_CTA   ?? "").toLowerCase().includes(_busca) ||
+      String(r.NOME_CONTA ?? "").toLowerCase().includes(_busca)
     );
   });
 
@@ -371,7 +373,7 @@ export default function App() {
                     <input
                       className="g-input"
                       style={{ width: 260 }}
-                      placeholder="Buscar por nota ou chave NF-e…"
+                      placeholder="Buscar por nota, chave NF-e ou conta F100…"
                       value={filtroTexto}
                       onChange={(e) => { setFiltroTexto(e.target.value); setPaginaComp(1); }}
                     />
@@ -431,11 +433,23 @@ export default function App() {
                             row._tipo === "divergencia" ? "app-row-diff" : ""
                           }
                         >
-                          <td>{row.NUM_DOC ?? "—"}</td>
                           <td>
-                            <code className="g-mono" style={{ fontSize: 11 }}>
-                              {row.CHV_NFE ?? row.CHV_CTE ?? "—"}
-                            </code>
+                            {row.NUM_DOC != null ? (
+                              row.NUM_DOC
+                            ) : row.COD_CTA != null ? (
+                              <code className="g-mono" style={{ fontSize: 11 }}>
+                                {row.COD_CTA}
+                              </code>
+                            ) : "—"}
+                          </td>
+                          <td>
+                            {row.CHV_NFE || row.CHV_CTE ? (
+                              <code className="g-mono" style={{ fontSize: 11 }}>
+                                {row.CHV_NFE ?? row.CHV_CTE}
+                              </code>
+                            ) : row.NOME_CONTA ? (
+                              <span style={{ fontSize: 12 }}>{row.NOME_CONTA}</span>
+                            ) : "—"}
                           </td>
                           <td>
                             <span

@@ -27,6 +27,15 @@ COLS_SPED = ["VL_ITEM", "VL_ICMS", "VL_IPI", "VL_PIS", "VL_COFINS"]
 #   VL_COFINS_D → do D105 (Cofins calculada no complemento)
 COLS_SPED_D = ["VL_SERV", "VL_PIS_D", "VL_COFINS_D"]
 
+# Colunas SPED usadas na comparação — Bloco F (F100)
+#   VL_PIS    → do F100 (PIS calculado no registro)
+#   VL_COFINS → do F100 (Cofins calculada no registro)
+COLS_SPED_F100 = ["VL_PIS", "VL_COFINS"]
+
+# Nomes das contas SAP que acumulam os créditos de regime misto (F100)
+CONTA_PIS_RECUPERAR    = "PIS a Recuperar"
+CONTA_COFINS_RECUPERAR = "COFINS a Recuperar"
+
 # Mapeamento nome-de-conta-SAP → campo interno de comparação.
 # Cada campo agrupa contas que representam o mesmo tributo, mas em
 # naturezas opostas (saída × entrada).  A separação por natureza é
@@ -287,6 +296,85 @@ def _agregar_sped_d(dfs: dict) -> pd.DataFrame:
     df["VL_PIS_D"]    = df["VL_PIS_D"].fillna(0.0)
     df["VL_COFINS_D"] = df["VL_COFINS_D"].fillna(0.0)
 
+    return df
+
+
+def _agregar_sped_f100(dfs: dict) -> pd.DataFrame:
+    """
+    Agrega F100 por COD_CTA (apenas IND_OPER=0 — despesas/entradas com
+    crédito de PIS/COFINS em regime misto).
+
+    Retorna df com colunas: COD_CTA, VL_PIS, VL_COFINS.
+    """
+    f100 = dfs.get("F100", pd.DataFrame())
+    if f100.empty:
+        return pd.DataFrame(columns=["COD_CTA"] + COLS_SPED_F100)
+
+    f100 = f100.copy()
+    f100["VL_PIS"]    = f100["VL_PIS"].apply(_to_float)
+    f100["VL_COFINS"] = f100["VL_COFINS"].apply(_to_float)
+
+    return (
+        f100[f100["IND_OPER"] == "0"]
+        .groupby("COD_CTA")[COLS_SPED_F100]
+        .sum()
+        .reset_index()
+    )
+
+
+def _agregar_sap_f100(df_contas: pd.DataFrame) -> pd.DataFrame:
+    """
+    Agrega os créditos de PIS/COFINS a Recuperar do diário SAP relacionados
+    a operações do Bloco F (regime misto não-NF-e).
+
+    Critério de identificação automática: a 'Conta de contrapartida' de
+    cada lançamento é um código contábil quando começa com dígito
+    (ex: '4.01.03.03.0001'), e um código de parceiro quando começa com
+    letra (ex: 'F04989').  Apenas os primeiros são de natureza F100.
+
+    Lógica de valor líquido por conta de contrapartida:
+      NET = sum(Débito) − sum(Crédito)
+    Apenas entradas com NET > 0 são retornadas (créditos efetivos).
+
+    Retorna df com colunas: COD_CTA, NOME_CONTA, VL_PIS_SAP, VL_COFINS_SAP.
+    """
+    # Lookup: código SAP → nome da conta (exclui as contas de recuperação)
+    _excluir = {CONTA_PIS_RECUPERAR, CONTA_COFINS_RECUPERAR}
+    _nome_lookup: dict = {}
+    for _, r in df_contas.iterrows():
+        cod  = str(r.get("Cta.contáb./cód.PN", "")).strip()
+        nome = str(r.get("Cta.cont./Nome PN",  "")).strip()
+        if cod and nome not in _excluir:
+            _nome_lookup[cod] = nome
+
+    def _net(conta_nome: str, campo: str) -> pd.DataFrame:
+        linhas = df_contas[df_contas["Cta.cont./Nome PN"] == conta_nome]
+        if linhas.empty:
+            return pd.DataFrame(columns=["COD_CTA", campo])
+        rows = []
+        for contra, grp in linhas.groupby("Conta de contrapartida"):
+            contra_str = str(contra).strip()
+            # Aceita apenas contrapartidas que são códigos contábeis (começam
+            # com dígito).  Códigos de parceiro (F00019…) são de NF-e/D100.
+            if not contra_str[:1].isdigit():
+                continue
+            deb  = grp["Débito (MC)"].apply(_limpar_valor_sap).sum()
+            cred = grp["Crédito (MC)"].apply(_limpar_valor_sap).sum()
+            net  = round(deb - cred, 2)
+            if net > 0:
+                rows.append({"COD_CTA": contra_str, campo: net})
+        return pd.DataFrame(rows) if rows else pd.DataFrame(columns=["COD_CTA", campo])
+
+    df_pis = _net(CONTA_PIS_RECUPERAR,    "VL_PIS_SAP")
+    df_cof = _net(CONTA_COFINS_RECUPERAR, "VL_COFINS_SAP")
+
+    if df_pis.empty and df_cof.empty:
+        return pd.DataFrame(columns=["COD_CTA", "NOME_CONTA", "VL_PIS_SAP", "VL_COFINS_SAP"])
+
+    df = df_pis.merge(df_cof, on="COD_CTA", how="outer")
+    df["VL_PIS_SAP"]    = df["VL_PIS_SAP"].fillna(0.0)
+    df["VL_COFINS_SAP"] = df["VL_COFINS_SAP"].fillna(0.0)
+    df.insert(1, "NOME_CONTA", df["COD_CTA"].map(_nome_lookup).fillna(""))
     return df
 
 
@@ -645,11 +733,44 @@ def compara_gera_diferenca(
         df_sped_transp, df_sap_transp, comparacoes_transporte, chave="CHV_CTE"
     )
 
-    # Lançamentos de ajuste (baseados nas divergências de saída e transporte)
-    df_lanc = gera_lancamentos_ajuste(
+    # ── Bloco F (F100 — demais operações sem nota fiscal) ────────────────────
+    # Usa o mesmo df_sap já carregado; _agregar_sap_f100 filtra automaticamente
+    # as contrapartidas contábeis (começam com dígito) das de parceiro (F…).
+    df_sped_f100 = _agregar_sped_f100(dfs)
+    df_sap_f100  = _agregar_sap_f100(df_sap)
+
+    # Lookup código → nome a partir do próprio diário SAP
+    _excluir_f = {CONTA_PIS_RECUPERAR, CONTA_COFINS_RECUPERAR}
+    _nome_f100 = {
+        str(r.get("Cta.contáb./cód.PN", "")).strip(): str(r.get("Cta.cont./Nome PN", "")).strip()
+        for _, r in df_sap.iterrows()
+        if str(r.get("Cta.cont./Nome PN", "")).strip() not in _excluir_f
+    }
+
+    comparacoes_f100 = {
+        "PIS":    ("VL_PIS",    "VL_PIS_SAP"),
+        "COFINS": ("VL_COFINS", "VL_COFINS_SAP"),
+    }
+    div_f, ok_f, so_sped_f, so_sap_f = _processar_lado(
+        df_sped_f100,
+        df_sap_f100,
+        comparacoes_f100,
+        chave="COD_CTA",
+    )
+
+    # Adiciona nome da conta em div, ok e só-SPED (só-SAP já tem NOME_CONTA
+    # via _agregar_sap_f100)
+    for _df in [div_f, ok_f, so_sped_f]:
+        if not _df.empty and "COD_CTA" in _df.columns:
+            _df.insert(1, "NOME_CONTA", _df["COD_CTA"].map(_nome_f100).fillna(""))
+
+    # Lançamentos de ajuste (NF-e saídas + CT-e + F100)
+    df_lanc_nf   = gera_lancamentos_ajuste(
         pd.concat([div_s, div_t], ignore_index=True),
         df_sap,
     )
+    df_lanc_f100 = gera_lancamentos_ajuste_f100(div_f, df_sap)
+    df_lanc = pd.concat([df_lanc_nf, df_lanc_f100], ignore_index=True)
 
     return {
         # DataFrames — Bloco C
@@ -666,6 +787,11 @@ def compara_gera_diferenca(
         "ok_transporte":            ok_t,
         "so_sped_transporte":       so_sped_t,
         "so_sap_transporte":        so_sap_t,
+        # DataFrames — Bloco F (F100)
+        "divergencias_f100":        div_f,
+        "ok_f100":                  ok_f,
+        "so_sped_f100":             so_sped_f,
+        "so_sap_f100":              so_sap_f,
         # Lançamentos consolidados
         "lancamentos":              df_lanc,
         # JSON equivalentes
@@ -681,6 +807,10 @@ def compara_gera_diferenca(
         "ok_transporte_json":           _df_para_json(ok_t),
         "so_sped_transporte_json":      _df_para_json(so_sped_t),
         "so_sap_transporte_json":       _df_para_json(so_sap_t),
+        "divergencias_f100_json":       _df_para_json(div_f),
+        "ok_f100_json":                 _df_para_json(ok_f),
+        "so_sped_f100_json":            _df_para_json(so_sped_f),
+        "so_sap_f100_json":             _df_para_json(so_sap_f),
         "lancamentos_json":             _df_para_json(df_lanc),
     }
 
@@ -756,6 +886,101 @@ def gera_lancamentos_ajuste(
                     "NUM_DOC":            num_doc,
                     "CHV_NFE":            chv,
                     "Imposto":            delta_col.replace("DELTA_", ""),
+                    "DELTA":              delta,
+                    "Sentido":            sentido,
+                })
+
+    return pd.DataFrame(linhas)
+
+
+def gera_lancamentos_ajuste_f100(
+    df_divergencias_f100: pd.DataFrame,
+    df_sap_raw: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Gera lançamentos de ajuste para divergências F100 (Bloco F).
+
+    Par de contas do ajuste:
+      - Conta de recuperação : PIS a Recuperar / COFINS a Recuperar
+      - Conta de contrapartida: a conta de despesa (COD_CTA do SPED)
+
+    DELTA > 0 (SPED > SAP) → SAP a menor (complemento):
+      Db PIS/COFINS a Recuperar / Cr Conta Despesa
+    DELTA < 0 (SPED < SAP) → SAP a maior (estorno):
+      Cr PIS/COFINS a Recuperar / Db Conta Despesa
+    """
+    if df_divergencias_f100.empty:
+        return pd.DataFrame()
+
+    # Metadados das contas de recuperação indexados por contra-account (COD_CTA)
+    _meta_rec = {
+        CONTA_PIS_RECUPERAR:    {},
+        CONTA_COFINS_RECUPERAR: {},
+    }
+    _fallback = {
+        CONTA_PIS_RECUPERAR:    None,
+        CONTA_COFINS_RECUPERAR: None,
+    }
+
+    for _, r in df_sap_raw.iterrows():
+        nome = str(r.get("Cta.cont./Nome PN", "")).strip()
+        if nome not in _meta_rec:
+            continue
+        contra = str(r.get("Conta de contrapartida", "")).strip()
+        if not contra[:1].isdigit():
+            continue
+        cod    = str(r.get("Cta.contáb./cód.PN", "")).strip()
+        cc     = str(r["Centro de Custo"]) if pd.notna(r.get("Centro de Custo")) else ""
+        filial = str(r.get("Nome da filial", "")) if pd.notna(r.get("Nome da filial")) else ""
+        entry  = {"cod_conta": cod, "nome_conta": nome, "cc": cc, "filial": filial}
+
+        if contra not in _meta_rec[nome]:
+            _meta_rec[nome][contra] = entry
+        if _fallback[nome] is None:
+            _fallback[nome] = entry
+
+    _DELTA_F100 = {
+        "DELTA_PIS":    (CONTA_PIS_RECUPERAR,    "PIS"),
+        "DELTA_COFINS": (CONTA_COFINS_RECUPERAR, "COFINS"),
+    }
+
+    linhas = []
+    for _, row in df_divergencias_f100.iterrows():
+        cod_cta  = str(row["COD_CTA"])
+        nome_cta = str(row.get("NOME_CONTA", ""))
+
+        for delta_col, (conta_rec, imposto) in _DELTA_F100.items():
+            if delta_col not in row.index:
+                continue
+            delta = round(float(row[delta_col]), 2)
+            if abs(delta) <= TOLERANCIA:
+                continue
+
+            meta_rec = _meta_rec[conta_rec].get(cod_cta) or _fallback[conta_rec]
+            if meta_rec is None:
+                continue
+
+            sentido   = "SAP a maior (estorno)" if delta < 0 else "SAP a menor (complemento)"
+            valor     = round(abs(delta), 2)
+            desc      = f"F100 {cod_cta}" + (f" - {nome_cta}" if nome_cta else "")
+            lado_rec  = "D" if delta > 0 else "C"
+            lado_desp = "C" if delta > 0 else "D"
+
+            for cod_c, nome_c, lado in [
+                (meta_rec["cod_conta"], meta_rec["nome_conta"], lado_rec),
+                (cod_cta,              nome_cta,                lado_desp),
+            ]:
+                linhas.append({
+                    "Código da Conta":    cod_c,
+                    "Descrição da Conta": nome_c,
+                    "Débito":             valor if lado == "D" else None,
+                    "Crédito":            valor if lado == "C" else None,
+                    "Descrição":          desc,
+                    "Centro de Custo":    meta_rec["cc"],
+                    "Filial":             meta_rec["filial"],
+                    "COD_CTA":            cod_cta,
+                    "NOME_CONTA":         nome_cta,
+                    "Imposto":            imposto,
                     "DELTA":              delta,
                     "Sentido":            sentido,
                 })
