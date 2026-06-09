@@ -1,0 +1,3347 @@
+{
+  "0000": {
+    "bloco": "0",
+    "nivel": 0,
+    "parent": null,
+    "fk_parent": null,
+    "headers": [
+      "REG",
+      "COD_VER",
+      "TIPO_ESCRIT",
+      "IND_SIT_ESP",
+      "NUM_REC_ANTERIOR",
+      "DT_INI",
+      "DT_FIN",
+      "NOME",
+      "CNPJ",
+      "UF",
+      "COD_MUN",
+      "SUFRAMA",
+      "IND_NAT_PJ",
+      "IND_NAT_PJ",
+      "IND_ATIV"
+    ]
+  },
+  "0001": {
+    "bloco": "0",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "IND_MOV"
+    ]
+  },
+  "0035": {
+    "bloco": "0",
+    "nivel": 2,
+    "parent": "0001",
+    "fk_parent": "fk_0001",
+    "headers": [
+      "REG",
+      "COD_SCP",
+      "DESC_SCP",
+      "INF_COMP"
+    ]
+  },
+  "0100": {
+    "bloco": "0",
+    "nivel": 2,
+    "parent": "0001",
+    "fk_parent": "fk_0001",
+    "headers": [
+      "REG",
+      "NOME",
+      "CPF",
+      "CRC",
+      "CNPJ",
+      "CEP",
+      "END",
+      "NUM",
+      "COMPL",
+      "BAIRRO",
+      "FONE",
+      "FAX",
+      "EMAIL",
+      "COD_MUN"
+    ]
+  },
+  "0110": {
+    "bloco": "0",
+    "nivel": 2,
+    "parent": "0001",
+    "fk_parent": "fk_0001",
+    "headers": [
+      "REG",
+      "COD_INC_TRIB",
+      "IND_APRO_CRED",
+      "COD_TIPO_CONT",
+      "IND_REG_CUM"
+    ]
+  },
+  "0111": {
+    "bloco": "0",
+    "nivel": 3,
+    "parent": "0110",
+    "fk_parent": "fk_0110",
+    "headers": [
+      "REG",
+      "REC_BRU_NCUM_TRIB_MI",
+      "REC_BRU_ NCUM_NT_MI",
+      "REC_BRU_ NCUM_EXP",
+      "REC_BRU_CUM",
+      "REC_BRU_TOTAL"
+    ]
+  },
+  "0120": {
+    "bloco": "0",
+    "nivel": 2,
+    "parent": "0001",
+    "fk_parent": "fk_0001",
+    "headers": [
+      "REG",
+      "MES_REFER",
+      "INF_COMP"
+    ]
+  },
+  "0140": {
+    "bloco": "0",
+    "nivel": 2,
+    "parent": "0001",
+    "fk_parent": "fk_0001",
+    "headers": [
+      "REG",
+      "COD_EST",
+      "NOME",
+      "CNPJ",
+      "UF",
+      "IE",
+      "COD_MUN",
+      "IM",
+      "SUFRAMA"
+    ]
+  },
+  "0145": {
+    "bloco": "0",
+    "nivel": 3,
+    "parent": "0140",
+    "fk_parent": "fk_0140",
+    "headers": [
+      "REG",
+      "COD_INC_TRIB",
+      "VL_REC_TOT",
+      "VL_REC_ATIV",
+      "VL_REC_DEMAIS_ATIV",
+      "INFO_COMPL"
+    ]
+  },
+  "0150": {
+    "bloco": "0",
+    "nivel": 3,
+    "parent": "0140",
+    "fk_parent": "fk_0140",
+    "headers": [
+      "REG",
+      "COD_PART",
+      "NOME",
+      "COD_PAIS",
+      "CNPJ",
+      "CPF",
+      "IE",
+      "COD_MUN",
+      "SUFRAMA",
+      "END",
+      "NUM",
+      "COMPL",
+      "BAIRRO"
+    ]
+  },
+  "0190": {
+    "bloco": "0",
+    "nivel": 3,
+    "parent": "0140",
+    "fk_parent": "fk_0140",
+    "headers": [
+      "REG",
+      "UNID",
+      "DESCR"
+    ]
+  },
+  "0200": {
+    "bloco": "0",
+    "nivel": 3,
+    "parent": "0140",
+    "fk_parent": "fk_0140",
+    "headers": [
+      "REG",
+      "COD_ITEM",
+      "DESCR_ITEM",
+      "COD_BARRA",
+      "COD_ANT_ITEM",
+      "UNID_INV",
+      "TIPO_ITEM",
+      "COD_NCM",
+      "EX_IPI",
+      "COD_GEN",
+      "COD_LST",
+      "COD_LST",
+      "ALIQ_ICMS"
+    ]
+  },
+  "0205": {
+    "bloco": "0",
+    "nivel": 4,
+    "parent": "0200",
+    "fk_parent": "fk_0200",
+    "headers": [
+      "REG",
+      "DESCR_ANT_ITEM",
+      "DT_INI",
+      "DT_FIM",
+      "COD_ANT_ITEM"
+    ]
+  },
+  "0206": {
+    "bloco": "0",
+    "nivel": 4,
+    "parent": "0200",
+    "fk_parent": "fk_0200",
+    "headers": [
+      "REG",
+      "COD_COMB"
+    ]
+  },
+  "0208": {
+    "bloco": "0",
+    "nivel": 4,
+    "parent": "0200",
+    "fk_parent": "fk_0200",
+    "headers": [
+      "REG",
+      "COD_TAB",
+      "COD_TAB",
+      "COD_GRU",
+      "MARCA_COM"
+    ]
+  },
+  "0400": {
+    "bloco": "0",
+    "nivel": 3,
+    "parent": "0140",
+    "fk_parent": "fk_0140",
+    "headers": [
+      "REG",
+      "COD_NAT",
+      "DESCR_NAT"
+    ]
+  },
+  "0450": {
+    "bloco": "0",
+    "nivel": 3,
+    "parent": "0140",
+    "fk_parent": "fk_0140",
+    "headers": [
+      "REG",
+      "COD_INF",
+      "TXT"
+    ]
+  },
+  "0500": {
+    "bloco": "0",
+    "nivel": 2,
+    "parent": "0001",
+    "fk_parent": "fk_0001",
+    "headers": [
+      "REG",
+      "DT_ALT",
+      "COD_ NAT_CC",
+      "IND_CTA",
+      "NÍVEL",
+      "COD_CTA",
+      "NOME_CTA",
+      "COD_CTA_REF",
+      "CNPJ_EST"
+    ]
+  },
+  "0600": {
+    "bloco": "0",
+    "nivel": 2,
+    "parent": "0001",
+    "fk_parent": "fk_0001",
+    "headers": [
+      "REG",
+      "DT_ALT",
+      "COD_CCUS",
+      "CCUS"
+    ]
+  },
+  "0900": {
+    "bloco": "0",
+    "nivel": 2,
+    "parent": "0001",
+    "fk_parent": "fk_0001",
+    "headers": [
+      "REG",
+      "REC_TOTAL_BLOCO_A",
+      "REC_NRB_BLOCO_A",
+      "REC_TOTAL_BLOCO_C",
+      "REC_NRB_BLOCO_C",
+      "REC_TOTAL_BLOCO_D",
+      "REC_NRB_BLOCO_D",
+      "REC_TOTAL_BLOCO_F",
+      "REC_NRB_BLOCO_F",
+      "REC_TOTAL_BLOCO_I",
+      "REC_NRB_BLOCO_I",
+      "REC_TOTAL_BLOCO_1",
+      "REC_NRB_BLOCO_1",
+      "REC_TOTAL_PERIODO",
+      "REC_TOTAL_NRB_PERÍODO"
+    ]
+  },
+  "0990": {
+    "bloco": "0",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "QTD_LIN_0"
+    ]
+  },
+  "1001": {
+    "bloco": "1",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "IND_MOV"
+    ]
+  },
+  "1010": {
+    "bloco": "1",
+    "nivel": 2,
+    "parent": "1001",
+    "fk_parent": "fk_1001",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "ID_SEC_JUD",
+      "ID_VARA",
+      "IND_NAT_ACAO",
+      "DESC_DEC_JUD",
+      "DT_SENT_JUD"
+    ]
+  },
+  "1011": {
+    "bloco": "1",
+    "nivel": 3,
+    "parent": "1010",
+    "fk_parent": "fk_1010",
+    "headers": [
+      "REG",
+      "REG_REF",
+      "CHAVE_DOC",
+      "COD_PART",
+      "COD_ITEM",
+      "DT_OPER",
+      "VL_OPER",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "CST_PIS_SUSP",
+      "VL_BC_PIS_SUSP",
+      "ALIQ_PIS_SUSP",
+      "VL_PIS_SUSP",
+      "CST_COFINS_SUSP",
+      "VL_BC_COFINS_SUSP",
+      "ALIQ_COFINS_SUSP",
+      "VL_COFINS_SUSP",
+      "COD_CTA",
+      "COD_CCUS",
+      "DESC_DOC_OPER"
+    ]
+  },
+  "1020": {
+    "bloco": "1",
+    "nivel": 2,
+    "parent": "1001",
+    "fk_parent": "fk_1001",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_NAT_ACAO",
+      "DT_DEC_ADM"
+    ]
+  },
+  "1050": {
+    "bloco": "1",
+    "nivel": 2,
+    "parent": "1001",
+    "fk_parent": "fk_1001",
+    "headers": [
+      "REG",
+      "DT_REF",
+      "IND_AJ_BC",
+      "CNPJ",
+      "VL_AJ_TOT",
+      "VL_AJ_CST01",
+      "VL_AJ_CST02",
+      "VL_AJ_CST03",
+      "VL_AJ_CST04",
+      "VL_AJ_CST05",
+      "VL_AJ_CST06",
+      "VL_AJ_CST07",
+      "VL_AJ_CST08",
+      "VL_AJ_CST09",
+      "VL_AJ_CST49",
+      "VL_AJ_CST99",
+      "IND_APROP",
+      "NUM_REC",
+      "INFO_COMPL"
+    ]
+  },
+  "1100": {
+    "bloco": "1",
+    "nivel": 2,
+    "parent": "1001",
+    "fk_parent": "fk_1001",
+    "headers": [
+      "REG",
+      "PER_APU_CRED",
+      "ORIG_CRED",
+      "CNPJ_SUC",
+      "COD_CRED",
+      "VL_CRED_APU",
+      "VL_CRED_EXT_APU",
+      "VL_TOT_CRED_APU",
+      "VL_CRED_DESC_PA_ANT",
+      "VL_CRED_PER_PA_ANT",
+      "VL_CRED_DCOMP_PA_ANT",
+      "SD_CRED_DISP_EFD",
+      "VL_CRED_DESC_EFD",
+      "VL_CRED_PER_EFD",
+      "VL_CRED_DCOMP_EFD",
+      "VL_CRED_TRANS",
+      "VL_CRED_OUT",
+      "SLD_CRED_FIM"
+    ]
+  },
+  "1101": {
+    "bloco": "1",
+    "nivel": 3,
+    "parent": "1100",
+    "fk_parent": "fk_1100",
+    "headers": [
+      "REG",
+      "COD_PART",
+      "COD_ITEM",
+      "COD_MOD",
+      "SER",
+      "SUB_SER",
+      "NUM_DOC",
+      "DT_OPER",
+      "CHV_NFE",
+      "VL_OPER",
+      "CFOP",
+      "NAT_BC_CRED",
+      "IND_ORIG_CRED",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "COD_CTA",
+      "COD_CCUS",
+      "DESC_COMPL",
+      "PER_ESCRIT",
+      "CNPJ"
+    ]
+  },
+  "1102": {
+    "bloco": "1",
+    "nivel": 4,
+    "parent": "1101",
+    "fk_parent": "fk_1101",
+    "headers": [
+      "REG",
+      "VL_CRED_PIS_TRIB_MI",
+      "VL_CRED_PIS_NT_MI",
+      "VL_CRED_PIS_ EXP"
+    ]
+  },
+  "1200": {
+    "bloco": "1",
+    "nivel": 2,
+    "parent": "1001",
+    "fk_parent": "fk_1001",
+    "headers": [
+      "REG",
+      "PER_APUR_ANT",
+      "NAT_CONT_REC",
+      "VL_CONT_APUR",
+      "VL_CRED_PIS_DESC",
+      "VL_CONT_DEV",
+      "VL_OUT_DED",
+      "VL_CONT_EXT",
+      "VL_MUL",
+      "VL_JUR",
+      "DT_RECOL"
+    ]
+  },
+  "1210": {
+    "bloco": "1",
+    "nivel": 3,
+    "parent": "1200",
+    "fk_parent": "fk_1200",
+    "headers": [
+      "REG",
+      "CNPJ",
+      "CST_PIS",
+      "COD_PART",
+      "DT_OPER",
+      "VL_OPER",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "COD_CTA",
+      "DESC_COMPL"
+    ]
+  },
+  "1220": {
+    "bloco": "1",
+    "nivel": 3,
+    "parent": "1200",
+    "fk_parent": "fk_1200",
+    "headers": [
+      "REG",
+      "PER_APU_CRED",
+      "ORIG_CRED",
+      "COD_CRED",
+      "VL_CRED"
+    ]
+  },
+  "1300": {
+    "bloco": "1",
+    "nivel": 2,
+    "parent": "1001",
+    "fk_parent": "fk_1001",
+    "headers": [
+      "REG",
+      "IND_NAT_RET",
+      "IND_NAT_RET",
+      "PR_REC_RET",
+      "VL_RET_APU",
+      "VL_RET_DED",
+      "VL_RET_PER",
+      "VL_RET_DCOMP",
+      "SLD_RET"
+    ]
+  },
+  "1500": {
+    "bloco": "1",
+    "nivel": 2,
+    "parent": "1001",
+    "fk_parent": "fk_1001",
+    "headers": [
+      "REG",
+      "PER_APU_CRED",
+      "ORIG_CRED",
+      "CNPJ_SUC",
+      "COD_CRED",
+      "VL_CRED_APU",
+      "VL_CRED_EXT_APU",
+      "VL_TOT_CRED_APU",
+      "VL_CRED_DESC_PA_ANT",
+      "VL_CRED_PER_PA_ANT",
+      "VL_CRED_DCOMP_PA_ANT",
+      "SD_CRED_DISP_EFD",
+      "VL_CRED_DESC_EFD",
+      "VL_CRED_PER_EFD",
+      "VL_CRED_DCOMP_EFD",
+      "VL_CRED_TRANS",
+      "VL_CRED_OUT",
+      "SLD_CRED_FIM"
+    ]
+  },
+  "1501": {
+    "bloco": "1",
+    "nivel": 3,
+    "parent": "1500",
+    "fk_parent": "fk_1500",
+    "headers": [
+      "REG",
+      "COD_PART",
+      "COD_ITEM",
+      "COD_MOD",
+      "SER",
+      "SUB_SER",
+      "NUM_DOC",
+      "DT_OPER",
+      "CHV_NFE",
+      "VL_OPER",
+      "CFOP",
+      "NAT_BC_CRED",
+      "IND_ORIG_CRED",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA",
+      "COD_CCUS",
+      "DESC_COMPL",
+      "PER_ESCRIT",
+      "CNPJ"
+    ]
+  },
+  "1502": {
+    "bloco": "1",
+    "nivel": 4,
+    "parent": "1501",
+    "fk_parent": "fk_1501",
+    "headers": [
+      "REG",
+      "VL_CRED_COFINS_TRIB_MI",
+      "VL_CRED_COFINS_NT_MI",
+      "VL_CRED_COFINS_ EXP"
+    ]
+  },
+  "1600": {
+    "bloco": "1",
+    "nivel": 2,
+    "parent": "1001",
+    "fk_parent": "fk_1001",
+    "headers": [
+      "REG",
+      "PER_APUR_ANT",
+      "NAT_CONT_REC",
+      "VL_CONT_APUR",
+      "VL_CRED_COFINS_DESC",
+      "VL_CONT_DEV",
+      "VL_OUT_DED",
+      "VL_CONT_EXT",
+      "VL_MUL",
+      "VL_JUR",
+      "DT_RECOL"
+    ]
+  },
+  "1610": {
+    "bloco": "1",
+    "nivel": 3,
+    "parent": "1600",
+    "fk_parent": "fk_1600",
+    "headers": [
+      "REG",
+      "CNPJ",
+      "CST_COFINS",
+      "COD_PART",
+      "DT_OPER",
+      "VL_OPER",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA",
+      "DESC_COMPL"
+    ]
+  },
+  "1620": {
+    "bloco": "1",
+    "nivel": 3,
+    "parent": "1600",
+    "fk_parent": "fk_1600",
+    "headers": [
+      "REG",
+      "PER_APU_CRED",
+      "ORIG_CRED",
+      "COD_CRED",
+      "VL_CRED"
+    ]
+  },
+  "1700": {
+    "bloco": "1",
+    "nivel": 2,
+    "parent": "1001",
+    "fk_parent": "fk_1001",
+    "headers": [
+      "REG",
+      "IND_NAT_RET",
+      "IND_NAT_RET",
+      "PR_REC_RET",
+      "VL_RET_APU",
+      "VL_RET_DED",
+      "VL_RET_PER",
+      "VL_RET_DCOMP",
+      "SLD_RET"
+    ]
+  },
+  "1800": {
+    "bloco": "1",
+    "nivel": 2,
+    "parent": "1001",
+    "fk_parent": "fk_1001",
+    "headers": [
+      "REG",
+      "INC_IMOB",
+      "REC_RECEB_RET",
+      "REC_FIN_RET",
+      "BC_RET",
+      "ALIQ_RET",
+      "VL_REC_UNI",
+      "DT_REC_UNI",
+      "COD_REC"
+    ]
+  },
+  "1809": {
+    "bloco": "1",
+    "nivel": 3,
+    "parent": "1800",
+    "fk_parent": "fk_1800",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "1900": {
+    "bloco": "1",
+    "nivel": 2,
+    "parent": "1001",
+    "fk_parent": "fk_1001",
+    "headers": [
+      "REG",
+      "CNPJ",
+      "COD_MOD",
+      "SER",
+      "SUB_SER",
+      "COD_SIT",
+      "VL_TOT_REC",
+      "QUANT_DOC",
+      "CST_PIS",
+      "CST_COFINS",
+      "CFOP",
+      "INF_COMPL",
+      "COD_CTA"
+    ]
+  },
+  "1990": {
+    "bloco": "1",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "QTD_LIN_1"
+    ]
+  },
+  "9001": {
+    "bloco": "9",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "IND_MOV"
+    ]
+  },
+  "9900": {
+    "bloco": "9",
+    "nivel": 2,
+    "parent": "9001",
+    "fk_parent": "fk_9001",
+    "headers": [
+      "REG",
+      "REG_BLC",
+      "QTD_REG_BLC"
+    ]
+  },
+  "9990": {
+    "bloco": "9",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "QTD_LIN_9"
+    ]
+  },
+  "9999": {
+    "bloco": "9",
+    "nivel": 0,
+    "parent": null,
+    "fk_parent": null,
+    "headers": [
+      "REG",
+      "QTD_LIN"
+    ]
+  },
+  "A001": {
+    "bloco": "A",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "IND_MOV"
+    ]
+  },
+  "A010": {
+    "bloco": "A",
+    "nivel": 2,
+    "parent": "A001",
+    "fk_parent": "fk_A001",
+    "headers": [
+      "REG",
+      "CNPJ"
+    ]
+  },
+  "A100": {
+    "bloco": "A",
+    "nivel": 3,
+    "parent": "A010",
+    "fk_parent": "fk_A010",
+    "headers": [
+      "REG",
+      "IND_OPER",
+      "IND_EMIT",
+      "COD_PART",
+      "COD_SIT",
+      "SER",
+      "SUB",
+      "NUM_DOC",
+      "CHV_NFSE",
+      "DT_DOC",
+      "DT_EXE_SERV",
+      "VL_DOC",
+      "IND_PGTO",
+      "VL_DESC",
+      "VL_BC_PIS",
+      "VL_PIS",
+      "VL_BC_COFINS",
+      "VL_COFINS",
+      "VL_PIS_RET",
+      "VL_COFINS_RET",
+      "VL_ISS"
+    ]
+  },
+  "A110": {
+    "bloco": "A",
+    "nivel": 4,
+    "parent": "A100",
+    "fk_parent": "fk_A100",
+    "headers": [
+      "REG",
+      "COD_INF",
+      "TXT_COMPL"
+    ]
+  },
+  "A111": {
+    "bloco": "A",
+    "nivel": 4,
+    "parent": "A100",
+    "fk_parent": "fk_A100",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "A120": {
+    "bloco": "A",
+    "nivel": 4,
+    "parent": "A100",
+    "fk_parent": "fk_A100",
+    "headers": [
+      "REG",
+      "VL_TOT_SERV",
+      "VL_BC_PIS",
+      "VL_PIS_IMP",
+      "DT_PAG_PIS",
+      "VL_BC_COFINS",
+      "VL_COFINS_IMP",
+      "DT_PAG_COFINS",
+      "LOC_EXE_SERV"
+    ]
+  },
+  "A170": {
+    "bloco": "A",
+    "nivel": 4,
+    "parent": "A100",
+    "fk_parent": "fk_A100",
+    "headers": [
+      "REG",
+      "NUM_ITEM",
+      "COD_ITEM",
+      "DESCR_COMPL",
+      "VL_ITEM",
+      "VL_DESC",
+      "NAT_BC_CRED",
+      "IND_ORIG_CRED",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA",
+      "COD_CCUS"
+    ]
+  },
+  "A990": {
+    "bloco": "A",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "QTD_LIN_A"
+    ]
+  },
+  "C001": {
+    "bloco": "C",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "IND_MOV"
+    ]
+  },
+  "C010": {
+    "bloco": "C",
+    "nivel": 2,
+    "parent": "C001",
+    "fk_parent": "fk_C001",
+    "headers": [
+      "REG",
+      "CNPJ",
+      "IND_ESCRI"
+    ]
+  },
+  "C100": {
+    "bloco": "C",
+    "nivel": 3,
+    "parent": "C010",
+    "fk_parent": "fk_C010",
+    "headers": [
+      "REG",
+      "IND_OPER",
+      "IND_EMIT",
+      "COD_PART",
+      "COD_MOD",
+      "COD_SIT;",
+      "SER",
+      "NUM_DOC",
+      "CHV_NFE",
+      "DT_DOC",
+      "DT_E_S",
+      "VL_DOC",
+      "IND_PGTO",
+      "IND_PGTO",
+      "VL_DESC",
+      "VL_ABAT_NT",
+      "VL_MERC",
+      "IND_FRT",
+      "IND_FRT",
+      "IND_FRT",
+      "VL_FRT",
+      "VL_SEG",
+      "VL_OUT_DA",
+      "VL_BC_ICMS",
+      "VL_ICMS",
+      "VL_BC_ICMS_ST",
+      "VL_ICMS_ST",
+      "VL_IPI",
+      "VL_PIS",
+      "VL_COFINS",
+      "VL_PIS_ST",
+      "VL_COFINS_ST"
+    ]
+  },
+  "C110": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C100",
+    "fk_parent": "fk_C100",
+    "headers": [
+      "REG",
+      "COD_INF",
+      "TXT_COMPL"
+    ]
+  },
+  "C111": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C100",
+    "fk_parent": "fk_C100",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "C120": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C100",
+    "fk_parent": "fk_C100",
+    "headers": [
+      "REG",
+      "COD_DOC_IMP",
+      "NUM_DOC_IMP",
+      "VL_PIS_IMP",
+      "VL_COFINS_IMP",
+      "NUM_ACDRAW"
+    ]
+  },
+  "C170": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C100",
+    "fk_parent": "fk_C100",
+    "headers": [
+      "REG",
+      "NUM_ITEM",
+      "COD_ITEM",
+      "DESCR_COMPL",
+      "QTD",
+      "UNID",
+      "VL_ITEM",
+      "VL_DESC",
+      "CST_ICMS",
+      "CFOP",
+      "COD_NAT",
+      "VL_BC_ICMS",
+      "ALIQ_ICMS",
+      "VL_ICMS",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_COFINS",
+      "IND_MOV",
+      "VL_BC_ICMS_ST",
+      "ALIQ_ST",
+      "VL_ICMS_ST",
+      "IND_APUR",
+      "CST_IPI",
+      "COD_ENQ",
+      "VL_BC_IPI",
+      "ALIQ_IPI",
+      "VL_IPI",
+      "COD_CTA"
+    ]
+  },
+  "C175": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C100",
+    "fk_parent": "fk_C100",
+    "headers": [
+      "REG",
+      "CFOP",
+      "VL_OPR",
+      "VL_DESC",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_COFINS",
+      "COD_CTA",
+      "INFO_COMPL"
+    ]
+  },
+  "C180": {
+    "bloco": "C",
+    "nivel": 3,
+    "parent": "C010",
+    "fk_parent": "fk_C010",
+    "headers": [
+      "REG",
+      "COD_MOD",
+      "DT_DOC_INI",
+      "DT_DOC_FIN",
+      "COD_ITEM",
+      "COD_NCM",
+      "EX_IPI",
+      "VL_TOT_ITEM"
+    ]
+  },
+  "C181": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C180",
+    "fk_parent": "fk_C180",
+    "headers": [
+      "REG",
+      "CST_PIS",
+      "CFOP",
+      "VL_ITEM",
+      "VL_DESC",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_PIS",
+      "COD_CTA"
+    ]
+  },
+  "C185": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C180",
+    "fk_parent": "fk_C180",
+    "headers": [
+      "REG",
+      "CST_COFINS",
+      "CFOP",
+      "VL_ITEM",
+      "VL_DESC",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "C188": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C180",
+    "fk_parent": "fk_C180",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "C190": {
+    "bloco": "C",
+    "nivel": 3,
+    "parent": "C010",
+    "fk_parent": "fk_C010",
+    "headers": [
+      "REG",
+      "COD_MOD",
+      "DT_REF_INI",
+      "DT_REF_FIN",
+      "COD_ITEM",
+      "COD_NCM",
+      "EX_IPI",
+      "VL_TOT_ITEM"
+    ]
+  },
+  "C191": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C190",
+    "fk_parent": "fk_C190",
+    "headers": [
+      "REG",
+      "CNPJ_CPF_PART",
+      "CST_PIS",
+      "CFOP",
+      "VL_ITEM",
+      "VL_DESC",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_PIS",
+      "COD_CTA"
+    ]
+  },
+  "C195": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C190",
+    "fk_parent": "fk_C190",
+    "headers": [
+      "REG",
+      "CNPJ_CPF_PART",
+      "CST_COFINS",
+      "CFOP",
+      "VL_ITEM",
+      "VL_DESC",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "C198": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C190",
+    "fk_parent": "fk_C190",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "C199": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C190",
+    "fk_parent": "fk_C190",
+    "headers": [
+      "REG",
+      "COD_DOC_IMP",
+      "NUM_DOC__IMP",
+      "VL_PIS_IMP",
+      "VL_COFINS_IMP",
+      "NUM_ACDRAW"
+    ]
+  },
+  "C380": {
+    "bloco": "C",
+    "nivel": 3,
+    "parent": "C010",
+    "fk_parent": "fk_C010",
+    "headers": [
+      "REG",
+      "COD_MOD",
+      "DT_DOC_INI",
+      "DT_DOC_FIN",
+      "NUM_DOC_INI",
+      "NUM_DOC_FIN",
+      "VL_DOC",
+      "VL_DOC_CANC"
+    ]
+  },
+  "C381": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C380",
+    "fk_parent": "fk_C380",
+    "headers": [
+      "REG",
+      "CST_PIS",
+      "COD_ITEM",
+      "VL_ITEM",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_PIS",
+      "COD_CTA"
+    ]
+  },
+  "C385": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C380",
+    "fk_parent": "fk_C380",
+    "headers": [
+      "REG",
+      "CST_COFINS",
+      "COD_ITEM",
+      "VL_ITEM",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "C395": {
+    "bloco": "C",
+    "nivel": 3,
+    "parent": "C010",
+    "fk_parent": "fk_C010",
+    "headers": [
+      "REG",
+      "COD_MOD",
+      "COD_PART",
+      "SER",
+      "SUB_SER",
+      "NUM_DOC",
+      "DT_DOC",
+      "VL_DOC"
+    ]
+  },
+  "C396": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C395",
+    "fk_parent": "fk_C395",
+    "headers": [
+      "REG",
+      "COD_ITEM",
+      "VL_ITEM",
+      "VL_DESC",
+      "NAT_BC_CRED",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "C400": {
+    "bloco": "C",
+    "nivel": 3,
+    "parent": "C010",
+    "fk_parent": "fk_C010",
+    "headers": [
+      "REG",
+      "COD_MOD",
+      "ECF_MOD",
+      "ECF_FAB",
+      "ECF_CX"
+    ]
+  },
+  "C405": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C400",
+    "fk_parent": "fk_C400",
+    "headers": [
+      "REG",
+      "DT_DOC",
+      "CRO",
+      "CRZ",
+      "NUM_COO_FIN",
+      "GT_FIN",
+      "VL_BRT"
+    ]
+  },
+  "C481": {
+    "bloco": "C",
+    "nivel": 5,
+    "parent": "C405",
+    "fk_parent": "fk_C405",
+    "headers": [
+      "REG",
+      "CST_PIS",
+      "VL_ITEM",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_PIS",
+      "COD_ITEM",
+      "COD_CTA"
+    ]
+  },
+  "C485": {
+    "bloco": "C",
+    "nivel": 5,
+    "parent": "C405",
+    "fk_parent": "fk_C405",
+    "headers": [
+      "REG",
+      "CST_COFINS",
+      "VL_ITEM",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_COFINS",
+      "COD_ITEM",
+      "COD_CTA"
+    ]
+  },
+  "C489": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C400",
+    "fk_parent": "fk_C400",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "C490": {
+    "bloco": "C",
+    "nivel": 3,
+    "parent": "C010",
+    "fk_parent": "fk_C010",
+    "headers": [
+      "REG",
+      "DT_DOC_INI",
+      "DT_DOC_FIN",
+      "COD_MOD"
+    ]
+  },
+  "C491": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C490",
+    "fk_parent": "fk_C490",
+    "headers": [
+      "REG",
+      "COD_ITEM",
+      "CST_PIS",
+      "CFOP",
+      "VL_ITEM",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_PIS",
+      "COD_CTA"
+    ]
+  },
+  "C495": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C490",
+    "fk_parent": "fk_C490",
+    "headers": [
+      "REG",
+      "COD_ITEM",
+      "CST_COFINS",
+      "CFOP",
+      "VL_ITEM",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "C499": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C490",
+    "fk_parent": "fk_C490",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "C500": {
+    "bloco": "C",
+    "nivel": 3,
+    "parent": "C010",
+    "fk_parent": "fk_C010",
+    "headers": [
+      "REG",
+      "COD_PART",
+      "COD_MOD",
+      "COD_SIT",
+      "SER",
+      "SUB",
+      "NUM_DOC",
+      "DT_DOC",
+      "DT_ENT",
+      "VL_DOC",
+      "VL_ICMS",
+      "COD_INF",
+      "VL_PIS",
+      "VL_COFINS",
+      "CHV_DOCe"
+    ]
+  },
+  "C501": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C500",
+    "fk_parent": "fk_C500",
+    "headers": [
+      "REG",
+      "CST_PIS",
+      "VL_ITEM",
+      "NAT_BC_CRED",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "COD_CTA"
+    ]
+  },
+  "C505": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C500",
+    "fk_parent": "fk_C500",
+    "headers": [
+      "REG",
+      "CST_COFINS",
+      "VL_ITEM",
+      "NAT_BC_CRED",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "C509": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C500",
+    "fk_parent": "fk_C500",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "C600": {
+    "bloco": "C",
+    "nivel": 3,
+    "parent": "C010",
+    "fk_parent": "fk_C010",
+    "headers": [
+      "REG",
+      "COD_MOD",
+      "COD_MUN",
+      "SER",
+      "SUB",
+      "COD_CONS",
+      "QTD_CONS",
+      "QTD_CANC",
+      "DT_DOC",
+      "VL_DOC",
+      "VL_DESC",
+      "CONS",
+      "VL_FORN",
+      "VL_SERV_NT",
+      "VL_TERC",
+      "VL_DA",
+      "VL_BC_ICMS",
+      "VL_ICMS",
+      "VL_BC_ICMS_ST",
+      "VL_ICMS_ST",
+      "VL_PIS",
+      "VL_COFINS"
+    ]
+  },
+  "C601": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C600",
+    "fk_parent": "fk_C600",
+    "headers": [
+      "REG",
+      "CST_PIS",
+      "VL_ITEM",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "COD_CTA"
+    ]
+  },
+  "C605": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C600",
+    "fk_parent": "fk_C600",
+    "headers": [
+      "REG",
+      "CST_COFINS",
+      "VL_ITEM",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "C609": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C600",
+    "fk_parent": "fk_C600",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "C800": {
+    "bloco": "C",
+    "nivel": 3,
+    "parent": "C010",
+    "fk_parent": "fk_C010",
+    "headers": [
+      "REG",
+      "COD_MOD",
+      "COD_SIT",
+      "NUM_CFE",
+      "DT_DOC",
+      "VL_CFE",
+      "VL_PIS",
+      "VL_COFINS",
+      "CNPJ_CPF",
+      "NR_SAT",
+      "CHV_CFE",
+      "VL_DESC",
+      "VL_MERC",
+      "VL_OUT_DA",
+      "VL_ICMS",
+      "VL_PIS_ST",
+      "VL_COFINS_ST"
+    ]
+  },
+  "C810": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C800",
+    "fk_parent": "fk_C800",
+    "headers": [
+      "REG",
+      "CFOP",
+      "VL_ITEM",
+      "COD_ITEM",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "C820": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C800",
+    "fk_parent": "fk_C800",
+    "headers": [
+      "REG",
+      "CFOP",
+      "VL_ITEM",
+      "COD_ITEM",
+      "CST_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_PIS",
+      "CST_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "C830": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C800",
+    "fk_parent": "fk_C800",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "C860": {
+    "bloco": "C",
+    "nivel": 3,
+    "parent": "C010",
+    "fk_parent": "fk_C010",
+    "headers": [
+      "REG",
+      "COD_MOD",
+      "NR_SAT",
+      "DT_DOC",
+      "DOC_INI",
+      "DOC_FIM"
+    ]
+  },
+  "C870": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C860",
+    "fk_parent": "fk_C860",
+    "headers": [
+      "REG",
+      "COD_ITEM",
+      "CFOP",
+      "VL_ITEM",
+      "VL_DESC",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "C880": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C860",
+    "fk_parent": "fk_C860",
+    "headers": [
+      "REG",
+      "COD_ITEM",
+      "CFOP",
+      "VL_ITEM",
+      "VL_DESC",
+      "CST_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_PIS",
+      "CST_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "C890": {
+    "bloco": "C",
+    "nivel": 4,
+    "parent": "C860",
+    "fk_parent": "fk_C860",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "C990": {
+    "bloco": "C",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "QTD_LIN_C"
+    ]
+  },
+  "D001": {
+    "bloco": "D",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "IND_MOV"
+    ]
+  },
+  "D010": {
+    "bloco": "D",
+    "nivel": 2,
+    "parent": "D001",
+    "fk_parent": "fk_D001",
+    "headers": [
+      "REG",
+      "CNPJ"
+    ]
+  },
+  "D100": {
+    "bloco": "D",
+    "nivel": 3,
+    "parent": "D010",
+    "fk_parent": "fk_D010",
+    "headers": [
+      "REG",
+      "IND_OPER",
+      "IND_EMIT",
+      "COD_PART",
+      "COD_MOD",
+      "COD_SIT",
+      "SER",
+      "SUB",
+      "NUM_DOC",
+      "CHV_CTE",
+      "DT_DOC",
+      "DT_A_P",
+      "TP_CT-e",
+      "CHV_CTE_REF",
+      "VL_DOC",
+      "VL_DESC",
+      "IND_FRT",
+      "IND_FRT",
+      "VL_SERV",
+      "VL_BC_ICMS",
+      "VL_ICMS",
+      "VL_NT",
+      "COD_INF",
+      "COD_CTA"
+    ]
+  },
+  "D101": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D100",
+    "fk_parent": "fk_D100",
+    "headers": [
+      "REG",
+      "IND_NAT_FRT",
+      "VL_ITEM",
+      "CST_PIS",
+      "NAT_BC_CRED",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "COD_CTA"
+    ]
+  },
+  "D105": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D100",
+    "fk_parent": "fk_D100",
+    "headers": [
+      "REG",
+      "IND_NAT_FRT",
+      "VL_ITEM",
+      "CST_COFINS",
+      "NAT_BC_CRED",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "D111": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D100",
+    "fk_parent": "fk_D100",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "D200": {
+    "bloco": "D",
+    "nivel": 3,
+    "parent": "D010",
+    "fk_parent": "fk_D010",
+    "headers": [
+      "REG",
+      "COD_MOD",
+      "COD_SIT",
+      "SER",
+      "SUB",
+      "NUM_DOC_INI",
+      "NUM_DOC_FIN",
+      "CFOP",
+      "DT_REF",
+      "VL_DOC",
+      "VL_DESC"
+    ]
+  },
+  "D201": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D200",
+    "fk_parent": "fk_D200",
+    "headers": [
+      "REG",
+      "CST_PIS",
+      "VL_ITEM",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "COD_CTA"
+    ]
+  },
+  "D205": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D200",
+    "fk_parent": "fk_D200",
+    "headers": [
+      "REG",
+      "CST_COFINS",
+      "VL_ITEM",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "D209": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D200",
+    "fk_parent": "fk_D200",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "D300": {
+    "bloco": "D",
+    "nivel": 3,
+    "parent": "D010",
+    "fk_parent": "fk_D010",
+    "headers": [
+      "REG",
+      "COD_MOD",
+      "SER",
+      "SUB",
+      "NUM_DOC_INI",
+      "NUM_DOC_FIN",
+      "CFOP",
+      "DT_REF",
+      "VL_DOC",
+      "VL_DESC",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "D309": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D300",
+    "fk_parent": "fk_D300",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "D350": {
+    "bloco": "D",
+    "nivel": 3,
+    "parent": "D010",
+    "fk_parent": "fk_D010",
+    "headers": [
+      "REG",
+      "COD_MOD",
+      "ECF_MOD",
+      "ECF_FAB",
+      "DT_DOC",
+      "CRO",
+      "CRZ",
+      "NUM_COO_FIN",
+      "GT_FIN",
+      "VL_BRT",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "D359": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D350",
+    "fk_parent": "fk_D350",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "D500": {
+    "bloco": "D",
+    "nivel": 3,
+    "parent": "D010",
+    "fk_parent": "fk_D010",
+    "headers": [
+      "REG",
+      "IND_OPER",
+      "IND_EMIT",
+      "COD_PART",
+      "COD_MOD",
+      "COD_SIT",
+      "SER",
+      "SUB",
+      "NUM_DOC",
+      "DT_DOC",
+      "DT_A_P",
+      "VL_DOC",
+      "VL_DESC",
+      "VL_SERV",
+      "VL_SERV_NT",
+      "VL_TERC",
+      "VL_DA",
+      "VL_BC_ICMS",
+      "VL_ICMS",
+      "COD_INF",
+      "VL_PIS",
+      "VL_COFINS"
+    ]
+  },
+  "D501": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D500",
+    "fk_parent": "fk_D500",
+    "headers": [
+      "REG",
+      "CST_PIS",
+      "VL_ITEM",
+      "NAT_BC_CRED",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "COD_CTA"
+    ]
+  },
+  "D505": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D500",
+    "fk_parent": "fk_D500",
+    "headers": [
+      "REG",
+      "CST_COFINS",
+      "VL_ITEM",
+      "NAT_BC_CRED",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "D509": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D500",
+    "fk_parent": "fk_D500",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "D600": {
+    "bloco": "D",
+    "nivel": 3,
+    "parent": "D010",
+    "fk_parent": "fk_D010",
+    "headers": [
+      "REG",
+      "COD_MOD",
+      "COD_MUN",
+      "SER",
+      "SUB",
+      "IND_REC",
+      "QTD_CONS",
+      "DT_DOC_INI",
+      "DT_DOC_FIN",
+      "VL_DOC",
+      "VL_DESC",
+      "VL_SERV",
+      "VL_SERV_NT",
+      "VL_TERC",
+      "VL_DA",
+      "VL_BC_ICMS",
+      "VL_ICMS",
+      "VL_PIS",
+      "VL_COFINS"
+    ]
+  },
+  "D601": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D600",
+    "fk_parent": "fk_D600",
+    "headers": [
+      "REG",
+      "COD_CLASS",
+      "VL_ITEM",
+      "VL_DESC",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "COD_CTA"
+    ]
+  },
+  "D605": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D600",
+    "fk_parent": "fk_D600",
+    "headers": [
+      "REG",
+      "COD_CLASS",
+      "VL_ITEM",
+      "VL_DESC",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA"
+    ]
+  },
+  "D609": {
+    "bloco": "D",
+    "nivel": 4,
+    "parent": "D600",
+    "fk_parent": "fk_D600",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "D990": {
+    "bloco": "D",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "QTD_LIN_D"
+    ]
+  },
+  "F001": {
+    "bloco": "F",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "IND_MOV"
+    ]
+  },
+  "F010": {
+    "bloco": "F",
+    "nivel": 2,
+    "parent": "F001",
+    "fk_parent": "fk_F001",
+    "headers": [
+      "REG",
+      "CNPJ"
+    ]
+  },
+  "F100": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "IND_OPER",
+      "COD_PART",
+      "COD_ITEM",
+      "DT_OPER",
+      "VL_OPER",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "NAT_BC_CRED",
+      "IND_ORIG_CRED",
+      "COD_CTA",
+      "COD_CCUS",
+      "DESC_DOC_OPER"
+    ]
+  },
+  "F111": {
+    "bloco": "F",
+    "nivel": 4,
+    "parent": "F100",
+    "fk_parent": "fk_F100",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "F120": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "NAT_BC_CRED",
+      "IDENT_BEM_IMOB",
+      "IND_ORIG_CRED",
+      "IND_UTIL_BEM_IMOB",
+      "VL_OPER_DEP",
+      "PARC_OPER_NAO_BC_CRED",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA",
+      "COD_CCUS",
+      "DESC_ BEM_IMOB"
+    ]
+  },
+  "F129": {
+    "bloco": "F",
+    "nivel": 4,
+    "parent": "F120",
+    "fk_parent": "fk_F120",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "F130": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "NAT_BC_CRED",
+      "IDENT_BEM_IMOB",
+      "IND_ORIG_CRED",
+      "IND_UTIL_BEM_IMOB",
+      "MES_OPER_AQUIS",
+      "VL_OPER_AQUIS",
+      "PARC_OPER_NAO_BC_CRED",
+      "VL_BC_CRED",
+      "IND_NR_PARC",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_CTA",
+      "COD_CCUS",
+      "DESC_ BEM_IMOB"
+    ]
+  },
+  "F139": {
+    "bloco": "F",
+    "nivel": 4,
+    "parent": "F130",
+    "fk_parent": "fk_F130",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "F150": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "NAT_BC_CRED",
+      "VL_TOT_EST",
+      "EST_IMP",
+      "VL_BC_EST",
+      "VL_BC_MEN_EST",
+      "CST_PIS",
+      "ALIQ_PIS",
+      "VL_CRED_PIS",
+      "CST_COFINS",
+      "ALIQ_COFINS",
+      "VL_CRED_ COFINS",
+      "DESC_EST",
+      "COD_CTA"
+    ]
+  },
+  "F200": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "IND_OPER",
+      "UNID_IMOB",
+      "IDENT_EMP",
+      "DESC_UNID_IMOB",
+      "NUM_CONT",
+      "CPF_CNPJ_ADQU",
+      "DT_OPER",
+      "VL_TOT_VEND",
+      "VL_REC_ACUM",
+      "VL_TOT_REC",
+      "CST_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "PERC_REC_RECEB",
+      "IND_NAT_EMP",
+      "INF_COMP"
+    ]
+  },
+  "F205": {
+    "bloco": "F",
+    "nivel": 4,
+    "parent": "F200",
+    "fk_parent": "fk_F200",
+    "headers": [
+      "REG",
+      "VL_CUS_INC_ACUM_ANT",
+      "VL_CUS_INC_PER_ESC",
+      "VL_CUS_INC_ACUM",
+      "VL_EXC_BC_CUS_INC_ACUM",
+      "VL_BC_CUS_INC",
+      "CST_PIS",
+      "ALIQ_PIS",
+      "VL_CRED_PIS_ACUM",
+      "VL_CRED_PIS_DESC_ANT",
+      "VL_CRED_PIS_DESC",
+      "VL_CRED_PIS_DESC_FUT",
+      "CST_COFINS",
+      "ALIQ_COFINS",
+      "VL_CRED_COFINS_ACUM",
+      "VL_CRED_COFINS_DESC_ANT",
+      "VL_CRED_COFINS_DESC",
+      "VL_CRED_COFINS_DESC_FUT"
+    ]
+  },
+  "F210": {
+    "bloco": "F",
+    "nivel": 4,
+    "parent": "F200",
+    "fk_parent": "fk_F200",
+    "headers": [
+      "REG",
+      "VL_CUS_ORC",
+      "VL_EXC",
+      "VL_CUS_ORC_AJU",
+      "VL_BC_CRED",
+      "CST_PIS",
+      "ALIQ_PIS",
+      "VL_CRED_PIS_UTIL",
+      "CST_COFINS",
+      "ALIQ_COFINS",
+      "VL_CRED_COFINS_UTIL"
+    ]
+  },
+  "F211": {
+    "bloco": "F",
+    "nivel": 4,
+    "parent": "F200",
+    "fk_parent": "fk_F200",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "F500": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "VL_REC_CAIXA",
+      "CST_PIS",
+      "VL_DESC_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_DESC_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_MOD",
+      "CFOP",
+      "COD_CTA",
+      "INFO_COMPL"
+    ]
+  },
+  "F509": {
+    "bloco": "F",
+    "nivel": 4,
+    "parent": "F500",
+    "fk_parent": "fk_F500",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "F510": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "VL_REC_CAIXA",
+      "CST_PIS",
+      "VL_DESC_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_DESC_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_COFINS",
+      "COD_MOD",
+      "CFOP",
+      "COD_CTA",
+      "INFO_COMPL"
+    ]
+  },
+  "F519": {
+    "bloco": "F",
+    "nivel": 4,
+    "parent": "F510",
+    "fk_parent": "fk_F510",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "F525": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "VL_REC",
+      "IND_REC",
+      "CNPJ_CPF",
+      "NUM_DOC",
+      "COD_ITEM",
+      "VL_REC_DET",
+      "CST_PIS",
+      "CST_COFINS",
+      "INFO_COMPL",
+      "COD_CTA"
+    ]
+  },
+  "F550": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "VL_REC_COMP",
+      "CST_PIS",
+      "VL_DESC_PIS",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_DESC_COFINS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "COD_MOD",
+      "CFOP",
+      "COD_CTA",
+      "INFO_COMPL"
+    ]
+  },
+  "F559": {
+    "bloco": "F",
+    "nivel": 4,
+    "parent": "F550",
+    "fk_parent": "fk_F550",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "F560": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "VL_REC_COMP",
+      "CST_PIS",
+      "VL_DESC_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_PIS",
+      "CST_COFINS",
+      "VL_DESC_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_COFINS",
+      "COD_MOD",
+      "CFOP",
+      "COD_CTA",
+      "INFO_COMPL"
+    ]
+  },
+  "F569": {
+    "bloco": "F",
+    "nivel": 4,
+    "parent": "F560",
+    "fk_parent": "fk_F560",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "F600": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "IND_NAT_RET",
+      "DT_RET",
+      "VL_BC_RET",
+      "VL_RET",
+      "COD_REC",
+      "IND_NAT_REC",
+      "CNPJ",
+      "VL_RET_PIS",
+      "VL_RET_COFINS",
+      "IND_DEC"
+    ]
+  },
+  "F700": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "IND_ORI_DED",
+      "IND_NAT_DED",
+      "VL_DED_PIS",
+      "VL_DED_COFINS",
+      "VL_BC_OPER",
+      "CNPJ",
+      "INF_COMP"
+    ]
+  },
+  "F800": {
+    "bloco": "F",
+    "nivel": 3,
+    "parent": "F010",
+    "fk_parent": "fk_F010",
+    "headers": [
+      "REG",
+      "IND_NAT_EVEN",
+      "DT_EVEN",
+      "CNPJ_SUCED",
+      "PA_CONT_CRED",
+      "COD_CRED",
+      "VL_CRED_PIS",
+      "VL_CRED_COFINS",
+      "PER_CRED_CIS"
+    ]
+  },
+  "F990": {
+    "bloco": "F",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "QTD_LIN_F"
+    ]
+  },
+  "I001": {
+    "bloco": "I",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "IND_MOV"
+    ]
+  },
+  "I010": {
+    "bloco": "I",
+    "nivel": 2,
+    "parent": "I001",
+    "fk_parent": "fk_I001",
+    "headers": [
+      "REG",
+      "CNPJ",
+      "IND_ATIV",
+      "INFO_COMPL"
+    ]
+  },
+  "I100": {
+    "bloco": "I",
+    "nivel": 3,
+    "parent": "I010",
+    "fk_parent": "fk_I010",
+    "headers": [
+      "REG",
+      "VL_REC",
+      "CST_PIS_COFINS",
+      "VL_TOT_DED_GER",
+      "VL_TOT_DED_ESP",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "VL_PIS",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "VL_COFINS",
+      "INFO_COMPL"
+    ]
+  },
+  "I199": {
+    "bloco": "I",
+    "nivel": 4,
+    "parent": "I100",
+    "fk_parent": "fk_I100",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "I200": {
+    "bloco": "I",
+    "nivel": 4,
+    "parent": "I100",
+    "fk_parent": "fk_I100",
+    "headers": [
+      "REG",
+      "NUM_CAMPO",
+      "COD_DET",
+      "DET_VALOR",
+      "COD_CTA",
+      "INFO_COMPL"
+    ]
+  },
+  "I299": {
+    "bloco": "I",
+    "nivel": 5,
+    "parent": "I200",
+    "fk_parent": "fk_I200",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "I300": {
+    "bloco": "I",
+    "nivel": 5,
+    "parent": "I200",
+    "fk_parent": "fk_I200",
+    "headers": [
+      "REG",
+      "COD_COMP",
+      "DET_VALOR",
+      "COD_CTA",
+      "INFO_COMPL"
+    ]
+  },
+  "I399": {
+    "bloco": "I",
+    "nivel": 6,
+    "parent": "I300",
+    "fk_parent": "fk_I300",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "I990": {
+    "bloco": "I",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "QTD_LIN_I"
+    ]
+  },
+  "M001": {
+    "bloco": "M",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "IND_MOV"
+    ]
+  },
+  "M100": {
+    "bloco": "M",
+    "nivel": 2,
+    "parent": "M001",
+    "fk_parent": "fk_M001",
+    "headers": [
+      "REG",
+      "COD_CRED",
+      "IND_CRED_ORI",
+      "VL_BC_PIS",
+      "ALIQ_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_CRED",
+      "VL_AJUS_ACRES",
+      "VL_AJUS_REDUC",
+      "VL_CRED_DIF",
+      "VL_CRED_DISP",
+      "IND_DESC_CRED",
+      "VL_CRED_DESC",
+      "SLD_CRED"
+    ]
+  },
+  "M105": {
+    "bloco": "M",
+    "nivel": 3,
+    "parent": "M100",
+    "fk_parent": "fk_M100",
+    "headers": [
+      "REG",
+      "NAT_BC_CRED",
+      "CST_PIS",
+      "VL_BC_PIS_TOT",
+      "VL_BC_PIS_CUM",
+      "VL_BC_PIS_NC",
+      "VL_BC_PIS",
+      "QUANT_BC_PIS_TOT",
+      "QUANT_BC_PIS",
+      "DESC_CRED"
+    ]
+  },
+  "M110": {
+    "bloco": "M",
+    "nivel": 3,
+    "parent": "M100",
+    "fk_parent": "fk_M100",
+    "headers": [
+      "REG",
+      "IND_AJ",
+      "VL_AJ",
+      "COD_AJ",
+      "NUM_DOC",
+      "DESCR_AJ",
+      "DT_REF"
+    ]
+  },
+  "M115": {
+    "bloco": "M",
+    "nivel": 4,
+    "parent": "M110",
+    "fk_parent": "fk_M110",
+    "headers": [
+      "REG",
+      "DET_VALOR_AJ",
+      "CST_PIS",
+      "DET_BC_CRED",
+      "DET_ALIQ",
+      "DT_OPER_AJ",
+      "DESC_AJ",
+      "COD_CTA",
+      "INFO_COMPL"
+    ]
+  },
+  "M200": {
+    "bloco": "M",
+    "nivel": 2,
+    "parent": "M001",
+    "fk_parent": "fk_M001",
+    "headers": [
+      "REG",
+      "VL_TOT_CONT_NC_PER",
+      "VL_TOT_CRED_DESC",
+      "VL_TOT_CRED_DESC_ANT",
+      "VL_TOT_CONT_NC_DEV",
+      "VL_RET_NC",
+      "VL_OUT_DED_NC",
+      "VL_CONT_NC_REC",
+      "VL_TOT_CONT_CUM_PER",
+      "VL_RET_CUM",
+      "VL_OUT_DED_CUM",
+      "VL_CONT_CUM_REC",
+      "VL_TOT_CONT_REC"
+    ]
+  },
+  "M205": {
+    "bloco": "M",
+    "nivel": 3,
+    "parent": "M200",
+    "fk_parent": "fk_M200",
+    "headers": [
+      "REG",
+      "NUM_CAMPO",
+      "COD_REC",
+      "VL_DEBITO"
+    ]
+  },
+  "M210": {
+    "bloco": "M",
+    "nivel": 3,
+    "parent": "M200",
+    "fk_parent": "fk_M200",
+    "headers": [
+      "REG",
+      "COD_CONT",
+      "VL_REC_BRT",
+      "VL_BC_CONT",
+      "ALIQ_PIS",
+      "QUANT_BC_PIS",
+      "ALIQ_PIS_QUANT",
+      "VL_CONT_APUR",
+      "VL_AJUS_ACRES",
+      "VL_AJUS_REDUC",
+      "VL_CONT_DIFER",
+      "VL_CONT_DIFER_ANT",
+      "VL_CONT_PER",
+      "VL_AJUS_ACRES_BC_PIS",
+      "VL_AJUS_REDUC_BC_PIS",
+      "VL_BC_CONT_AJUS"
+    ]
+  },
+  "M211": {
+    "bloco": "M",
+    "nivel": 4,
+    "parent": "M210",
+    "fk_parent": "fk_M210",
+    "headers": [
+      "REG",
+      "IND_TIP_COOP",
+      "VL_BC_CONT_ANT_EXC_COOP",
+      "VL_EXC_COOP_GER",
+      "VL_EXC_ESP_COOP",
+      "VL_BC_CONT"
+    ]
+  },
+  "M215": {
+    "bloco": "M",
+    "nivel": 4,
+    "parent": "M210",
+    "fk_parent": "fk_M210",
+    "headers": [
+      "REG",
+      "IND_AJ_BC",
+      "VL_AJ_BC",
+      "COD_AJ_BC",
+      "NUM_DOC",
+      "DESCR_AJ_BC",
+      "DT_REF",
+      "COD_CTA",
+      "CNPJ",
+      "INFO_COMPL"
+    ]
+  },
+  "M220": {
+    "bloco": "M",
+    "nivel": 4,
+    "parent": "M210",
+    "fk_parent": "fk_M210",
+    "headers": [
+      "REG",
+      "IND_AJ",
+      "VL_AJ",
+      "COD_AJ",
+      "NUM_DOC",
+      "DESCR_AJ",
+      "DT_REF"
+    ]
+  },
+  "M225": {
+    "bloco": "M",
+    "nivel": 5,
+    "parent": "M220",
+    "fk_parent": "fk_M220",
+    "headers": [
+      "REG",
+      "DET_VALOR_AJ",
+      "CST_PIS",
+      "DET_BC_CRED",
+      "DET_ALIQ",
+      "DT_OPER_AJ",
+      "DESC_AJ",
+      "COD_CTA",
+      "INFO_COMPL"
+    ]
+  },
+  "M230": {
+    "bloco": "M",
+    "nivel": 4,
+    "parent": "M210",
+    "fk_parent": "fk_M210",
+    "headers": [
+      "REG",
+      "CNPJ",
+      "VL_VEND",
+      "VL_NAO_RECEB",
+      "VL_CONT_DIF",
+      "VL_CRED_DIF",
+      "COD_CRED"
+    ]
+  },
+  "M300": {
+    "bloco": "M",
+    "nivel": 2,
+    "parent": "M001",
+    "fk_parent": "fk_M001",
+    "headers": [
+      "REG",
+      "COD_CONT",
+      "VL_CONT_APUR_DIFER",
+      "NAT_CRED_DESC",
+      "VL_CRED_DESC_DIFER",
+      "VL_CONT_DIFER_ANT",
+      "PER_APUR",
+      "DT_RECEB"
+    ]
+  },
+  "M350": {
+    "bloco": "M",
+    "nivel": 2,
+    "parent": "M001",
+    "fk_parent": "fk_M001",
+    "headers": [
+      "REG",
+      "VL_TOT_FOL",
+      "VL_EXC_BC",
+      "VL_TOT_BC",
+      "ALIQ_PIS_FOL",
+      "VL_TOT_CONT_FOL"
+    ]
+  },
+  "M400": {
+    "bloco": "M",
+    "nivel": 2,
+    "parent": "M001",
+    "fk_parent": "fk_M001",
+    "headers": [
+      "REG",
+      "CST_PIS",
+      "VL_TOT_REC",
+      "COD_CTA",
+      "DESC_COMPL"
+    ]
+  },
+  "M410": {
+    "bloco": "M",
+    "nivel": 3,
+    "parent": "M400",
+    "fk_parent": "fk_M400",
+    "headers": [
+      "REG",
+      "NAT_REC",
+      "VL_REC",
+      "COD_CTA",
+      "DESC_COMPL"
+    ]
+  },
+  "M500": {
+    "bloco": "M",
+    "nivel": 2,
+    "parent": "M001",
+    "fk_parent": "fk_M001",
+    "headers": [
+      "REG",
+      "COD_CRED",
+      "IND_CRED_ORI",
+      "VL_BC_COFINS",
+      "ALIQ_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_CRED",
+      "VL_AJUS_ACRES",
+      "VL_AJUS_REDUC",
+      "VL_CRED_DIFER",
+      "VL_CRED_DISP",
+      "IND_DESC_CRED",
+      "VL_CRED_DESC",
+      "SLD_CRED"
+    ]
+  },
+  "M505": {
+    "bloco": "M",
+    "nivel": 3,
+    "parent": "M500",
+    "fk_parent": "fk_M500",
+    "headers": [
+      "REG",
+      "NAT_BC_CRED",
+      "CST_COFINS",
+      "VL_BC_COFINS_TOT",
+      "VL_BC_COFINS_CUM",
+      "VL_BC_COFINS_NC",
+      "VL_BC_COFINS",
+      "QUANT_BC_COFINS_TOT",
+      "QUANT_BC_COFINS",
+      "DESC_CRED"
+    ]
+  },
+  "M510": {
+    "bloco": "M",
+    "nivel": 3,
+    "parent": "M500",
+    "fk_parent": "fk_M500",
+    "headers": [
+      "REG",
+      "IND_AJ",
+      "VL_AJ",
+      "COD_AJ",
+      "NUM_DOC",
+      "DESCR_AJ",
+      "DT_REF"
+    ]
+  },
+  "M515": {
+    "bloco": "M",
+    "nivel": 4,
+    "parent": "M510",
+    "fk_parent": "fk_M510",
+    "headers": [
+      "REG",
+      "DET_VALOR_AJ",
+      "CST_COFINS",
+      "DET_BC_CRED",
+      "DET_ALIQ",
+      "DT_OPER_AJ",
+      "DESC_AJ",
+      "COD_CTA",
+      "INFO_COMPL"
+    ]
+  },
+  "M600": {
+    "bloco": "M",
+    "nivel": 2,
+    "parent": "M001",
+    "fk_parent": "fk_M001",
+    "headers": [
+      "REG",
+      "VL_TOT_CONT_NC_PER",
+      "VL_TOT_CRED_DESC",
+      "VL_TOT_CRED_DESC_ANT",
+      "VL_TOT_CONT_NC_DEV",
+      "VL_RET_NC",
+      "VL_OUT_DED_NC",
+      "VL_CONT_NC_REC",
+      "VL_TOT_CONT_CUM_PER",
+      "VL_RET_CUM",
+      "VL_OUT_DED_CUM",
+      "VL_CONT_CUM_REC",
+      "VL_TOT_CONT_REC"
+    ]
+  },
+  "M605": {
+    "bloco": "M",
+    "nivel": 3,
+    "parent": "M600",
+    "fk_parent": "fk_M600",
+    "headers": [
+      "REG",
+      "NUM_CAMPO",
+      "COD_REC",
+      "VL_DEBITO"
+    ]
+  },
+  "M610": {
+    "bloco": "M",
+    "nivel": 3,
+    "parent": "M600",
+    "fk_parent": "fk_M600",
+    "headers": [
+      "REG",
+      "COD_CONT",
+      "VL_REC_BRT",
+      "VL_BC_CONT",
+      "ALIQ_COFINS",
+      "QUANT_BC_COFINS",
+      "ALIQ_COFINS_QUANT",
+      "VL_CONT_APUR",
+      "VL_AJUS_ACRES",
+      "VL_AJUS_REDUC",
+      "VL_CONT_DIFER",
+      "VL_CONT_DIFER_ANT",
+      "VL_CONT_PER",
+      "VL_AJUS_ACRES_BC_COFINS",
+      "VL_AJUS_REDUC_BC_COFINS",
+      "VL_BC_CONT_AJUS"
+    ]
+  },
+  "M611": {
+    "bloco": "M",
+    "nivel": 4,
+    "parent": "M610",
+    "fk_parent": "fk_M610",
+    "headers": [
+      "REG",
+      "IND_TIP_COOP",
+      "VL_BC_CONT_ANT_EXC_COOP",
+      "VL_EXC_COOP_GER",
+      "VL_EXC_ESP_COOP",
+      "VL_BC_CONT"
+    ]
+  },
+  "M615": {
+    "bloco": "M",
+    "nivel": 4,
+    "parent": "M610",
+    "fk_parent": "fk_M610",
+    "headers": [
+      "REG",
+      "IND_AJ_BC",
+      "VL_AJ_BC",
+      "COD_AJ_BC",
+      "NUM_DOC",
+      "DESCR_AJ_BC",
+      "DT_REF",
+      "COD_CTA",
+      "CNPJ",
+      "INFO_COMPL"
+    ]
+  },
+  "M620": {
+    "bloco": "M",
+    "nivel": 4,
+    "parent": "M610",
+    "fk_parent": "fk_M610",
+    "headers": [
+      "REG",
+      "IND_AJ",
+      "VL_AJ",
+      "COD_AJ",
+      "NUM_DOC",
+      "DESCR_AJ",
+      "DT_REF"
+    ]
+  },
+  "M625": {
+    "bloco": "M",
+    "nivel": 5,
+    "parent": "M620",
+    "fk_parent": "fk_M620",
+    "headers": [
+      "REG",
+      "DET_VALOR_AJ",
+      "CST_COFINS",
+      "DET_BC_CRED",
+      "DET_ALIQ",
+      "DT_OPER_AJ",
+      "DESC_AJ",
+      "COD_CTA",
+      "INFO_COMPL"
+    ]
+  },
+  "M630": {
+    "bloco": "M",
+    "nivel": 4,
+    "parent": "M610",
+    "fk_parent": "fk_M610",
+    "headers": [
+      "REG",
+      "CNPJ",
+      "VL_VEND",
+      "VL_NAO_RECEB",
+      "VL_CONT_DIF",
+      "VL_CRED_DIF",
+      "COD_CRED"
+    ]
+  },
+  "M700": {
+    "bloco": "M",
+    "nivel": 2,
+    "parent": "M001",
+    "fk_parent": "fk_M001",
+    "headers": [
+      "REG",
+      "COD_CONT",
+      "VL_CONT_APUR_DIFER",
+      "NAT_CRED_DESC",
+      "VL_CRED_DESC_DIFER",
+      "VL_CONT_DIFER_ANT",
+      "PER_APUR",
+      "DT_RECEB"
+    ]
+  },
+  "M800": {
+    "bloco": "M",
+    "nivel": 2,
+    "parent": "M001",
+    "fk_parent": "fk_M001",
+    "headers": [
+      "REG",
+      "CST_COFINS",
+      "VL_TOT_REC",
+      "COD_CTA",
+      "DESC_COMPL"
+    ]
+  },
+  "M810": {
+    "bloco": "M",
+    "nivel": 3,
+    "parent": "M800",
+    "fk_parent": "fk_M800",
+    "headers": [
+      "REG",
+      "NAT_REC",
+      "VL_REC",
+      "COD_CTA",
+      "DESC_COMPL"
+    ]
+  },
+  "M990": {
+    "bloco": "M",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "QTD_LIN_M"
+    ]
+  },
+  "P001": {
+    "bloco": "P",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "IND_MOV"
+    ]
+  },
+  "P010": {
+    "bloco": "P",
+    "nivel": 2,
+    "parent": "P001",
+    "fk_parent": "fk_P001",
+    "headers": [
+      "REG",
+      "CNPJ"
+    ]
+  },
+  "P100": {
+    "bloco": "P",
+    "nivel": 3,
+    "parent": "P010",
+    "fk_parent": "fk_P010",
+    "headers": [
+      "REG",
+      "DT_INI",
+      "DT_FIN",
+      "VL_REC_TOT_EST",
+      "COD_ATIV_ECON",
+      "VL_REC_ATIV_ESTAB",
+      "VL_EXC",
+      "VL_BC_CONT",
+      "ALIQ_CONT",
+      "VL_CONT_APU",
+      "COD_CTA",
+      "INFO_COMPL"
+    ]
+  },
+  "P110": {
+    "bloco": "P",
+    "nivel": 4,
+    "parent": "P100",
+    "fk_parent": "fk_P100",
+    "headers": [
+      "REG",
+      "NUM_CAMPO",
+      "COD_DET",
+      "DET_VALOR",
+      "INF_COMPL"
+    ]
+  },
+  "P199": {
+    "bloco": "P",
+    "nivel": 4,
+    "parent": "P100",
+    "fk_parent": "fk_P100",
+    "headers": [
+      "REG",
+      "NUM_PROC",
+      "IND_PROC"
+    ]
+  },
+  "P200": {
+    "bloco": "P",
+    "nivel": 2,
+    "parent": "P001",
+    "fk_parent": "fk_P001",
+    "headers": [
+      "REG",
+      "PER_REF",
+      "VL_TOT_CONT_APU",
+      "VL_TOT_AJ_REDUC",
+      "VL_TOT_AJ_ACRES",
+      "VL_TOT_CONT_DEV",
+      "COD_REC"
+    ]
+  },
+  "P210": {
+    "bloco": "P",
+    "nivel": 3,
+    "parent": "P200",
+    "fk_parent": "fk_P200",
+    "headers": [
+      "REG",
+      "IND_AJ",
+      "VL_AJ",
+      "COD_AJ",
+      "NUM_DOC",
+      "DESCR_AJ",
+      "DT_REF"
+    ]
+  },
+  "P990": {
+    "bloco": "P",
+    "nivel": 1,
+    "parent": "0000",
+    "fk_parent": "fk_0000",
+    "headers": [
+      "REG",
+      "QTD_LIN_P"
+    ]
+  }
+}
