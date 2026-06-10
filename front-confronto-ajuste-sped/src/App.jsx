@@ -190,7 +190,8 @@ export default function App() {
 
   const _buscaLanc = filtroLanc.trim().toLowerCase();
   const lancamentos = (resultado?.lancamentos ?? []).filter((l) => {
-    if (impostosAtivos[l["Imposto"]] !== true) return false;
+    const impostoKey = (l["Imposto"] ?? "").replace(/_D$/, "");
+    if (impostosAtivos[impostoKey] !== true) return false;
     if (!_buscaLanc) return true;
     return (
       String(l["Código da Conta"] ?? "").toLowerCase().includes(_buscaLanc) ||

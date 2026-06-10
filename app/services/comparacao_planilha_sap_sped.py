@@ -849,7 +849,10 @@ def gera_lancamentos_ajuste(
         for delta_col, campo in DELTA_PARA_CAMPO.items():
             if delta_col not in row.index:
                 continue
-            delta = round(float(row[delta_col]), 2)
+            raw = row[delta_col]
+            if pd.isna(raw):
+                continue
+            delta = round(float(raw), 2)
             if abs(delta) <= TOLERANCIA:
                 continue
 
