@@ -368,23 +368,32 @@ export default function App() {
                     gap: "var(--g-space-2)",
                   }}
                 >
-                  <div
-                    className="g-cluster"
-                    style={{ gap: "var(--g-space-1)" }}
-                  >
-                    {[
-                      ["todos", "Todos"],
-                      ["divergencia", "Divergências"],
-                      ["ok", "OK"],
-                    ].map(([val, label]) => (
-                      <button
-                        key={val}
-                        className={`g-pill${filtro === val ? " g-pill--active" : ""}`}
-                        onClick={() => mudarFiltro(val)}
-                      >
-                        {label}
-                      </button>
-                    ))}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "var(--g-space-1)" }}>
+                    <div className="g-cluster" style={{ gap: "var(--g-space-1)" }}>
+                      {[["todos", "Todos"], ["divergencia", "Divergências"], ["ok", "OK"]].map(([val, label]) => (
+                        <button
+                          key={val}
+                          className={`g-pill${filtro === val ? " g-pill--active" : ""}`}
+                          onClick={() => mudarFiltro(val)}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    {(filtro === "todos" || filtro === "so_sped" || filtro === "so_sap") && (
+                      <div className="g-cluster" style={{ gap: "var(--g-space-1)", paddingLeft: "var(--g-space-3)" }}>
+                        <span className="g-helper" style={{ fontSize: 11 }}>↳</span>
+                        {[["so_sped", "Só SPED"], ["so_sap", "Só SAP"]].map(([val, label]) => (
+                          <button
+                            key={val}
+                            className={`g-pill${filtro === val ? " g-pill--active" : ""}`}
+                            onClick={() => mudarFiltro(val)}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "var(--g-space-2)" }}>
                     <input
