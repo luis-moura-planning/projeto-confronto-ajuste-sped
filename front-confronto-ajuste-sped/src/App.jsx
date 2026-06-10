@@ -42,6 +42,15 @@ const TIPO_LABELS = {
   ok: "OK",
 };
 
+function _bloco(r) {
+  if (r.COD_CTA != null) return "F100";
+  if (r.CHV_CTE != null) return "D";
+  return "C";
+}
+
+const BLOCO_CLASS = { C: "app-bloco--c", D: "app-bloco--d", F100: "app-bloco--f100" };
+const BLOCO_LABEL = { C: "Bloco C", D: "Bloco D", F100: "F100" };
+
 const OPCOES_POR_PAGINA = [10, 20, 50, 100];
 
 function fmt(val) {
@@ -357,8 +366,6 @@ export default function App() {
                       ["todos", "Todos"],
                       ["divergencia", "Divergências"],
                       ["ok", "OK"],
-                      ["so_sped", "Só SPED"],
-                      ["so_sap", "Só SAP"],
                     ].map(([val, label]) => (
                       <button
                         key={val}
@@ -411,6 +418,7 @@ export default function App() {
                       <tr>
                         <th>Documento</th>
                         <th>Identificador</th>
+                        <th>Bloco</th>
                         <th>Tipo</th>
                         <th></th>
                         {TAXAS.map((t) => (
@@ -421,7 +429,7 @@ export default function App() {
                     <tbody>
                       {linhasPag.length === 0 && (
                         <tr>
-                          <td colSpan={TAXAS.length + 4} className="g-empty">
+                          <td colSpan={TAXAS.length + 5} className="g-empty">
                             Nenhum resultado.
                           </td>
                         </tr>
@@ -450,6 +458,13 @@ export default function App() {
                             ) : row.NOME_CONTA ? (
                               <span style={{ fontSize: 12 }}>{row.NOME_CONTA}</span>
                             ) : "—"}
+                          </td>
+                          <td>
+                            {(() => { const b = _bloco(row); return (
+                              <span className={`app-bloco ${BLOCO_CLASS[b]}`}>
+                                {BLOCO_LABEL[b]}
+                              </span>
+                            ); })()}
                           </td>
                           <td>
                             <span

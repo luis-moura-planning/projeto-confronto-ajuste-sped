@@ -61,3 +61,17 @@
 .app-td-diff    { color: var(--g-warn-fg);   font-weight: var(--g-fw-semi); }
 .app-td-debito  { color: var(--g-danger);    font-weight: var(--g-fw-semi); }
 .app-td-credito { color: var(--g-success);   font-weight: var(--g-fw-semi); }
+
+/* ── Bloco badges (C / D / F100) ───────────────────────────── */
+.app-bloco {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.app-bloco--c    { background: #dbeafe; color: #1d4ed8; }
+.app-bloco--d    { background: #f3e8ff; color: #7e22ce; }
+.app-bloco--f100 { background: #d1fae5; color: #065f46; }
