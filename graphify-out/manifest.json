@@ -1,0 +1,167 @@
+{
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\.graphify_detect.json": {
+    "mtime": 1781093701.9755516,
+    "ast_hash": "e58c5b53c5f2f4ac4f1d35f75b464ce0",
+    "semantic_hash": "e58c5b53c5f2f4ac4f1d35f75b464ce0"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\app\\__init__.py": {
+    "mtime": 1779457787.405587,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\app\\main_api.py": {
+    "mtime": 1779717732.6002374,
+    "ast_hash": "5bc6cd97dff16dc304fb20e5bab0b59b",
+    "semantic_hash": "5bc6cd97dff16dc304fb20e5bab0b59b"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\app\\routers\\__init__.py": {
+    "mtime": 1779457787.4075873,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\app\\routers\\compara_planilha_sped.py": {
+    "mtime": 1781027496.3181615,
+    "ast_hash": "6db2d569fd196ba8a5a3ee9ad287d8b4",
+    "semantic_hash": "6db2d569fd196ba8a5a3ee9ad287d8b4"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\app\\services\\__init__.py": {
+    "mtime": 1779457787.4085877,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\app\\services\\comparacao_planilha_sap_sped.py": {
+    "mtime": 1781029676.8237827,
+    "ast_hash": "b02c16d74f4e1a7148d65d1e86adb9a8",
+    "semantic_hash": "b02c16d74f4e1a7148d65d1e86adb9a8"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\app\\services\\extrai_dados_planilha_sap.py": {
+    "mtime": 1780407391.6386385,
+    "ast_hash": "e5d99738d1edb4054bfa79b66826cd4f",
+    "semantic_hash": "e5d99738d1edb4054bfa79b66826cd4f"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\app\\services\\extrai_dados_sped.py": {
+    "mtime": 1780949667.3307106,
+    "ast_hash": "ba19ea95cb8be39e8fd6d7e6eefa2a2c",
+    "semantic_hash": "ba19ea95cb8be39e8fd6d7e6eefa2a2c"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\arquivos_auxiliares\\rascunho_formatador\\app.py": {
+    "mtime": 1779373195.790939,
+    "ast_hash": "3331cc64d27e3f9cc9debcceaf6e258f",
+    "semantic_hash": "3331cc64d27e3f9cc9debcceaf6e258f"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\arquivos_auxiliares\\rascunho_formatador\\mapear_cabecario_sped\\sped_metadata.json": {
+    "mtime": 1779368893.9694164,
+    "ast_hash": "54535647e8b0034dd23400bf2e3dcdde",
+    "semantic_hash": "54535647e8b0034dd23400bf2e3dcdde"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\front-confronto-ajuste-sped\\eslint.config.js": {
+    "mtime": 1779395912.526022,
+    "ast_hash": "3aa4b57d7f08181d86bde52a4dcb7f22",
+    "semantic_hash": "3aa4b57d7f08181d86bde52a4dcb7f22"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\front-confronto-ajuste-sped\\package.json": {
+    "mtime": 1779809613.2550514,
+    "ast_hash": "1ab2b276a7a60b1003ec92453c131539",
+    "semantic_hash": "1ab2b276a7a60b1003ec92453c131539"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\front-confronto-ajuste-sped\\src\\App.jsx": {
+    "mtime": 1781027698.347492,
+    "ast_hash": "c8fd2f7fe90585244183640f4f780292",
+    "semantic_hash": "c8fd2f7fe90585244183640f4f780292"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\front-confronto-ajuste-sped\\src\\main.jsx": {
+    "mtime": 1779808381.9147477,
+    "ast_hash": "1e63b74955338781021761aac8320dae",
+    "semantic_hash": "1e63b74955338781021761aac8320dae"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\front-confronto-ajuste-sped\\vite.config.js": {
+    "mtime": 1779717726.432014,
+    "ast_hash": "c8dd878050d2e099fdb0a0e2d57b279f",
+    "semantic_hash": "c8dd878050d2e099fdb0a0e2d57b279f"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\teste.py": {
+    "mtime": 1780659716.139027,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\arquivos_auxiliares\\Relacao_filiais.txt": {
+    "mtime": 1779388152.802599,
+    "ast_hash": "e1a97ae588d91d9363a3b244625477f1",
+    "semantic_hash": "e1a97ae588d91d9363a3b244625477f1"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\arquivos_auxiliares\\arquivos_base\\2 - Sped Contribuicoes.txt": {
+    "mtime": 1779388672.9256625,
+    "ast_hash": "8ce5c39633be017bd7941d10e3553d9c",
+    "semantic_hash": "8ce5c39633be017bd7941d10e3553d9c"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\arquivos_auxiliares\\rascunho_formatador\\DOCUMENTACAO_SPED.md": {
+    "mtime": 1779375518.1933482,
+    "ast_hash": "845ba453873e17b6f1ea929081e4e5a5",
+    "semantic_hash": "845ba453873e17b6f1ea929081e4e5a5"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\front-confronto-ajuste-sped\\README.md": {
+    "mtime": 1779395912.5910225,
+    "ast_hash": "a28dc4cb878325f3e9e5649f3e1469ac",
+    "semantic_hash": "a28dc4cb878325f3e9e5649f3e1469ac"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\front-confronto-ajuste-sped\\index.html": {
+    "mtime": 1779809075.271563,
+    "ast_hash": "7c56da6243e782cc7da9356d9741b74d",
+    "semantic_hash": "7c56da6243e782cc7da9356d9741b74d"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\graphify-out\\converted\\1.1 - De_Para_Recorrente_Fornecedores_00940d2b.md": {
+    "mtime": 1781093700.9195533,
+    "ast_hash": "0f49820cb08f7264b383ecb5fb51ed84",
+    "semantic_hash": "0f49820cb08f7264b383ecb5fb51ed84"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\graphify-out\\converted\\1.2 - Lista Centro Custo_acc33dd5.md": {
+    "mtime": 1781093700.9827952,
+    "ast_hash": "af4b5c2c82ad37d2e6af6d92c50200b1",
+    "semantic_hash": "af4b5c2c82ad37d2e6af6d92c50200b1"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\requirements.txt": {
+    "mtime": 1779997931.2398555,
+    "ast_hash": "4ba4dfa3d3fdaa756593176c2909ac52",
+    "semantic_hash": "4ba4dfa3d3fdaa756593176c2909ac52"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\sped_test\\PISCOFINS_20260201_20260228_04784935000167_Retificadora_20260326172805_E21C73128DC88F1E37E6664E04670C674A1FD3AE.txt": {
+    "mtime": 1780315587.0,
+    "ast_hash": "35925220b5cd2c0ddca134309e098426",
+    "semantic_hash": "35925220b5cd2c0ddca134309e098426"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\sped_test\\PISCOFINS_20260301_20260331_04784935000167_Original_20260415164738_3B13D02B5763C278137AB3286018AD0488132796.txt": {
+    "mtime": 1780315586.0,
+    "ast_hash": "8ce5c39633be017bd7941d10e3553d9c",
+    "semantic_hash": "8ce5c39633be017bd7941d10e3553d9c"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\sped_test\\PISCOFINS_20260401_20260430_04784935000167_Original_20260525142635_905511BB645C87DA613D6ACA1DC77D6669A0CB74.txt": {
+    "mtime": 1780315589.0,
+    "ast_hash": "e265f16e87e67e133a6bf76309ad7f5e",
+    "semantic_hash": "e265f16e87e67e133a6bf76309ad7f5e"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\front-confronto-ajuste-sped\\public\\favicon.svg": {
+    "mtime": 1779395912.6320877,
+    "ast_hash": "7e840862161341271697daa99a40d76b",
+    "semantic_hash": "7e840862161341271697daa99a40d76b"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\front-confronto-ajuste-sped\\public\\icons.svg": {
+    "mtime": 1779395912.6540878,
+    "ast_hash": "3b4fcfcf393eca4d264dca4a4663bc37",
+    "semantic_hash": "3b4fcfcf393eca4d264dca4a4663bc37"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\front-confronto-ajuste-sped\\src\\assets\\hero.png": {
+    "mtime": 1779395912.6080873,
+    "ast_hash": "aead493361b27e7510691c5d7072dfc1",
+    "semantic_hash": "aead493361b27e7510691c5d7072dfc1"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\front-confronto-ajuste-sped\\src\\assets\\react.svg": {
+    "mtime": 1779395912.669087,
+    "ast_hash": "f0402b67b6ce880f65666bb49e841696",
+    "semantic_hash": "f0402b67b6ce880f65666bb49e841696"
+  },
+  "C:\\Users\\luis.moura\\Documents\\GitHub\\projeto-confronto-ajuste-sped\\front-confronto-ajuste-sped\\src\\assets\\vite.svg": {
+    "mtime": 1779395912.682087,
+    "ast_hash": "9960a24288958394ac50e57ff638b036",
+    "semantic_hash": "9960a24288958394ac50e57ff638b036"
+  }
+}

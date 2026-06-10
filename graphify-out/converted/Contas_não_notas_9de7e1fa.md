@@ -1,0 +1,129 @@
+<!-- converted from Contas_não_notas.xlsx -->
+
+## Sheet: Sheet1
+| Nº seq. | Nº transação | Data de lançamento | Série | Nº doc. | Ref.3 (Linha) | Cta.contáb./cód.PN | Cta.cont./Nome PN | Conta de contrapartida | Débito (MC) | Crédito (MC) | Observações | Nome da filial | Centro de Custo |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.01.01.0001 |  | R$ 7.410,03 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.01.01.0001 | Custo dos Produtos Vendidos | 1.01.05.01.0003 | R$ 7.410,03 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.01.01.0001 |  | R$ 34.130,93 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.01.01.0001 | Custo dos Produtos Vendidos | 1.01.05.01.0004 | R$ 34.130,93 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.01.01.0002 |  | R$ 101,90 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.01.01.0002 | Fretes sobre compras | 1.01.05.01.0003 | R$ 101,90 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.01.01.0002 |  | R$ 469,35 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.01.01.0002 | Fretes sobre compras | 1.01.05.01.0004 | R$ 469,35 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.03.03.0003 |  | R$ 10,50 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.03.03.0003 | Energia Elétrica - Alojamentos | 1.01.05.01.0003 | R$ 10,50 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.03.03.0003 |  | R$ 48,41 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.03.03.0003 | Energia Elétrica - Alojamentos | 1.01.05.01.0004 | R$ 48,41 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.02.03.0011 | R$ 433,25 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.02.03.0011 | (-) Pis s/ Alugués | 1.01.05.01.0003 |  | R$ 433,25 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.02.03.0012 | R$ 1.995,57 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.02.03.0012 | (-) Cofins s/ Aluguéis | 1.01.05.01.0004 |  | R$ 1.995,57 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 5.01.01.06.0003 | R$ 2.686,84 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 5.01.01.06.0003 | (-) Pis s/ Depreciação | 1.01.05.01.0003 |  | R$ 2.686,84 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 5.01.01.06.0004 | R$ 12.375,73 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 5.01.01.06.0004 | (-) Cofins s/ Depreciação | 1.01.05.01.0004 |  | R$ 12.375,73 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.03.01.0006 | R$ 169,87 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.03.01.0006 | Locação de banheiro químico, contaneir, ferramentas e demais equipamentos para obras | 1.01.05.01.0003 |  | R$ 169,87 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.03.01.0006 | R$ 782,45 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.03.01.0006 | Locação de banheiro químico, contaneir, ferramentas e demais equipamentos para obras | 1.01.05.01.0004 |  | R$ 782,45 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 5.01.01.04.0008 | R$ 5.795,89 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 5.01.01.04.0008 | Locação, rastreamento, e manutenção de veículos leves | 1.01.05.01.0003 |  | R$ 5.795,89 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 5.01.01.04.0008 | R$ 26.696,21 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 5.01.01.04.0008 | Locação, rastreamento, e manutenção de veículos leves | 1.01.05.01.0004 |  | R$ 26.696,21 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.02.02.0016 | R$ 283,39 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.02.02.0016 | Uniformes e Equipamentos de Segurança (EPI) | 1.01.05.01.0003 |  | R$ 283,39 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.02.02.0016 | R$ 1.305,33 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.02.02.0016 | Uniformes e Equipamentos de Segurança (EPI) | 1.01.05.01.0004 |  | R$ 1.305,33 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.03.01.0010 | R$ 516,03 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.03.01.0010 | Manutenção de caminhões e máquinas pesadas | 1.01.05.01.0003 |  | R$ 516,03 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.03.01.0010 | R$ 2.376,87 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.03.01.0010 | Manutenção de caminhões e máquinas pesadas | 1.01.05.01.0004 |  | R$ 2.376,87 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 5.01.01.04.0011 | R$ 3,48 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 5.01.01.04.0011 | Manutenção e conservação das unidades | 1.01.05.01.0003 |  | R$ 3,48 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 5.01.01.04.0011 | R$ 16,01 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 5.01.01.04.0011 | Manutenção e conservação das unidades | 1.01.05.01.0004 |  | R$ 16,01 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 5.01.01.03.0005 | R$ 1,42 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 5.01.01.03.0005 | Vale transporte | 1.01.05.01.0003 |  | R$ 1,42 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 5.01.01.03.0005 | R$ 6,55 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 5.01.01.03.0005 | Vale transporte | 1.01.05.01.0004 |  | R$ 6,55 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0005-90 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.01.01.0001 |  | R$ 113,80 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Cristalina | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0005-90 | 4.01.01.01.0001 | Custo dos Produtos Vendidos | 1.01.05.01.0003 | R$ 113,80 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Cristalina | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0005-90 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.01.01.0001 |  | R$ 524,27 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Cristalina | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0005-90 | 4.01.01.01.0001 | Custo dos Produtos Vendidos | 1.01.05.01.0004 | R$ 524,27 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Cristalina | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0005-90 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.01.01.0002 |  | R$ 3,74 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Cristalina | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0005-90 | 4.01.01.01.0002 | Fretes sobre compras | 1.01.05.01.0003 | R$ 3,74 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Cristalina | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0005-90 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.01.01.0002 |  | R$ 17,23 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Cristalina | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0005-90 | 4.01.01.01.0002 | Fretes sobre compras | 1.01.05.01.0004 | R$ 17,23 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Cristalina | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.01.01.0001 |  | R$ 118,35 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 4.01.01.01.0001 | Custo dos Produtos Vendidos | 1.01.05.01.0003 | R$ 118,35 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.01.01.0001 |  | R$ 545,14 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 4.01.01.01.0001 | Custo dos Produtos Vendidos | 1.01.05.01.0004 | R$ 545,14 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.01.01.0002 |  | R$ 1,83 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 4.01.01.01.0002 | Fretes sobre compras | 1.01.05.01.0003 | R$ 1,83 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.01.01.0002 |  | R$ 8,37 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 4.01.01.01.0002 | Fretes sobre compras | 1.01.05.01.0004 | R$ 8,37 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.03.03.0003 |  | R$ 0,76 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 4.01.03.03.0003 | Energia Elétrica - Alojamentos | 1.01.05.01.0003 | R$ 0,76 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.03.03.0003 |  | R$ 3,49 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 4.01.03.03.0003 | Energia Elétrica - Alojamentos | 1.01.05.01.0004 | R$ 3,49 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.02.03.0011 | R$ 18,87 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 4.01.02.03.0011 | (-) Pis s/ Alugués | 1.01.05.01.0003 |  | R$ 18,87 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.02.03.0012 | R$ 86,94 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0008-33 | 4.01.02.03.0012 | (-) Cofins s/ Aluguéis | 1.01.05.01.0004 |  | R$ 86,94 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Formosa | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0009-14 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.03.01.0008 | R$ 29,04 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Rio Verde | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0009-14 | 4.01.03.01.0008 | Locação de caminhão, munck e/ou máquinas pesadas para obras | 1.01.05.01.0003 |  | R$ 29,04 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Rio Verde | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0009-14 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.03.01.0008 | R$ 133,75 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Rio Verde | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0009-14 | 4.01.03.01.0008 | Locação de caminhão, munck e/ou máquinas pesadas para obras | 1.01.05.01.0004 |  | R$ 133,75 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Rio Verde | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0009-14 | 1.01.05.01.0003 | PIS a Recuperar | 5.01.01.04.0011 | R$ 29,04 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Rio Verde | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0009-14 | 5.01.01.04.0011 | Manutenção e conservação das unidades | 1.01.05.01.0003 |  | R$ 29,04 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Rio Verde | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0009-14 | 1.01.05.01.0004 | COFINS a Recuperar | 5.01.01.04.0011 | R$ 133,75 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Rio Verde | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0009-14 | 5.01.01.04.0011 | Manutenção e conservação das unidades | 1.01.05.01.0004 |  | R$ 133,75 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Rio Verde | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0011-39 | 1.01.05.01.0003 | PIS a Recuperar | 5.01.01.07.0001 |  | R$ 3,84 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Paraíso do Tocantins | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0011-39 | 5.01.01.07.0001 | Fretes sobre vendas | 1.01.05.01.0003 | R$ 3,84 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Paraíso do Tocantins | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0011-39 | 1.01.05.01.0004 | COFINS a Recuperar | 5.01.01.07.0001 |  | R$ 17,70 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Paraíso do Tocantins | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0011-39 | 5.01.01.07.0001 | Fretes sobre vendas | 1.01.05.01.0004 | R$ 17,70 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Paraíso do Tocantins | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0011-39 | 1.01.05.01.0003 | PIS a Recuperar | 5.01.01.06.0003 | R$ 2,60 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Paraíso do Tocantins | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0011-39 | 5.01.01.06.0003 | (-) Pis s/ Depreciação | 1.01.05.01.0003 |  | R$ 2,60 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Paraíso do Tocantins | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0011-39 | 1.01.05.01.0004 | COFINS a Recuperar | 5.01.01.06.0004 | R$ 11,99 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Paraíso do Tocantins | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0011-39 | 5.01.01.06.0004 | (-) Cofins s/ Depreciação | 1.01.05.01.0004 |  | R$ 11,99 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Paraíso do Tocantins | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0011-39 | 1.01.05.01.0003 | PIS a Recuperar | 5.01.01.04.0011 | R$ 274,82 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Paraíso do Tocantins | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0011-39 | 5.01.01.04.0011 | Manutenção e conservação das unidades | 1.01.05.01.0003 |  | R$ 274,82 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Paraíso do Tocantins | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0011-39 | 1.01.05.01.0004 | COFINS a Recuperar | 5.01.01.04.0011 | R$ 1.265,83 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Paraíso do Tocantins | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0011-39 | 5.01.01.04.0011 | Manutenção e conservação das unidades | 1.01.05.01.0004 |  | R$ 1.265,83 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Paraíso do Tocantins | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.01.01.0001 |  | R$ 694,27 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 4.01.01.01.0001 | Custo dos Produtos Vendidos | 1.01.05.01.0003 | R$ 694,27 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.01.01.0001 |  | R$ 3.197,91 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 4.01.01.01.0001 | Custo dos Produtos Vendidos | 1.01.05.01.0004 | R$ 3.197,91 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0003 | PIS a Recuperar | 5.01.01.07.0001 |  | R$ 2,05 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 5.01.01.07.0001 | Fretes sobre vendas | 1.01.05.01.0003 | R$ 2,05 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0004 | COFINS a Recuperar | 5.01.01.07.0001 |  | R$ 9,46 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 5.01.01.07.0001 | Fretes sobre vendas | 1.01.05.01.0004 | R$ 9,46 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.03.03.0003 | R$ 4,14 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 4.01.03.03.0003 | Energia Elétrica - Alojamentos | 1.01.05.01.0003 |  | R$ 4,14 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.03.03.0003 | R$ 19,09 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 4.01.03.03.0003 | Energia Elétrica - Alojamentos | 1.01.05.01.0004 |  | R$ 19,09 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.02.03.0011 | R$ 214,00 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 4.01.02.03.0011 | (-) Pis s/ Alugués | 1.01.05.01.0003 |  | R$ 214,00 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.02.03.0012 | R$ 985,72 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 4.01.02.03.0012 | (-) Cofins s/ Aluguéis | 1.01.05.01.0004 |  | R$ 985,72 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0003 | PIS a Recuperar | 5.01.01.06.0003 | R$ 1,17 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 5.01.01.06.0003 | (-) Pis s/ Depreciação | 1.01.05.01.0003 |  | R$ 1,17 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0004 | COFINS a Recuperar | 5.01.01.06.0004 | R$ 5,37 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 5.01.01.06.0004 | (-) Cofins s/ Depreciação | 1.01.05.01.0004 |  | R$ 5,37 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.02.02.0016 | R$ 44,02 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 4.01.02.02.0016 | Uniformes e Equipamentos de Segurança (EPI) | 1.01.05.01.0003 |  | R$ 44,02 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.02.02.0016 | R$ 202,76 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 4.01.02.02.0016 | Uniformes e Equipamentos de Segurança (EPI) | 1.01.05.01.0004 |  | R$ 202,76 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0003 | PIS a Recuperar | 5.01.01.04.0011 | R$ 1.020,35 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 5.01.01.04.0011 | Manutenção e conservação das unidades | 1.01.05.01.0003 |  | R$ 1.020,35 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 1.01.05.01.0004 | COFINS a Recuperar | 5.01.01.04.0011 | R$ 4.699,81 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0012-10 | 5.01.01.04.0011 | Manutenção e conservação das unidades | 1.01.05.01.0004 |  | R$ 4.699,81 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Uberlândia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 4.01.01.01.0009 |  | R$ 3.359,77 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.01.01.0009 | Ajuste de Inventário | 1.01.05.01.0003 | R$ 3.359,77 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 4.01.01.01.0009 |  | R$ 15.475,30 | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 4.01.01.01.0009 | Ajuste de Inventário | 1.01.05.01.0004 | R$ 15.475,30 |  | Crédito PIS/COFINS Regime Misto | CENTRAL IRRIGACAO LTDA - Goiânia | OBRAS |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0003 | PIS a Recuperar | 2.01.01.04.0002 |  | R$ 57.148,26 | Compensação   PIS/COFINS | CENTRAL IRRIGACAO LTDA - Goiânia | ADMIN |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 2.01.01.04.0002 | PIS a Recolher | 1.01.05.01.0003 | R$ 57.148,26 |  | Compensação   PIS/COFINS | CENTRAL IRRIGACAO LTDA - Goiânia | ADMIN |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 1.01.05.01.0004 | COFINS a Recuperar | 2.01.01.04.0003 |  | R$ 263.419,02 | Compensação   PIS/COFINS | CENTRAL IRRIGACAO LTDA - Goiânia | ADMIN |
+|  |  | 30/04/2026 |  |  | 04.784.935/0001-67 | 2.01.01.04.0003 | COFINS a Recolher | 1.01.05.01.0004 | R$ 263.419,02 |  | Compensação   PIS/COFINS | CENTRAL IRRIGACAO LTDA - Goiânia | ADMIN |

@@ -1,0 +1,1189 @@
+{
+  "communities": {
+    "0": [
+      "app_main_api",
+      "app_main_api_root",
+      "dataframe",
+      "routers_compara_planilha_sped",
+      "routers_compara_planilha_sped_comparar",
+      "series",
+      "services_comparacao_planilha_sap_sped",
+      "services_comparacao_planilha_sap_sped_agregar_sap",
+      "services_comparacao_planilha_sap_sped_agregar_sap_f100",
+      "services_comparacao_planilha_sap_sped_agregar_sped",
+      "services_comparacao_planilha_sap_sped_agregar_sped_d",
+      "services_comparacao_planilha_sap_sped_agregar_sped_f100",
+      "services_comparacao_planilha_sap_sped_compara_gera_diferenca",
+      "services_comparacao_planilha_sap_sped_df_para_json",
+      "services_comparacao_planilha_sap_sped_extrair_contrapartidas",
+      "services_comparacao_planilha_sap_sped_extrair_metadados_contas",
+      "services_comparacao_planilha_sap_sped_gera_lancamentos_ajuste",
+      "services_comparacao_planilha_sap_sped_gera_lancamentos_ajuste_f100",
+      "services_comparacao_planilha_sap_sped_limpar_valor_sap",
+      "services_comparacao_planilha_sap_sped_propagar_num_doc",
+      "services_comparacao_planilha_sap_sped_rationale_144",
+      "services_comparacao_planilha_sap_sped_rationale_167",
+      "services_comparacao_planilha_sap_sped_rationale_193",
+      "services_comparacao_planilha_sap_sped_rationale_241",
+      "services_comparacao_planilha_sap_sped_rationale_303",
+      "services_comparacao_planilha_sap_sped_rationale_326",
+      "services_comparacao_planilha_sap_sped_rationale_385",
+      "services_comparacao_planilha_sap_sped_rationale_462",
+      "services_comparacao_planilha_sap_sped_rationale_530",
+      "services_comparacao_planilha_sap_sped_rationale_572",
+      "services_comparacao_planilha_sap_sped_rationale_585",
+      "services_comparacao_planilha_sap_sped_rationale_822",
+      "services_comparacao_planilha_sap_sped_rationale_900",
+      "services_comparacao_planilha_sap_sped_to_float",
+      "services_comparacao_planilha_sap_sped_valor_sap_correto",
+      "services_extrai_dados_planilha_sap",
+      "services_extrai_dados_planilha_sap_extrai_dados_planilha_sap",
+      "services_extrai_dados_sped",
+      "services_extrai_dados_sped_extrai_dados_sped",
+      "uploadfile"
+    ],
+    "1": [
+      "mapear_cabecario_sped_sped_metadata",
+      "mapear_cabecario_sped_sped_metadata_0001",
+      "mapear_cabecario_sped_sped_metadata_0001_bloco",
+      "mapear_cabecario_sped_sped_metadata_0001_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0001_headers",
+      "mapear_cabecario_sped_sped_metadata_0001_nivel",
+      "mapear_cabecario_sped_sped_metadata_0001_parent",
+      "mapear_cabecario_sped_sped_metadata_0190",
+      "mapear_cabecario_sped_sped_metadata_0190_bloco",
+      "mapear_cabecario_sped_sped_metadata_0190_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0190_headers",
+      "mapear_cabecario_sped_sped_metadata_0190_nivel",
+      "mapear_cabecario_sped_sped_metadata_0190_parent",
+      "mapear_cabecario_sped_sped_metadata_1800",
+      "mapear_cabecario_sped_sped_metadata_1800_bloco",
+      "mapear_cabecario_sped_sped_metadata_1800_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1800_headers",
+      "mapear_cabecario_sped_sped_metadata_1800_nivel",
+      "mapear_cabecario_sped_sped_metadata_1800_parent",
+      "mapear_cabecario_sped_sped_metadata_c190",
+      "mapear_cabecario_sped_sped_metadata_c190_bloco",
+      "mapear_cabecario_sped_sped_metadata_c190_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c190_headers",
+      "mapear_cabecario_sped_sped_metadata_c190_nivel",
+      "mapear_cabecario_sped_sped_metadata_c190_parent",
+      "mapear_cabecario_sped_sped_metadata_c481",
+      "mapear_cabecario_sped_sped_metadata_c481_bloco",
+      "mapear_cabecario_sped_sped_metadata_c481_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c481_headers",
+      "mapear_cabecario_sped_sped_metadata_c481_nivel",
+      "mapear_cabecario_sped_sped_metadata_c481_parent",
+      "mapear_cabecario_sped_sped_metadata_c490",
+      "mapear_cabecario_sped_sped_metadata_c490_bloco"
+    ],
+    "2": [
+      "central_irrigacao_cristalina",
+      "central_irrigacao_formosa",
+      "central_irrigacao_goiania",
+      "central_irrigacao_paraiso",
+      "central_irrigacao_rioverde",
+      "central_irrigacao_uberlandia",
+      "contas_nao_notas",
+      "depara_fornecedores",
+      "diario_abr2026_central",
+      "diario_central_marco2026",
+      "diario_fev2026_central",
+      "diario_mar2026_central",
+      "documentacao_sped_confronto_fiscal",
+      "fastapi_dep",
+      "flask_api_confronto",
+      "front_index_html",
+      "front_readme_react_vite",
+      "lista_centro_custo",
+      "modelo_importacao_sap",
+      "openpyxl_pandas_dep",
+      "pis_cofins_regime_misto",
+      "postgresql_banco",
+      "razao_contabil_fonte",
+      "relacao_filiais_central_irrigacao",
+      "requirements_txt",
+      "sap_erp_sistema",
+      "sped_apppy_parser",
+      "sped_efd_contribuicoes",
+      "sped_metadata_json"
+    ],
+    "3": [
+      "front_confronto_ajuste_sped_package",
+      "front_confronto_ajuste_sped_package_dependencies",
+      "front_confronto_ajuste_sped_package_dependencies_react",
+      "front_confronto_ajuste_sped_package_dependencies_react_dom",
+      "front_confronto_ajuste_sped_package_dependencies_xlsx",
+      "front_confronto_ajuste_sped_package_devdependencies",
+      "front_confronto_ajuste_sped_package_devdependencies_eslint",
+      "front_confronto_ajuste_sped_package_devdependencies_eslint_js",
+      "front_confronto_ajuste_sped_package_devdependencies_eslint_plugin_react_hooks",
+      "front_confronto_ajuste_sped_package_devdependencies_eslint_plugin_react_refresh",
+      "front_confronto_ajuste_sped_package_devdependencies_globals",
+      "front_confronto_ajuste_sped_package_devdependencies_types_react",
+      "front_confronto_ajuste_sped_package_devdependencies_types_react_dom",
+      "front_confronto_ajuste_sped_package_devdependencies_vite",
+      "front_confronto_ajuste_sped_package_devdependencies_vitejs_plugin_react",
+      "front_confronto_ajuste_sped_package_name",
+      "front_confronto_ajuste_sped_package_private",
+      "front_confronto_ajuste_sped_package_scripts",
+      "front_confronto_ajuste_sped_package_scripts_build",
+      "front_confronto_ajuste_sped_package_scripts_dev",
+      "front_confronto_ajuste_sped_package_scripts_lint",
+      "front_confronto_ajuste_sped_package_scripts_preview",
+      "front_confronto_ajuste_sped_package_type",
+      "front_confronto_ajuste_sped_package_version"
+    ],
+    "4": [
+      "company_central_irrigacao",
+      "concept_bloco0",
+      "concept_cnpj_04784935000167",
+      "concept_nao_cumulativo",
+      "concept_original",
+      "concept_period_apr2026",
+      "concept_period_feb2026",
+      "concept_period_mar2026",
+      "concept_retificadora",
+      "reg_0000",
+      "reg_0001",
+      "reg_0100",
+      "reg_0110",
+      "reg_0111",
+      "reg_0140",
+      "reg_0150",
+      "reg_0190",
+      "reg_0200",
+      "sped_apr2026_original",
+      "sped_contribuicoes_base_doc",
+      "sped_feb2026_retificadora",
+      "sped_mar2026_original"
+    ],
+    "5": [
+      "src_app",
+      "src_app_app",
+      "src_app_barrapaginacao",
+      "src_app_dropfield",
+      "src_app_exportarxlsx",
+      "src_app_fmt",
+      "src_app_impostos_lanc",
+      "src_app_opcoes_por_pagina",
+      "src_app_reclas",
+      "src_app_resumocard",
+      "src_app_taxa_labels",
+      "src_app_taxas",
+      "src_app_tipo_badge",
+      "src_app_tipo_labels",
+      "src_main"
+    ],
+    "6": [
+      "rascunho_formatador_app",
+      "rascunho_formatador_app_carregar_metadata",
+      "rascunho_formatador_app_col_db",
+      "rascunho_formatador_app_enrich_records",
+      "rascunho_formatador_app_gerenciar_notas",
+      "rascunho_formatador_app_inserir_sped_no_banco",
+      "rascunho_formatador_app_parse_sped_binary",
+      "rascunho_formatador_app_rationale_110",
+      "rascunho_formatador_app_rationale_24",
+      "rascunho_formatador_app_rationale_33",
+      "rascunho_formatador_app_rationale_67",
+      "rascunho_formatador_app_record_to_obj"
+    ],
+    "7": [
+      "concept_bloco_c",
+      "concept_cst_50",
+      "concept_cst_98",
+      "reg_c001",
+      "reg_c010",
+      "reg_c100",
+      "reg_c170",
+      "reg_c500",
+      "reg_c501",
+      "reg_c505"
+    ],
+    "8": [
+      "concept_bloco_m",
+      "concept_piscofins_contribuicoes",
+      "reg_m001",
+      "reg_m100",
+      "reg_m200",
+      "reg_m400",
+      "reg_m500",
+      "reg_m600",
+      "reg_m800"
+    ],
+    "9": [
+      "icon_bluesky",
+      "icon_discord",
+      "icon_documentation",
+      "icon_github",
+      "icon_social",
+      "icon_x",
+      "icons_svg"
+    ],
+    "10": [
+      "concept_app_branding",
+      "concept_react_branding",
+      "concept_vite_branding",
+      "favicon_svg",
+      "react_svg",
+      "vite_svg"
+    ],
+    "11": [
+      "concept_cst_01",
+      "concept_cst_02",
+      "concept_cst_51",
+      "concept_pis_aliquota_065",
+      "concept_pis_aliquota_165",
+      "reg_m210"
+    ],
+    "12": [
+      "concept_cst_04",
+      "concept_cst_05",
+      "concept_cst_09",
+      "concept_cst_13",
+      "concept_cst_14",
+      "reg_m105"
+    ],
+    "13": [
+      "mapear_cabecario_sped_sped_metadata_0000",
+      "mapear_cabecario_sped_sped_metadata_0000_bloco",
+      "mapear_cabecario_sped_sped_metadata_0000_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0000_headers",
+      "mapear_cabecario_sped_sped_metadata_0000_nivel",
+      "mapear_cabecario_sped_sped_metadata_0000_parent"
+    ],
+    "14": [
+      "mapear_cabecario_sped_sped_metadata_0035",
+      "mapear_cabecario_sped_sped_metadata_0035_bloco",
+      "mapear_cabecario_sped_sped_metadata_0035_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0035_headers",
+      "mapear_cabecario_sped_sped_metadata_0035_nivel",
+      "mapear_cabecario_sped_sped_metadata_0035_parent"
+    ],
+    "15": [
+      "mapear_cabecario_sped_sped_metadata_0100",
+      "mapear_cabecario_sped_sped_metadata_0100_bloco",
+      "mapear_cabecario_sped_sped_metadata_0100_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0100_headers",
+      "mapear_cabecario_sped_sped_metadata_0100_nivel",
+      "mapear_cabecario_sped_sped_metadata_0100_parent"
+    ],
+    "16": [
+      "mapear_cabecario_sped_sped_metadata_0110",
+      "mapear_cabecario_sped_sped_metadata_0110_bloco",
+      "mapear_cabecario_sped_sped_metadata_0110_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0110_headers",
+      "mapear_cabecario_sped_sped_metadata_0110_nivel",
+      "mapear_cabecario_sped_sped_metadata_0110_parent"
+    ],
+    "17": [
+      "mapear_cabecario_sped_sped_metadata_0111",
+      "mapear_cabecario_sped_sped_metadata_0111_bloco",
+      "mapear_cabecario_sped_sped_metadata_0111_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0111_headers",
+      "mapear_cabecario_sped_sped_metadata_0111_nivel",
+      "mapear_cabecario_sped_sped_metadata_0111_parent"
+    ],
+    "18": [
+      "mapear_cabecario_sped_sped_metadata_0120",
+      "mapear_cabecario_sped_sped_metadata_0120_bloco",
+      "mapear_cabecario_sped_sped_metadata_0120_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0120_headers",
+      "mapear_cabecario_sped_sped_metadata_0120_nivel",
+      "mapear_cabecario_sped_sped_metadata_0120_parent"
+    ],
+    "19": [
+      "mapear_cabecario_sped_sped_metadata_0140",
+      "mapear_cabecario_sped_sped_metadata_0140_bloco",
+      "mapear_cabecario_sped_sped_metadata_0140_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0140_headers",
+      "mapear_cabecario_sped_sped_metadata_0140_nivel",
+      "mapear_cabecario_sped_sped_metadata_0140_parent"
+    ],
+    "20": [
+      "mapear_cabecario_sped_sped_metadata_0145",
+      "mapear_cabecario_sped_sped_metadata_0145_bloco",
+      "mapear_cabecario_sped_sped_metadata_0145_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0145_headers",
+      "mapear_cabecario_sped_sped_metadata_0145_nivel",
+      "mapear_cabecario_sped_sped_metadata_0145_parent"
+    ],
+    "21": [
+      "mapear_cabecario_sped_sped_metadata_0150",
+      "mapear_cabecario_sped_sped_metadata_0150_bloco",
+      "mapear_cabecario_sped_sped_metadata_0150_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0150_headers",
+      "mapear_cabecario_sped_sped_metadata_0150_nivel",
+      "mapear_cabecario_sped_sped_metadata_0150_parent"
+    ],
+    "22": [
+      "mapear_cabecario_sped_sped_metadata_0200",
+      "mapear_cabecario_sped_sped_metadata_0200_bloco",
+      "mapear_cabecario_sped_sped_metadata_0200_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0200_headers",
+      "mapear_cabecario_sped_sped_metadata_0200_nivel",
+      "mapear_cabecario_sped_sped_metadata_0200_parent"
+    ],
+    "23": [
+      "mapear_cabecario_sped_sped_metadata_0205",
+      "mapear_cabecario_sped_sped_metadata_0205_bloco",
+      "mapear_cabecario_sped_sped_metadata_0205_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0205_headers",
+      "mapear_cabecario_sped_sped_metadata_0205_nivel",
+      "mapear_cabecario_sped_sped_metadata_0205_parent"
+    ],
+    "24": [
+      "mapear_cabecario_sped_sped_metadata_0206",
+      "mapear_cabecario_sped_sped_metadata_0206_bloco",
+      "mapear_cabecario_sped_sped_metadata_0206_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0206_headers",
+      "mapear_cabecario_sped_sped_metadata_0206_nivel",
+      "mapear_cabecario_sped_sped_metadata_0206_parent"
+    ],
+    "25": [
+      "mapear_cabecario_sped_sped_metadata_0208",
+      "mapear_cabecario_sped_sped_metadata_0208_bloco",
+      "mapear_cabecario_sped_sped_metadata_0208_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0208_headers",
+      "mapear_cabecario_sped_sped_metadata_0208_nivel",
+      "mapear_cabecario_sped_sped_metadata_0208_parent"
+    ],
+    "26": [
+      "mapear_cabecario_sped_sped_metadata_0400",
+      "mapear_cabecario_sped_sped_metadata_0400_bloco",
+      "mapear_cabecario_sped_sped_metadata_0400_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0400_headers",
+      "mapear_cabecario_sped_sped_metadata_0400_nivel",
+      "mapear_cabecario_sped_sped_metadata_0400_parent"
+    ],
+    "27": [
+      "mapear_cabecario_sped_sped_metadata_0450",
+      "mapear_cabecario_sped_sped_metadata_0450_bloco",
+      "mapear_cabecario_sped_sped_metadata_0450_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0450_headers",
+      "mapear_cabecario_sped_sped_metadata_0450_nivel",
+      "mapear_cabecario_sped_sped_metadata_0450_parent"
+    ],
+    "28": [
+      "mapear_cabecario_sped_sped_metadata_0500",
+      "mapear_cabecario_sped_sped_metadata_0500_bloco",
+      "mapear_cabecario_sped_sped_metadata_0500_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0500_headers",
+      "mapear_cabecario_sped_sped_metadata_0500_nivel",
+      "mapear_cabecario_sped_sped_metadata_0500_parent"
+    ],
+    "29": [
+      "mapear_cabecario_sped_sped_metadata_0600",
+      "mapear_cabecario_sped_sped_metadata_0600_bloco",
+      "mapear_cabecario_sped_sped_metadata_0600_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0600_headers",
+      "mapear_cabecario_sped_sped_metadata_0600_nivel",
+      "mapear_cabecario_sped_sped_metadata_0600_parent"
+    ],
+    "30": [
+      "mapear_cabecario_sped_sped_metadata_0900",
+      "mapear_cabecario_sped_sped_metadata_0900_bloco",
+      "mapear_cabecario_sped_sped_metadata_0900_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0900_headers",
+      "mapear_cabecario_sped_sped_metadata_0900_nivel",
+      "mapear_cabecario_sped_sped_metadata_0900_parent"
+    ],
+    "31": [
+      "mapear_cabecario_sped_sped_metadata_0990",
+      "mapear_cabecario_sped_sped_metadata_0990_bloco",
+      "mapear_cabecario_sped_sped_metadata_0990_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_0990_headers",
+      "mapear_cabecario_sped_sped_metadata_0990_nivel",
+      "mapear_cabecario_sped_sped_metadata_0990_parent"
+    ],
+    "32": [
+      "mapear_cabecario_sped_sped_metadata_1001",
+      "mapear_cabecario_sped_sped_metadata_1001_bloco",
+      "mapear_cabecario_sped_sped_metadata_1001_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1001_headers",
+      "mapear_cabecario_sped_sped_metadata_1001_nivel",
+      "mapear_cabecario_sped_sped_metadata_1001_parent"
+    ],
+    "33": [
+      "mapear_cabecario_sped_sped_metadata_1010",
+      "mapear_cabecario_sped_sped_metadata_1010_bloco",
+      "mapear_cabecario_sped_sped_metadata_1010_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1010_headers",
+      "mapear_cabecario_sped_sped_metadata_1010_nivel",
+      "mapear_cabecario_sped_sped_metadata_1010_parent"
+    ],
+    "34": [
+      "mapear_cabecario_sped_sped_metadata_1011",
+      "mapear_cabecario_sped_sped_metadata_1011_bloco",
+      "mapear_cabecario_sped_sped_metadata_1011_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1011_headers",
+      "mapear_cabecario_sped_sped_metadata_1011_nivel",
+      "mapear_cabecario_sped_sped_metadata_1011_parent"
+    ],
+    "35": [
+      "mapear_cabecario_sped_sped_metadata_1020",
+      "mapear_cabecario_sped_sped_metadata_1020_bloco",
+      "mapear_cabecario_sped_sped_metadata_1020_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1020_headers",
+      "mapear_cabecario_sped_sped_metadata_1020_nivel",
+      "mapear_cabecario_sped_sped_metadata_1020_parent"
+    ],
+    "36": [
+      "mapear_cabecario_sped_sped_metadata_1050",
+      "mapear_cabecario_sped_sped_metadata_1050_bloco",
+      "mapear_cabecario_sped_sped_metadata_1050_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1050_headers",
+      "mapear_cabecario_sped_sped_metadata_1050_nivel",
+      "mapear_cabecario_sped_sped_metadata_1050_parent"
+    ],
+    "37": [
+      "mapear_cabecario_sped_sped_metadata_1100",
+      "mapear_cabecario_sped_sped_metadata_1100_bloco",
+      "mapear_cabecario_sped_sped_metadata_1100_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1100_headers",
+      "mapear_cabecario_sped_sped_metadata_1100_nivel",
+      "mapear_cabecario_sped_sped_metadata_1100_parent"
+    ],
+    "38": [
+      "mapear_cabecario_sped_sped_metadata_1101",
+      "mapear_cabecario_sped_sped_metadata_1101_bloco",
+      "mapear_cabecario_sped_sped_metadata_1101_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1101_headers",
+      "mapear_cabecario_sped_sped_metadata_1101_nivel",
+      "mapear_cabecario_sped_sped_metadata_1101_parent"
+    ],
+    "39": [
+      "mapear_cabecario_sped_sped_metadata_1102",
+      "mapear_cabecario_sped_sped_metadata_1102_bloco",
+      "mapear_cabecario_sped_sped_metadata_1102_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1102_headers",
+      "mapear_cabecario_sped_sped_metadata_1102_nivel",
+      "mapear_cabecario_sped_sped_metadata_1102_parent"
+    ],
+    "40": [
+      "mapear_cabecario_sped_sped_metadata_1200",
+      "mapear_cabecario_sped_sped_metadata_1200_bloco",
+      "mapear_cabecario_sped_sped_metadata_1200_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1200_headers",
+      "mapear_cabecario_sped_sped_metadata_1200_nivel",
+      "mapear_cabecario_sped_sped_metadata_1200_parent"
+    ],
+    "41": [
+      "mapear_cabecario_sped_sped_metadata_1210",
+      "mapear_cabecario_sped_sped_metadata_1210_bloco",
+      "mapear_cabecario_sped_sped_metadata_1210_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1210_headers",
+      "mapear_cabecario_sped_sped_metadata_1210_nivel",
+      "mapear_cabecario_sped_sped_metadata_1210_parent"
+    ],
+    "42": [
+      "mapear_cabecario_sped_sped_metadata_1220",
+      "mapear_cabecario_sped_sped_metadata_1220_bloco",
+      "mapear_cabecario_sped_sped_metadata_1220_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1220_headers",
+      "mapear_cabecario_sped_sped_metadata_1220_nivel",
+      "mapear_cabecario_sped_sped_metadata_1220_parent"
+    ],
+    "43": [
+      "mapear_cabecario_sped_sped_metadata_1300",
+      "mapear_cabecario_sped_sped_metadata_1300_bloco",
+      "mapear_cabecario_sped_sped_metadata_1300_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1300_headers",
+      "mapear_cabecario_sped_sped_metadata_1300_nivel",
+      "mapear_cabecario_sped_sped_metadata_1300_parent"
+    ],
+    "44": [
+      "mapear_cabecario_sped_sped_metadata_1500",
+      "mapear_cabecario_sped_sped_metadata_1500_bloco",
+      "mapear_cabecario_sped_sped_metadata_1500_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1500_headers",
+      "mapear_cabecario_sped_sped_metadata_1500_nivel",
+      "mapear_cabecario_sped_sped_metadata_1500_parent"
+    ],
+    "45": [
+      "mapear_cabecario_sped_sped_metadata_1501",
+      "mapear_cabecario_sped_sped_metadata_1501_bloco",
+      "mapear_cabecario_sped_sped_metadata_1501_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1501_headers",
+      "mapear_cabecario_sped_sped_metadata_1501_nivel",
+      "mapear_cabecario_sped_sped_metadata_1501_parent"
+    ],
+    "46": [
+      "mapear_cabecario_sped_sped_metadata_1502",
+      "mapear_cabecario_sped_sped_metadata_1502_bloco",
+      "mapear_cabecario_sped_sped_metadata_1502_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1502_headers",
+      "mapear_cabecario_sped_sped_metadata_1502_nivel",
+      "mapear_cabecario_sped_sped_metadata_1502_parent"
+    ],
+    "47": [
+      "mapear_cabecario_sped_sped_metadata_1600",
+      "mapear_cabecario_sped_sped_metadata_1600_bloco",
+      "mapear_cabecario_sped_sped_metadata_1600_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1600_headers",
+      "mapear_cabecario_sped_sped_metadata_1600_nivel",
+      "mapear_cabecario_sped_sped_metadata_1600_parent"
+    ],
+    "48": [
+      "mapear_cabecario_sped_sped_metadata_1610",
+      "mapear_cabecario_sped_sped_metadata_1610_bloco",
+      "mapear_cabecario_sped_sped_metadata_1610_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1610_headers",
+      "mapear_cabecario_sped_sped_metadata_1610_nivel",
+      "mapear_cabecario_sped_sped_metadata_1610_parent"
+    ],
+    "49": [
+      "mapear_cabecario_sped_sped_metadata_1620",
+      "mapear_cabecario_sped_sped_metadata_1620_bloco",
+      "mapear_cabecario_sped_sped_metadata_1620_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1620_headers",
+      "mapear_cabecario_sped_sped_metadata_1620_nivel",
+      "mapear_cabecario_sped_sped_metadata_1620_parent"
+    ],
+    "50": [
+      "mapear_cabecario_sped_sped_metadata_1700",
+      "mapear_cabecario_sped_sped_metadata_1700_bloco",
+      "mapear_cabecario_sped_sped_metadata_1700_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1700_headers",
+      "mapear_cabecario_sped_sped_metadata_1700_nivel",
+      "mapear_cabecario_sped_sped_metadata_1700_parent"
+    ],
+    "51": [
+      "mapear_cabecario_sped_sped_metadata_1809",
+      "mapear_cabecario_sped_sped_metadata_1809_bloco",
+      "mapear_cabecario_sped_sped_metadata_1809_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1809_headers",
+      "mapear_cabecario_sped_sped_metadata_1809_nivel",
+      "mapear_cabecario_sped_sped_metadata_1809_parent"
+    ],
+    "52": [
+      "mapear_cabecario_sped_sped_metadata_1900",
+      "mapear_cabecario_sped_sped_metadata_1900_bloco",
+      "mapear_cabecario_sped_sped_metadata_1900_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1900_headers",
+      "mapear_cabecario_sped_sped_metadata_1900_nivel",
+      "mapear_cabecario_sped_sped_metadata_1900_parent"
+    ],
+    "53": [
+      "mapear_cabecario_sped_sped_metadata_1990",
+      "mapear_cabecario_sped_sped_metadata_1990_bloco",
+      "mapear_cabecario_sped_sped_metadata_1990_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_1990_headers",
+      "mapear_cabecario_sped_sped_metadata_1990_nivel",
+      "mapear_cabecario_sped_sped_metadata_1990_parent"
+    ],
+    "54": [
+      "mapear_cabecario_sped_sped_metadata_9001",
+      "mapear_cabecario_sped_sped_metadata_9001_bloco",
+      "mapear_cabecario_sped_sped_metadata_9001_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_9001_headers",
+      "mapear_cabecario_sped_sped_metadata_9001_nivel",
+      "mapear_cabecario_sped_sped_metadata_9001_parent"
+    ],
+    "55": [
+      "mapear_cabecario_sped_sped_metadata_9900",
+      "mapear_cabecario_sped_sped_metadata_9900_bloco",
+      "mapear_cabecario_sped_sped_metadata_9900_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_9900_headers",
+      "mapear_cabecario_sped_sped_metadata_9900_nivel",
+      "mapear_cabecario_sped_sped_metadata_9900_parent"
+    ],
+    "56": [
+      "mapear_cabecario_sped_sped_metadata_9990",
+      "mapear_cabecario_sped_sped_metadata_9990_bloco",
+      "mapear_cabecario_sped_sped_metadata_9990_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_9990_headers",
+      "mapear_cabecario_sped_sped_metadata_9990_nivel",
+      "mapear_cabecario_sped_sped_metadata_9990_parent"
+    ],
+    "57": [
+      "mapear_cabecario_sped_sped_metadata_9999",
+      "mapear_cabecario_sped_sped_metadata_9999_bloco",
+      "mapear_cabecario_sped_sped_metadata_9999_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_9999_headers",
+      "mapear_cabecario_sped_sped_metadata_9999_nivel",
+      "mapear_cabecario_sped_sped_metadata_9999_parent"
+    ],
+    "58": [
+      "mapear_cabecario_sped_sped_metadata_a001",
+      "mapear_cabecario_sped_sped_metadata_a001_bloco",
+      "mapear_cabecario_sped_sped_metadata_a001_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_a001_headers",
+      "mapear_cabecario_sped_sped_metadata_a001_nivel",
+      "mapear_cabecario_sped_sped_metadata_a001_parent"
+    ],
+    "59": [
+      "mapear_cabecario_sped_sped_metadata_a010",
+      "mapear_cabecario_sped_sped_metadata_a010_bloco",
+      "mapear_cabecario_sped_sped_metadata_a010_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_a010_headers",
+      "mapear_cabecario_sped_sped_metadata_a010_nivel",
+      "mapear_cabecario_sped_sped_metadata_a010_parent"
+    ],
+    "60": [
+      "mapear_cabecario_sped_sped_metadata_a100",
+      "mapear_cabecario_sped_sped_metadata_a100_bloco",
+      "mapear_cabecario_sped_sped_metadata_a100_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_a100_headers",
+      "mapear_cabecario_sped_sped_metadata_a100_nivel",
+      "mapear_cabecario_sped_sped_metadata_a100_parent"
+    ],
+    "61": [
+      "mapear_cabecario_sped_sped_metadata_a110",
+      "mapear_cabecario_sped_sped_metadata_a110_bloco",
+      "mapear_cabecario_sped_sped_metadata_a110_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_a110_headers",
+      "mapear_cabecario_sped_sped_metadata_a110_nivel",
+      "mapear_cabecario_sped_sped_metadata_a110_parent"
+    ],
+    "62": [
+      "mapear_cabecario_sped_sped_metadata_a111",
+      "mapear_cabecario_sped_sped_metadata_a111_bloco",
+      "mapear_cabecario_sped_sped_metadata_a111_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_a111_headers",
+      "mapear_cabecario_sped_sped_metadata_a111_nivel",
+      "mapear_cabecario_sped_sped_metadata_a111_parent"
+    ],
+    "63": [
+      "mapear_cabecario_sped_sped_metadata_a120",
+      "mapear_cabecario_sped_sped_metadata_a120_bloco",
+      "mapear_cabecario_sped_sped_metadata_a120_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_a120_headers",
+      "mapear_cabecario_sped_sped_metadata_a120_nivel",
+      "mapear_cabecario_sped_sped_metadata_a120_parent"
+    ],
+    "64": [
+      "mapear_cabecario_sped_sped_metadata_a170",
+      "mapear_cabecario_sped_sped_metadata_a170_bloco",
+      "mapear_cabecario_sped_sped_metadata_a170_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_a170_headers",
+      "mapear_cabecario_sped_sped_metadata_a170_nivel",
+      "mapear_cabecario_sped_sped_metadata_a170_parent"
+    ],
+    "65": [
+      "mapear_cabecario_sped_sped_metadata_a990",
+      "mapear_cabecario_sped_sped_metadata_a990_bloco",
+      "mapear_cabecario_sped_sped_metadata_a990_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_a990_headers",
+      "mapear_cabecario_sped_sped_metadata_a990_nivel",
+      "mapear_cabecario_sped_sped_metadata_a990_parent"
+    ],
+    "66": [
+      "mapear_cabecario_sped_sped_metadata_c001",
+      "mapear_cabecario_sped_sped_metadata_c001_bloco",
+      "mapear_cabecario_sped_sped_metadata_c001_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c001_headers",
+      "mapear_cabecario_sped_sped_metadata_c001_nivel",
+      "mapear_cabecario_sped_sped_metadata_c001_parent"
+    ],
+    "67": [
+      "mapear_cabecario_sped_sped_metadata_c010",
+      "mapear_cabecario_sped_sped_metadata_c010_bloco",
+      "mapear_cabecario_sped_sped_metadata_c010_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c010_headers",
+      "mapear_cabecario_sped_sped_metadata_c010_nivel",
+      "mapear_cabecario_sped_sped_metadata_c010_parent"
+    ],
+    "68": [
+      "mapear_cabecario_sped_sped_metadata_c100",
+      "mapear_cabecario_sped_sped_metadata_c100_bloco",
+      "mapear_cabecario_sped_sped_metadata_c100_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c100_headers",
+      "mapear_cabecario_sped_sped_metadata_c100_nivel",
+      "mapear_cabecario_sped_sped_metadata_c100_parent"
+    ],
+    "69": [
+      "mapear_cabecario_sped_sped_metadata_c110",
+      "mapear_cabecario_sped_sped_metadata_c110_bloco",
+      "mapear_cabecario_sped_sped_metadata_c110_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c110_headers",
+      "mapear_cabecario_sped_sped_metadata_c110_nivel",
+      "mapear_cabecario_sped_sped_metadata_c110_parent"
+    ],
+    "70": [
+      "mapear_cabecario_sped_sped_metadata_c111",
+      "mapear_cabecario_sped_sped_metadata_c111_bloco",
+      "mapear_cabecario_sped_sped_metadata_c111_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c111_headers",
+      "mapear_cabecario_sped_sped_metadata_c111_nivel",
+      "mapear_cabecario_sped_sped_metadata_c111_parent"
+    ],
+    "71": [
+      "mapear_cabecario_sped_sped_metadata_c120",
+      "mapear_cabecario_sped_sped_metadata_c120_bloco",
+      "mapear_cabecario_sped_sped_metadata_c120_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c120_headers",
+      "mapear_cabecario_sped_sped_metadata_c120_nivel",
+      "mapear_cabecario_sped_sped_metadata_c120_parent"
+    ],
+    "72": [
+      "mapear_cabecario_sped_sped_metadata_c170",
+      "mapear_cabecario_sped_sped_metadata_c170_bloco",
+      "mapear_cabecario_sped_sped_metadata_c170_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c170_headers",
+      "mapear_cabecario_sped_sped_metadata_c170_nivel",
+      "mapear_cabecario_sped_sped_metadata_c170_parent"
+    ],
+    "73": [
+      "mapear_cabecario_sped_sped_metadata_c175",
+      "mapear_cabecario_sped_sped_metadata_c175_bloco",
+      "mapear_cabecario_sped_sped_metadata_c175_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c175_headers",
+      "mapear_cabecario_sped_sped_metadata_c175_nivel",
+      "mapear_cabecario_sped_sped_metadata_c175_parent"
+    ],
+    "74": [
+      "mapear_cabecario_sped_sped_metadata_c180",
+      "mapear_cabecario_sped_sped_metadata_c180_bloco",
+      "mapear_cabecario_sped_sped_metadata_c180_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c180_headers",
+      "mapear_cabecario_sped_sped_metadata_c180_nivel",
+      "mapear_cabecario_sped_sped_metadata_c180_parent"
+    ],
+    "75": [
+      "mapear_cabecario_sped_sped_metadata_c181",
+      "mapear_cabecario_sped_sped_metadata_c181_bloco",
+      "mapear_cabecario_sped_sped_metadata_c181_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c181_headers",
+      "mapear_cabecario_sped_sped_metadata_c181_nivel",
+      "mapear_cabecario_sped_sped_metadata_c181_parent"
+    ],
+    "76": [
+      "mapear_cabecario_sped_sped_metadata_c185",
+      "mapear_cabecario_sped_sped_metadata_c185_bloco",
+      "mapear_cabecario_sped_sped_metadata_c185_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c185_headers",
+      "mapear_cabecario_sped_sped_metadata_c185_nivel",
+      "mapear_cabecario_sped_sped_metadata_c185_parent"
+    ],
+    "77": [
+      "mapear_cabecario_sped_sped_metadata_c188",
+      "mapear_cabecario_sped_sped_metadata_c188_bloco",
+      "mapear_cabecario_sped_sped_metadata_c188_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c188_headers",
+      "mapear_cabecario_sped_sped_metadata_c188_nivel",
+      "mapear_cabecario_sped_sped_metadata_c188_parent"
+    ],
+    "78": [
+      "mapear_cabecario_sped_sped_metadata_c191",
+      "mapear_cabecario_sped_sped_metadata_c191_bloco",
+      "mapear_cabecario_sped_sped_metadata_c191_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c191_headers",
+      "mapear_cabecario_sped_sped_metadata_c191_nivel",
+      "mapear_cabecario_sped_sped_metadata_c191_parent"
+    ],
+    "79": [
+      "mapear_cabecario_sped_sped_metadata_c195",
+      "mapear_cabecario_sped_sped_metadata_c195_bloco",
+      "mapear_cabecario_sped_sped_metadata_c195_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c195_headers",
+      "mapear_cabecario_sped_sped_metadata_c195_nivel",
+      "mapear_cabecario_sped_sped_metadata_c195_parent"
+    ],
+    "80": [
+      "mapear_cabecario_sped_sped_metadata_c198",
+      "mapear_cabecario_sped_sped_metadata_c198_bloco",
+      "mapear_cabecario_sped_sped_metadata_c198_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c198_headers",
+      "mapear_cabecario_sped_sped_metadata_c198_nivel",
+      "mapear_cabecario_sped_sped_metadata_c198_parent"
+    ],
+    "81": [
+      "mapear_cabecario_sped_sped_metadata_c199",
+      "mapear_cabecario_sped_sped_metadata_c199_bloco",
+      "mapear_cabecario_sped_sped_metadata_c199_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c199_headers",
+      "mapear_cabecario_sped_sped_metadata_c199_nivel",
+      "mapear_cabecario_sped_sped_metadata_c199_parent"
+    ],
+    "82": [
+      "mapear_cabecario_sped_sped_metadata_c380",
+      "mapear_cabecario_sped_sped_metadata_c380_bloco",
+      "mapear_cabecario_sped_sped_metadata_c380_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c380_headers",
+      "mapear_cabecario_sped_sped_metadata_c380_nivel",
+      "mapear_cabecario_sped_sped_metadata_c380_parent"
+    ],
+    "83": [
+      "mapear_cabecario_sped_sped_metadata_c381",
+      "mapear_cabecario_sped_sped_metadata_c381_bloco",
+      "mapear_cabecario_sped_sped_metadata_c381_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c381_headers",
+      "mapear_cabecario_sped_sped_metadata_c381_nivel",
+      "mapear_cabecario_sped_sped_metadata_c381_parent"
+    ],
+    "84": [
+      "mapear_cabecario_sped_sped_metadata_c385",
+      "mapear_cabecario_sped_sped_metadata_c385_bloco",
+      "mapear_cabecario_sped_sped_metadata_c385_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c385_headers",
+      "mapear_cabecario_sped_sped_metadata_c385_nivel",
+      "mapear_cabecario_sped_sped_metadata_c385_parent"
+    ],
+    "85": [
+      "mapear_cabecario_sped_sped_metadata_c395",
+      "mapear_cabecario_sped_sped_metadata_c395_bloco",
+      "mapear_cabecario_sped_sped_metadata_c395_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c395_headers",
+      "mapear_cabecario_sped_sped_metadata_c395_nivel",
+      "mapear_cabecario_sped_sped_metadata_c395_parent"
+    ],
+    "86": [
+      "mapear_cabecario_sped_sped_metadata_c396",
+      "mapear_cabecario_sped_sped_metadata_c396_bloco",
+      "mapear_cabecario_sped_sped_metadata_c396_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c396_headers",
+      "mapear_cabecario_sped_sped_metadata_c396_nivel",
+      "mapear_cabecario_sped_sped_metadata_c396_parent"
+    ],
+    "87": [
+      "mapear_cabecario_sped_sped_metadata_c400",
+      "mapear_cabecario_sped_sped_metadata_c400_bloco",
+      "mapear_cabecario_sped_sped_metadata_c400_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c400_headers",
+      "mapear_cabecario_sped_sped_metadata_c400_nivel",
+      "mapear_cabecario_sped_sped_metadata_c400_parent"
+    ],
+    "88": [
+      "mapear_cabecario_sped_sped_metadata_c405",
+      "mapear_cabecario_sped_sped_metadata_c405_bloco",
+      "mapear_cabecario_sped_sped_metadata_c405_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c405_headers",
+      "mapear_cabecario_sped_sped_metadata_c405_nivel",
+      "mapear_cabecario_sped_sped_metadata_c405_parent"
+    ],
+    "89": [
+      "mapear_cabecario_sped_sped_metadata_c485",
+      "mapear_cabecario_sped_sped_metadata_c485_bloco",
+      "mapear_cabecario_sped_sped_metadata_c485_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c485_headers",
+      "mapear_cabecario_sped_sped_metadata_c485_nivel",
+      "mapear_cabecario_sped_sped_metadata_c485_parent"
+    ],
+    "90": [
+      "mapear_cabecario_sped_sped_metadata_c489",
+      "mapear_cabecario_sped_sped_metadata_c489_bloco",
+      "mapear_cabecario_sped_sped_metadata_c489_fk_parent",
+      "mapear_cabecario_sped_sped_metadata_c489_headers",
+      "mapear_cabecario_sped_sped_metadata_c489_nivel",
+      "mapear_cabecario_sped_sped_metadata_c489_parent"
+    ],
+    "91": [
+      "concept_bloco_d",
+      "reg_d001",
+      "reg_d100",
+      "reg_d101",
+      "reg_d105"
+    ],
+    "92": [
+      "concept_bloco1",
+      "reg_1001",
+      "reg_1100",
+      "reg_1500"
+    ],
+    "93": [
+      "concept_bloco9",
+      "reg_9001",
+      "reg_9900",
+      "reg_9999"
+    ],
+    "94": [
+      "concept_bloco_a",
+      "reg_a001",
+      "reg_a100",
+      "reg_a170"
+    ],
+    "95": [
+      "concept_bloco_f",
+      "reg_f001",
+      "reg_f100",
+      "reg_f120"
+    ],
+    "96": [
+      "hero_png_heroimage",
+      "hero_png_isometriclayers",
+      "hero_png_purplebranding",
+      "hero_png_uiasset"
+    ],
+    "97": [
+      "concept_cofins_aliquota_3",
+      "concept_cofins_aliquota_76",
+      "reg_m610"
+    ],
+    "98": [
+      "app_init"
+    ],
+    "99": [
+      "front_confronto_ajuste_sped_eslint_config"
+    ],
+    "100": [
+      "front_confronto_ajuste_sped_vite_config"
+    ],
+    "101": [
+      "graphify_detect"
+    ],
+    "102": [
+      "routers_init"
+    ],
+    "103": [
+      "services_init"
+    ],
+    "104": [
+      "teste"
+    ]
+  },
+  "cohesion": {
+    "0": 0.08846153846153847,
+    "1": 0.06060606060606061,
+    "2": 0.10344827586206896,
+    "3": 0.08333333333333333,
+    "4": 0.12121212121212122,
+    "5": 0.13333333333333333,
+    "6": 0.24242424242424243,
+    "7": 0.2,
+    "8": 0.2777777777777778,
+    "9": 0.3333333333333333,
+    "10": 0.3333333333333333,
+    "11": 0.3333333333333333,
+    "12": 0.3333333333333333,
+    "13": 0.3333333333333333,
+    "14": 0.3333333333333333,
+    "15": 0.3333333333333333,
+    "16": 0.3333333333333333,
+    "17": 0.3333333333333333,
+    "18": 0.3333333333333333,
+    "19": 0.3333333333333333,
+    "20": 0.3333333333333333,
+    "21": 0.3333333333333333,
+    "22": 0.3333333333333333,
+    "23": 0.3333333333333333,
+    "24": 0.3333333333333333,
+    "25": 0.3333333333333333,
+    "26": 0.3333333333333333,
+    "27": 0.3333333333333333,
+    "28": 0.3333333333333333,
+    "29": 0.3333333333333333,
+    "30": 0.3333333333333333,
+    "31": 0.3333333333333333,
+    "32": 0.3333333333333333,
+    "33": 0.3333333333333333,
+    "34": 0.3333333333333333,
+    "35": 0.3333333333333333,
+    "36": 0.3333333333333333,
+    "37": 0.3333333333333333,
+    "38": 0.3333333333333333,
+    "39": 0.3333333333333333,
+    "40": 0.3333333333333333,
+    "41": 0.3333333333333333,
+    "42": 0.3333333333333333,
+    "43": 0.3333333333333333,
+    "44": 0.3333333333333333,
+    "45": 0.3333333333333333,
+    "46": 0.3333333333333333,
+    "47": 0.3333333333333333,
+    "48": 0.3333333333333333,
+    "49": 0.3333333333333333,
+    "50": 0.3333333333333333,
+    "51": 0.3333333333333333,
+    "52": 0.3333333333333333,
+    "53": 0.3333333333333333,
+    "54": 0.3333333333333333,
+    "55": 0.3333333333333333,
+    "56": 0.3333333333333333,
+    "57": 0.3333333333333333,
+    "58": 0.3333333333333333,
+    "59": 0.3333333333333333,
+    "60": 0.3333333333333333,
+    "61": 0.3333333333333333,
+    "62": 0.3333333333333333,
+    "63": 0.3333333333333333,
+    "64": 0.3333333333333333,
+    "65": 0.3333333333333333,
+    "66": 0.3333333333333333,
+    "67": 0.3333333333333333,
+    "68": 0.3333333333333333,
+    "69": 0.3333333333333333,
+    "70": 0.3333333333333333,
+    "71": 0.3333333333333333,
+    "72": 0.3333333333333333,
+    "73": 0.3333333333333333,
+    "74": 0.3333333333333333,
+    "75": 0.3333333333333333,
+    "76": 0.3333333333333333,
+    "77": 0.3333333333333333,
+    "78": 0.3333333333333333,
+    "79": 0.3333333333333333,
+    "80": 0.3333333333333333,
+    "81": 0.3333333333333333,
+    "82": 0.3333333333333333,
+    "83": 0.3333333333333333,
+    "84": 0.3333333333333333,
+    "85": 0.3333333333333333,
+    "86": 0.3333333333333333,
+    "87": 0.3333333333333333,
+    "88": 0.3333333333333333,
+    "89": 0.3333333333333333,
+    "90": 0.3333333333333333,
+    "91": 0.4,
+    "92": 0.5,
+    "93": 0.5,
+    "94": 0.5,
+    "95": 0.5,
+    "96": 0.6666666666666666,
+    "97": 0.6666666666666666,
+    "98": 1.0,
+    "99": 1.0,
+    "100": 1.0,
+    "101": 1.0,
+    "102": 1.0,
+    "103": 1.0,
+    "104": 1.0
+  },
+  "gods": [
+    {
+      "id": "services_comparacao_planilha_sap_sped_compara_gera_diferenca",
+      "label": "compara_gera_diferenca()",
+      "degree": 15
+    },
+    {
+      "id": "concept_bloco_m",
+      "label": "Bloco M - Apuração da Contribuição e Crédito",
+      "degree": 15
+    },
+    {
+      "id": "dataframe",
+      "label": "DataFrame",
+      "degree": 11
+    },
+    {
+      "id": "concept_bloco0",
+      "label": "Bloco 0 - Abertura e Referências",
+      "degree": 9
+    },
+    {
+      "id": "concept_bloco_c",
+      "label": "Bloco C - Documentos Fiscais I (NF-e, NF)",
+      "degree": 8
+    },
+    {
+      "id": "central_irrigacao_goiania",
+      "label": "Central Irrigação LTDA - Goiânia (CNPJ 04.784.935/0001-67)",
+      "degree": 7
+    },
+    {
+      "id": "reg_m105",
+      "label": "Registro M105 - Detalhamento da Base de Cálculo de PIS - CST",
+      "degree": 7
+    },
+    {
+      "id": "services_comparacao_planilha_sap_sped_propagar_num_doc",
+      "label": "_propagar_num_doc()",
+      "degree": 6
+    },
+    {
+      "id": "services_comparacao_planilha_sap_sped_extrair_contrapartidas",
+      "label": "_extrair_contrapartidas()",
+      "degree": 6
+    },
+    {
+      "id": "services_comparacao_planilha_sap_sped_extrair_metadados_contas",
+      "label": "_extrair_metadados_contas()",
+      "degree": 6
+    }
+  ],
+  "surprises": [
+    {
+      "source": "Razão Contábil - Fonte de Dados (a definir)",
+      "target": "Diário Contábil Central Irrigação - Fevereiro 2026",
+      "source_files": [
+        "arquivos_auxiliares/rascunho_formatador/DOCUMENTACAO_SPED.md",
+        "graphify-out/converted/Diário 02.2026 - Central_2c4127dd.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "semantically_similar_to",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link; peripheral node `Diário Contábil Central Irrigação - Fevereiro 2026` unexpectedly reaches hub `Razão Contábil - Fonte de Dados (a definir)`"
+    },
+    {
+      "source": "Razão Contábil - Fonte de Dados (a definir)",
+      "target": "Diário Contábil Central Irrigação - Março 2026 (Sheet1)",
+      "source_files": [
+        "arquivos_auxiliares/rascunho_formatador/DOCUMENTACAO_SPED.md",
+        "graphify-out/converted/Diário 03.2026 - Central_44ca640d.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "semantically_similar_to",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link; peripheral node `Diário Contábil Central Irrigação - Março 2026 (Sheet1)` unexpectedly reaches hub `Razão Contábil - Fonte de Dados (a definir)`"
+    },
+    {
+      "source": "Razão Contábil - Fonte de Dados (a definir)",
+      "target": "Diário Contábil Central Irrigação - Abril 2026",
+      "source_files": [
+        "arquivos_auxiliares/rascunho_formatador/DOCUMENTACAO_SPED.md",
+        "graphify-out/converted/Diário 04.2026 - Central_0f49318a.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "semantically_similar_to",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link"
+    },
+    {
+      "source": "Razão Contábil - Fonte de Dados (a definir)",
+      "target": "Diário Contábil Central Irrigação - Março 2026",
+      "source_files": [
+        "arquivos_auxiliares/rascunho_formatador/DOCUMENTACAO_SPED.md",
+        "graphify-out/converted/1 - Diário - Central Irrigação_5f1c9e28.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "semantically_similar_to",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link"
+    },
+    {
+      "source": "Flask API - Rota /confronto",
+      "target": "FastAPI - Framework Web",
+      "source_files": [
+        "arquivos_auxiliares/rascunho_formatador/DOCUMENTACAO_SPED.md",
+        "requirements.txt"
+      ],
+      "confidence": "INFERRED",
+      "relation": "semantically_similar_to",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `0000` connect `Community 13` to `Community 1`?",
+      "why": "High betweenness centrality (0.010) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `0035` connect `Community 14` to `Community 1`?",
+      "why": "High betweenness centrality (0.010) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 5 inferred relationships involving `Bloco M - Apuração da Contribuição e Crédito` (e.g. with `Bloco A - Documentos de Serviços (NFS)` and `Bloco C - Documentos Fiscais I (NF-e, NF)`) actually correct?",
+      "why": "`Bloco M - Apuração da Contribuição e Crédito` has 5 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `UploadFile`, `Propaga o NUM_DOC (Ref.3) para cada linha de detalhe da planilha SAP.      A p`, `Retorna o valor monetário correto de uma linha SAP com base na     natureza da` to the rest of the system?",
+      "why": "520 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 0` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.08846153846153847 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.06060606060606061 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 2` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.10344827586206896 - nodes in this community are weakly interconnected."
+    }
+  ]
+}
