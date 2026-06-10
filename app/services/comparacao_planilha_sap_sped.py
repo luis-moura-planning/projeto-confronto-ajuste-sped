@@ -58,6 +58,7 @@ MAPA_CONTAS_SAP = {
     # Transporte (fretes pagos — entradas do Bloco D)
     "Fretes e Carretos":                 "VL_SERV_SAP",
     "Frete sobre Compras":               "VL_SERV_SAP",
+    "Fretes sobre compras":              "VL_SERV_SAP",
     "Despesas com Fretes":               "VL_SERV_SAP",
 }
 
@@ -84,6 +85,7 @@ CONTAS_ENTRADA = {
     # Fretes pagos (CT-e aquisição — Bloco D)
     "Fretes e Carretos",
     "Frete sobre Compras",
+    "Fretes sobre compras",
     "Despesas com Fretes",
 }
 
@@ -97,7 +99,7 @@ CONTA_CANONICA_SAIDA = {
     "VL_ICMS_SAP":   ["ICMS e Contribuições a Recolher",   "( - ) ICMS"],
     "VL_ITEM_SAP":   ["Vendas de Mercadorias"],
     # Frete: sem conta canônica (usa a primeira encontrada)
-    "VL_SERV_SAP":   ["Fretes e Carretos", "Frete sobre Compras", "Despesas com Fretes"],
+    "VL_SERV_SAP":   ["Fretes e Carretos", "Frete sobre Compras", "Fretes sobre compras", "Despesas com Fretes"],
 }
 
 # Mapeamento delta → campo SAP (usado em gera_lancamentos_ajuste)

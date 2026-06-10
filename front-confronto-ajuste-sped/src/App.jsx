@@ -5,13 +5,17 @@ import "./App.css";
 const TOLERANCIA = 0.05;
 
 function _reclas(r) {
-  const deltaPis    = (r.VL_PIS    ?? 0) - (r.VL_PIS_SAP    ?? 0);
-  const deltaCofins = (r.VL_COFINS ?? 0) - (r.VL_COFINS_SAP ?? 0);
+  const vlPis    = r.VL_PIS    ?? r.VL_PIS_D    ?? 0;
+  const vlCofins = r.VL_COFINS ?? r.VL_COFINS_D ?? 0;
+  const deltaPis    = vlPis    - (r.VL_PIS_SAP    ?? 0);
+  const deltaCofins = vlCofins - (r.VL_COFINS_SAP ?? 0);
   const tipo = Math.abs(deltaPis) > TOLERANCIA || Math.abs(deltaCofins) > TOLERANCIA
     ? "divergencia"
     : "ok";
   return {
     ...r,
+    VL_PIS:       vlPis,
+    VL_COFINS:    vlCofins,
     _tipo:        tipo,
     DELTA_PIS:    Math.round(deltaPis    * 100) / 100,
     DELTA_COFINS: Math.round(deltaCofins * 100) / 100,
@@ -147,10 +151,15 @@ export default function App() {
     ? [
         // Reclassifica divergencias e ok do backend usando apenas PIS e COFINS
         ...[...(resultado.divergencias ?? []), ...(resultado.ok ?? [])].map(_reclas),
-        // Só SPED: mantém apenas registros com PIS ou COFINS
+        // Só SPED: mantém registros com PIS ou COFINS (incluindo variantes _D do Bloco D)
         ...(resultado.so_sped ?? [])
-          .filter((r) => (r.VL_PIS ?? 0) !== 0 || (r.VL_COFINS ?? 0) !== 0)
-          .map((r) => ({ ...r, _tipo: "so_sped" })),
+          .filter((r) => (r.VL_PIS ?? r.VL_PIS_D ?? 0) !== 0 || (r.VL_COFINS ?? r.VL_COFINS_D ?? 0) !== 0)
+          .map((r) => ({
+            ...r,
+            VL_PIS:    r.VL_PIS    ?? r.VL_PIS_D    ?? 0,
+            VL_COFINS: r.VL_COFINS ?? r.VL_COFINS_D ?? 0,
+            _tipo: "so_sped",
+          })),
         // Só SAP: mantém apenas registros com PIS ou COFINS
         ...(resultado.so_sap ?? [])
           .filter((r) => (r.VL_PIS_SAP ?? 0) !== 0 || (r.VL_COFINS_SAP ?? 0) !== 0)
