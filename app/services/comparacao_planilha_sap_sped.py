@@ -579,6 +579,95 @@ def _df_para_json(df: pd.DataFrame) -> list:
 # FUNÇÕES PRINCIPAIS
 # =============================================================================
 
+def gera_lancamentos_so_sped(
+    df_sap_raw: pd.DataFrame,
+    so_sped_entrada: pd.DataFrame,
+    so_sped_transporte: pd.DataFrame,
+    so_sped_f100: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Gera lançamentos sugeridos para registros presentes apenas no SPED.
+
+    Como não há lançamento SAP de referência, os códigos das contas de
+    PIS/COFINS a Recuperar são extraídos de outros lançamentos do diário SAP.
+    A conta de contrapartida fica em branco — deve ser preenchida manualmente
+    antes da importação.
+
+    Colunas do DataFrame retornado: mesmas de gera_lancamentos_ajuste, com
+    Sentido = "Só SPED".
+    """
+    # Extrai código contábil das contas de recuperação do diário SAP
+    _cod_pis = _cod_cofins = ""
+    for _, r in df_sap_raw.iterrows():
+        nome = str(r.get("Cta.cont./Nome PN", "")).strip()
+        cod  = str(r.get("Cta.contáb./cód.PN", "")).strip()
+        if nome == CONTA_PIS_RECUPERAR and not _cod_pis:
+            _cod_pis = cod
+        if nome == CONTA_COFINS_RECUPERAR and not _cod_cofins:
+            _cod_cofins = cod
+        if _cod_pis and _cod_cofins:
+            break
+
+    linhas = []
+
+    def _lanc(vl_pis, vl_cofins, descricao, num_doc="", chv=""):
+        vl_pis    = _to_float(vl_pis)
+        vl_cofins = _to_float(vl_cofins)
+        if abs(vl_pis) > TOLERANCIA:
+            linhas.append({
+                "Código da Conta":    _cod_pis,
+                "Descrição da Conta": CONTA_PIS_RECUPERAR,
+                "Débito":             round(vl_pis, 2),
+                "Crédito":            None,
+                "Descrição":          descricao,
+                "Centro de Custo":    "",
+                "Filial":             "",
+                "NUM_DOC":            num_doc,
+                "CHV_NFE":            chv,
+                "Imposto":            "PIS",
+                "DELTA":              None,
+                "Sentido":            "Só SPED",
+            })
+        if abs(vl_cofins) > TOLERANCIA:
+            linhas.append({
+                "Código da Conta":    _cod_cofins,
+                "Descrição da Conta": CONTA_COFINS_RECUPERAR,
+                "Débito":             round(vl_cofins, 2),
+                "Crédito":            None,
+                "Descrição":          descricao,
+                "Centro de Custo":    "",
+                "Filial":             "",
+                "NUM_DOC":            num_doc,
+                "CHV_NFE":            chv,
+                "Imposto":            "COFINS",
+                "DELTA":              None,
+                "Sentido":            "Só SPED",
+            })
+
+    # Bloco C — entradas (NF-e recebidas só no SPED)
+    for _, row in so_sped_entrada.iterrows():
+        num = str(row.get("NUM_DOC", ""))
+        chv = str(row.get("CHV_NFE", ""))
+        desc = f"NF {num}" if num else f"CHV {chv[:20]}"
+        _lanc(row.get("VL_PIS", 0), row.get("VL_COFINS", 0), desc, num, chv)
+
+    # Bloco D — transporte (CT-e só no SPED)
+    for _, row in so_sped_transporte.iterrows():
+        num = str(row.get("NUM_DOC", ""))
+        chv = str(row.get("CHV_CTE", ""))
+        desc = f"CT-e {num}" if num else f"CTE {chv[:20]}"
+        _lanc(row.get("VL_PIS_D", 0), row.get("VL_COFINS_D", 0), desc, num, chv)
+
+    # Bloco F — F100 só no SPED
+    for _, row in so_sped_f100.iterrows():
+        cod  = str(row.get("COD_CTA", ""))
+        nome = str(row.get("NOME_CONTA", ""))
+        desc = f"F100 {cod}" + (f" - {nome}" if nome else "")
+        _lanc(row.get("VL_PIS", 0), row.get("VL_COFINS", 0), desc)
+
+    return pd.DataFrame(linhas) if linhas else pd.DataFrame()
+
+
 def compara_gera_diferenca(
     arquivo_sped: str,
     planilha_diario: str,
@@ -774,6 +863,14 @@ def compara_gera_diferenca(
     df_lanc_f100 = gera_lancamentos_ajuste_f100(div_f, df_sap)
     df_lanc = pd.concat([df_lanc_nf, df_lanc_f100], ignore_index=True)
 
+    # Lançamentos sugeridos para registros só no SPED (sem contrapartida SAP)
+    df_lanc_so_sped = gera_lancamentos_so_sped(
+        df_sap,
+        so_sped_e,
+        so_sped_t,
+        so_sped_f,
+    )
+
     return {
         # DataFrames — Bloco C
         "divergencias_saida":       div_s,
@@ -796,6 +893,7 @@ def compara_gera_diferenca(
         "so_sap_f100":              so_sap_f,
         # Lançamentos consolidados
         "lancamentos":              df_lanc,
+        "lancamentos_so_sped":      df_lanc_so_sped,
         # JSON equivalentes
         "divergencias_saida_json":      _df_para_json(div_s),
         "divergencias_entrada_json":    _df_para_json(div_e),
@@ -814,6 +912,7 @@ def compara_gera_diferenca(
         "so_sped_f100_json":            _df_para_json(so_sped_f),
         "so_sap_f100_json":             _df_para_json(so_sap_f),
         "lancamentos_json":             _df_para_json(df_lanc),
+        "lancamentos_so_sped_json":     _df_para_json(df_lanc_so_sped),
     }
 
 

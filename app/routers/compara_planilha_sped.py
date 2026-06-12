@@ -54,7 +54,8 @@ async def comparar(
                 + resultado["so_sap_transporte_json"]
                 + resultado["so_sap_f100_json"]
             ),
-            "lancamentos": resultado["lancamentos_json"],
+            "lancamentos":         resultado["lancamentos_json"],
+            "lancamentos_so_sped": resultado["lancamentos_so_sped_json"],
         }
 
     except ValueError as exc:

@@ -24,7 +24,15 @@
   word-break: break-all;
 }
 
-/* ── Alert erro ─────────────────────────────────────────────── */
+/* ── Alerts ─────────────────────────────────────────────────── */
+.app-alert-warn {
+  background: var(--g-warn-soft);
+  border: 1px solid var(--g-warn-border, var(--g-warn-fg));
+  color: var(--g-warn-fg);
+  border-radius: var(--g-radius-sm);
+  padding: 12px 16px;
+  font-size: var(--g-fs-14);
+}
 .app-alert-err {
   background: var(--g-danger-soft);
   border: 1px solid var(--g-danger-border);
@@ -57,6 +65,9 @@
   border-right: 1px solid var(--g-border);
   padding-right: 14px !important;
 }
+
+.app-row-so-sped td       { background: var(--g-warn-soft); }
+.app-row-so-sped:hover td { background: var(--g-amber-100, #fef3c7); }
 
 .app-td-diff    { color: var(--g-warn-fg);   font-weight: var(--g-fw-semi); }
 .app-td-debito  { color: var(--g-danger);    font-weight: var(--g-fw-semi); }

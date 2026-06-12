@@ -105,6 +105,7 @@ export default function App() {
   );
   const [filtroTexto, setFiltroTexto] = useState("");
   const [filtroLanc, setFiltroLanc] = useState("");
+  const [incluirSoSped, setIncluirSoSped] = useState(false);
 
   const sapRef = useRef(null);
   const spedRef = useRef(null);
@@ -175,7 +176,8 @@ export default function App() {
       String(r.NUM_DOC   ?? "").toLowerCase().includes(_busca) ||
       String(r.CHV_NFE   ?? r.CHV_CTE ?? "").toLowerCase().includes(_busca) ||
       String(r.COD_CTA   ?? "").toLowerCase().includes(_busca) ||
-      String(r.NOME_CONTA ?? "").toLowerCase().includes(_busca)
+      String(r.NOME_CONTA ?? "").toLowerCase().includes(_busca) ||
+      BLOCO_LABEL[_bloco(r)].toLowerCase().includes(_busca)
     );
   });
 
@@ -188,8 +190,12 @@ export default function App() {
     paginaComp * porPaginaComp,
   );
 
+  const lancSoSped = incluirSoSped
+    ? (resultado?.lancamentos_so_sped ?? []).map((l) => ({ ...l, _soSped: true }))
+    : [];
+
   const _buscaLanc = filtroLanc.trim().toLowerCase();
-  const lancamentos = (resultado?.lancamentos ?? []).filter((l) => {
+  const lancamentos = [...(resultado?.lancamentos ?? []), ...lancSoSped].filter((l) => {
     const impostoKey = (l["Imposto"] ?? "").replace(/_D$/, "");
     if (impostosAtivos[impostoKey] !== true) return false;
     if (!_buscaLanc) return true;
@@ -399,7 +405,7 @@ export default function App() {
                     <input
                       className="g-input"
                       style={{ width: 260 }}
-                      placeholder="Buscar por nota, chave NF-e ou conta F100…"
+                      placeholder="Buscar por nota, chave NF-e, conta F100 ou bloco…"
                       value={filtroTexto}
                       onChange={(e) => { setFiltroTexto(e.target.value); setPaginaComp(1); }}
                     />
@@ -600,6 +606,14 @@ export default function App() {
                         {label}
                       </label>
                     ))}
+                    <label className="g-check" style={{ color: "var(--g-warn-fg)" }}>
+                      <input
+                        type="checkbox"
+                        checked={incluirSoSped}
+                        onChange={() => { setIncluirSoSped((v) => !v); setPaginaLanc(1); }}
+                      />
+                      Incluir Só SPED
+                    </label>
                   </div>
                   <div
                     className="g-cluster"
@@ -636,6 +650,15 @@ export default function App() {
                   </div>
                 </div>
 
+                {incluirSoSped && (
+                  <div className="app-alert-warn">
+                    <strong>Atenção — lançamentos Só SPED:</strong> esses registros existem
+                    apenas no SPED e não possuem contrapartida no SAP. Os códigos de conta
+                    são apenas sugestões; verifique e preencha a conta de contrapartida
+                    antes de importar no SAP.
+                  </div>
+                )}
+
                 {lancamentos.length === 0 ? (
                   <p className="g-empty">
                     Nenhum lançamento gerado — sem diferenças encontradas.
@@ -671,7 +694,7 @@ export default function App() {
                         </thead>
                         <tbody>
                           {lancPag.map((l, i) => (
-                            <tr key={i}>
+                            <tr key={i} className={l._soSped ? "app-row-so-sped" : ""}>
                               <td>
                                 <code className="g-mono">
                                   {l["Código da Conta"]}
