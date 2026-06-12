@@ -76,6 +76,8 @@ def extrai_dados_sped(sped_txt: str) -> dict:
     }
 
     dados = {"0000": [], "C100": [], "C170": [], "C500": [], "C501": [], "C505": [], "D100": [], "D101": [], "D105": [], "F100": []}
+    # CNPJ do estabelecimento atual — atualizado a cada C010
+    cnpj_atual = ""
     nota_atual_chv = ""
     nota_atual_valida = True
     # Controle de estado para o Bloco C500
@@ -95,6 +97,12 @@ def extrai_dados_sped(sped_txt: str) -> dict:
 
                 campos = linha.strip("|").split("|")
                 reg = campos[0]
+
+                # C010 não precisa ser armazenado — apenas atualiza o CNPJ do estabelecimento
+                if reg == "C010":
+                    cnpj_atual = campos[1] if len(campos) > 1 else ""
+                    continue
+
                 if reg not in layouts:
                     continue
 
@@ -111,12 +119,14 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                     if not nota_atual_valida:
                         continue
                     registro["CHV_NFE"] = nota_atual_chv
+                    registro["CNPJ_ESTAB"] = cnpj_atual
                     dados["C100"].append(registro)
 
                 elif reg == "C170":
                     if not nota_atual_valida:
                         continue
                     registro["CHV_NFE"] = nota_atual_chv
+                    registro["CNPJ_ESTAB"] = cnpj_atual
                     dados["C170"].append(registro)
 
                 elif reg == "C500":
@@ -126,6 +136,7 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                     c500_atual_num = registro.get("NUM_DOC", "")
                     if not c500_atual_valida:
                         continue
+                    registro["CNPJ_ESTAB"] = cnpj_atual
                     dados["C500"].append(registro)
 
                 elif reg in ("C501", "C505"):
@@ -133,6 +144,7 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                         continue
                     registro["CHV_DOCe"] = c500_atual_chv
                     registro["NUM_DOC"] = c500_atual_num
+                    registro["CNPJ_ESTAB"] = cnpj_atual
                     dados[reg].append(registro)
 
                 elif reg == "D100":
@@ -141,6 +153,7 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                     d100_atual_chv = registro.get("CHV_CTE", "")
                     if not d100_atual_valida:
                         continue
+                    registro["CNPJ_ESTAB"] = cnpj_atual
                     dados["D100"].append(registro)
 
                 elif reg in ("D101", "D105"):
@@ -148,9 +161,11 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                     if not d100_atual_valida:
                         continue
                     registro["CHV_CTE"] = d100_atual_chv
+                    registro["CNPJ_ESTAB"] = cnpj_atual
                     dados[reg].append(registro)
 
                 elif reg == "F100":
+                    registro["CNPJ_ESTAB"] = cnpj_atual
                     dados["F100"].append(registro)
 
                 else:
