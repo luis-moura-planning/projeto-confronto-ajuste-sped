@@ -220,9 +220,11 @@ def _agregar_sped(dfs: dict) -> tuple:
     c100 = c100.merge(vl_item_por_chv, on="CHV_NFE", how="left")
     c100["VL_ITEM"] = c100["VL_ITEM"].fillna(0.0)
 
+    _cnpj = ["CNPJ_ESTAB"] if "CNPJ_ESTAB" in c100.columns else []
+
     df_saidas = (
         c100[c100["IND_OPER"] == "1"]
-        .groupby(["NUM_DOC", "CHV_NFE"])[COLS_SPED]
+        .groupby(["NUM_DOC", "CHV_NFE"] + _cnpj)[COLS_SPED]
         .sum()
         .reset_index()
     )
@@ -236,7 +238,7 @@ def _agregar_sped(dfs: dict) -> tuple:
     ]
     df_entradas = (
         c100_entradas
-        .groupby(["CHV_NFE", "NUM_DOC"])[COLS_SPED]
+        .groupby(["CHV_NFE", "NUM_DOC"] + _cnpj)[COLS_SPED]
         .sum()
         .reset_index()
     )
@@ -292,9 +294,10 @@ def _agregar_sped_d(dfs: dict) -> pd.DataFrame:
     else:
         cofins_por_cte = pd.DataFrame(columns=["CHV_CTE", "VL_COFINS_D"])
 
+    _cnpj = ["CNPJ_ESTAB"] if "CNPJ_ESTAB" in d100.columns else []
     df = (
         d100[d100["IND_OPER"] == "0"]
-        .groupby(["CHV_CTE", "NUM_DOC"])["VL_SERV"]
+        .groupby(["CHV_CTE", "NUM_DOC"] + _cnpj)["VL_SERV"]
         .sum()
         .reset_index()
     )
@@ -321,12 +324,12 @@ def _agregar_sped_f100(dfs: dict) -> pd.DataFrame:
     f100["VL_PIS"]    = f100["VL_PIS"].apply(_to_float)
     f100["VL_COFINS"] = f100["VL_COFINS"].apply(_to_float)
 
-    return (
-        f100[f100["IND_OPER"] == "0"]
-        .groupby("COD_CTA")[COLS_SPED_F100]
-        .sum()
-        .reset_index()
-    )
+    f100_ent = f100[f100["IND_OPER"] == "0"]
+    df_f = f100_ent.groupby("COD_CTA")[COLS_SPED_F100].sum().reset_index()
+    if "CNPJ_ESTAB" in f100.columns:
+        cnpj_f = f100_ent.groupby("COD_CTA")["CNPJ_ESTAB"].first().reset_index()
+        df_f = df_f.merge(cnpj_f, on="COD_CTA", how="left")
+    return df_f
 
 
 def _agregar_sped_c500(dfs: dict) -> pd.DataFrame:
@@ -346,7 +349,8 @@ def _agregar_sped_c500(dfs: dict) -> pd.DataFrame:
     if c500.empty:
         return pd.DataFrame(columns=["NUM_DOC"] + COLS_SPED_C500)
 
-    df = c500[["NUM_DOC"]].drop_duplicates().copy()
+    _cols_base = ["NUM_DOC"] + (["CNPJ_ESTAB"] if "CNPJ_ESTAB" in c500.columns else [])
+    df = c500[_cols_base].drop_duplicates("NUM_DOC").copy()
 
     if not c501.empty and "NUM_DOC" in c501.columns:
         c501 = c501.copy()
@@ -666,7 +670,7 @@ def gera_lancamentos_so_sped(
 
     linhas = []
 
-    def _lanc(vl_pis, vl_cofins, descricao, num_doc="", chv=""):
+    def _lanc(vl_pis, vl_cofins, descricao, num_doc="", chv="", cnpj=""):
         vl_pis    = _to_float(vl_pis)
         vl_cofins = _to_float(vl_cofins)
         if abs(vl_pis) > TOLERANCIA:
@@ -677,7 +681,7 @@ def gera_lancamentos_so_sped(
                 "Crédito":            None,
                 "Descrição":          descricao,
                 "Centro de Custo":    "",
-                "Filial":             "",
+                "Filial":             cnpj,
                 "NUM_DOC":            num_doc,
                 "CHV_NFE":            chv,
                 "Imposto":            "PIS",
@@ -692,7 +696,7 @@ def gera_lancamentos_so_sped(
                 "Crédito":            None,
                 "Descrição":          descricao,
                 "Centro de Custo":    "",
-                "Filial":             "",
+                "Filial":             cnpj,
                 "NUM_DOC":            num_doc,
                 "CHV_NFE":            chv,
                 "Imposto":            "COFINS",
@@ -702,30 +706,34 @@ def gera_lancamentos_so_sped(
 
     # Bloco C — entradas (NF-e recebidas só no SPED)
     for _, row in so_sped_entrada.iterrows():
-        num = str(row.get("NUM_DOC", ""))
-        chv = str(row.get("CHV_NFE", ""))
+        num  = str(row.get("NUM_DOC", ""))
+        chv  = str(row.get("CHV_NFE", ""))
+        cnpj = str(row.get("CNPJ_ESTAB", "") or "")
         desc = f"NF {num}" if num else f"CHV {chv[:20]}"
-        _lanc(row.get("VL_PIS", 0), row.get("VL_COFINS", 0), desc, num, chv)
+        _lanc(row.get("VL_PIS", 0), row.get("VL_COFINS", 0), desc, num, chv, cnpj)
 
     # Bloco D — transporte (CT-e só no SPED)
     for _, row in so_sped_transporte.iterrows():
-        num = str(row.get("NUM_DOC", ""))
-        chv = str(row.get("CHV_CTE", ""))
+        num  = str(row.get("NUM_DOC", ""))
+        chv  = str(row.get("CHV_CTE", ""))
+        cnpj = str(row.get("CNPJ_ESTAB", "") or "")
         desc = f"CT-e {num}" if num else f"CTE {chv[:20]}"
-        _lanc(row.get("VL_PIS_D", 0), row.get("VL_COFINS_D", 0), desc, num, chv)
+        _lanc(row.get("VL_PIS_D", 0), row.get("VL_COFINS_D", 0), desc, num, chv, cnpj)
 
     # Bloco F — F100 só no SPED
     for _, row in so_sped_f100.iterrows():
         cod  = str(row.get("COD_CTA", ""))
         nome = str(row.get("NOME_CONTA", ""))
+        cnpj = str(row.get("CNPJ_ESTAB", "") or "")
         desc = f"F100 {cod}" + (f" - {nome}" if nome else "")
-        _lanc(row.get("VL_PIS", 0), row.get("VL_COFINS", 0), desc)
+        _lanc(row.get("VL_PIS", 0), row.get("VL_COFINS", 0), desc, cnpj=cnpj)
 
     # Bloco C500 — energia elétrica / telecomunicações só no SPED
     for _, row in so_sped_c500.iterrows():
         num  = str(row.get("NUM_DOC", ""))
+        cnpj = str(row.get("CNPJ_ESTAB", "") or "")
         desc = f"Energia/Telecom {num}" if num else "C500"
-        _lanc(row.get("VL_PIS_C5", 0), row.get("VL_COFINS_C5", 0), desc, num)
+        _lanc(row.get("VL_PIS_C5", 0), row.get("VL_COFINS_C5", 0), desc, num, cnpj=cnpj)
 
     return pd.DataFrame(linhas) if linhas else pd.DataFrame()
 
@@ -836,11 +844,12 @@ def compara_gera_diferenca(
 
         id_cols       = [chave] + (["NUM_DOC"] if chave != "NUM_DOC" and "NUM_DOC" in df.columns else [])
         chv_col       = [c for c in ["CHV_NFE", "CHV_CTE"] if c in df.columns and c != chave]
+        cnpj_col      = ["CNPJ_ESTAB"] if "CNPJ_ESTAB" in df.columns else []
         sap_cols_pres = [c for c in df_sap_agg.columns if c != chave and c in df.columns and c not in id_cols]
 
         df_so_sped = (
             df[df["_merge"] == "left_only"]
-            [id_cols + chv_col + [c for c in (COLS_SPED + COLS_SPED_D + COLS_SPED_C500) if c in df.columns]]
+            [id_cols + chv_col + cnpj_col + [c for c in (COLS_SPED + COLS_SPED_D + COLS_SPED_C500) if c in df.columns]]
             .reset_index(drop=True)
         )
         df_so_sap = (
@@ -865,12 +874,12 @@ def compara_gera_diferenca(
 
         df_div = (
             df_ambos[mask]
-            [id_cols + chv_col + sped_cols + sap_cols + delta_cols]
+            [id_cols + chv_col + cnpj_col + sped_cols + sap_cols + delta_cols]
             .reset_index(drop=True)
         )
         df_ok = (
             df_ambos[~mask]
-            [id_cols + chv_col + sped_cols + sap_cols]
+            [id_cols + chv_col + cnpj_col + sped_cols + sap_cols]
             .reset_index(drop=True)
         )
 
@@ -1037,8 +1046,9 @@ def gera_lancamentos_ajuste(
     linhas = []
 
     for _, row in df_divergencias.iterrows():
-        num_doc = str(row["NUM_DOC"])
-        chv     = row.get("CHV_NFE", "")
+        num_doc    = str(row["NUM_DOC"])
+        chv        = row.get("CHV_NFE", "")
+        cnpj_estab = str(row.get("CNPJ_ESTAB", "") or "")
 
         for delta_col, campo in DELTA_PARA_CAMPO.items():
             if delta_col not in row.index:
@@ -1081,7 +1091,7 @@ def gera_lancamentos_ajuste(
                     "Crédito":            valor if lado_ajuste == "C" else None,
                     "Descrição":          f"NF {num_doc} - {c['obs']}" if c["obs"] else f"NF {num_doc}",
                     "Centro de Custo":    c["cc"],
-                    "Filial":             c["filial"],
+                    "Filial":             cnpj_estab or c["filial"],
                     "NUM_DOC":            num_doc,
                     "CHV_NFE":            chv,
                     "Imposto":            delta_col.replace("DELTA_", ""),

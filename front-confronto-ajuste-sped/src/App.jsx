@@ -174,10 +174,11 @@ export default function App() {
     if (filtro !== "todos" && r._tipo !== filtro) return false;
     if (!_busca) return true;
     return (
-      String(r.NUM_DOC   ?? "").toLowerCase().includes(_busca) ||
-      String(r.CHV_NFE   ?? r.CHV_CTE ?? "").toLowerCase().includes(_busca) ||
-      String(r.COD_CTA   ?? "").toLowerCase().includes(_busca) ||
+      String(r.NUM_DOC    ?? "").toLowerCase().includes(_busca) ||
+      String(r.CHV_NFE    ?? r.CHV_CTE ?? "").toLowerCase().includes(_busca) ||
+      String(r.COD_CTA    ?? "").toLowerCase().includes(_busca) ||
       String(r.NOME_CONTA ?? "").toLowerCase().includes(_busca) ||
+      String(r.CNPJ_ESTAB ?? "").toLowerCase().includes(_busca) ||
       BLOCO_LABEL[_bloco(r)].toLowerCase().includes(_busca)
     );
   });
@@ -469,7 +470,12 @@ export default function App() {
                         >
                           <td>
                             {row.NUM_DOC != null ? (
-                              row.NUM_DOC
+                              <>
+                                {row.NUM_DOC}
+                                {row.CNPJ_ESTAB && (
+                                  <><br /><span className="g-helper" style={{ fontSize: 10 }}>{row.CNPJ_ESTAB}</span></>
+                                )}
+                              </>
                             ) : row.COD_CTA != null ? (
                               <code className="g-mono" style={{ fontSize: 11 }}>
                                 {row.COD_CTA}
