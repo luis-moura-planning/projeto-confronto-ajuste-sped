@@ -98,8 +98,8 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                 campos = linha.strip("|").split("|")
                 reg = campos[0]
 
-                # C010 não precisa ser armazenado — apenas atualiza o CNPJ do estabelecimento
-                if reg == "C010":
+                # C010 / D010 / F010 — atualiza o CNPJ do estabelecimento ativo
+                if reg in ("C010", "D010", "F010"):
                     cnpj_atual = campos[1] if len(campos) > 1 else ""
                     continue
 

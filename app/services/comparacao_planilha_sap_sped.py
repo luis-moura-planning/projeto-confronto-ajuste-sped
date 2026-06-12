@@ -1155,8 +1155,9 @@ def gera_lancamentos_ajuste_f100(
 
     linhas = []
     for _, row in df_divergencias_f100.iterrows():
-        cod_cta  = str(row["COD_CTA"])
-        nome_cta = str(row.get("NOME_CONTA", ""))
+        cod_cta    = str(row["COD_CTA"])
+        nome_cta   = str(row.get("NOME_CONTA", ""))
+        cnpj_estab = str(row.get("CNPJ_ESTAB", "") or "")
 
         for delta_col, (conta_rec, imposto) in _DELTA_F100.items():
             if delta_col not in row.index:
@@ -1186,7 +1187,7 @@ def gera_lancamentos_ajuste_f100(
                     "Crédito":            valor if lado == "C" else None,
                     "Descrição":          desc,
                     "Centro de Custo":    meta_rec["cc"],
-                    "Filial":             meta_rec["filial"],
+                    "Filial":             cnpj_estab or meta_rec["filial"],
                     "COD_CTA":            cod_cta,
                     "NOME_CONTA":         nome_cta,
                     "Imposto":            imposto,

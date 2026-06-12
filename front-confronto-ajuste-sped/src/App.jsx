@@ -477,9 +477,12 @@ export default function App() {
                                 )}
                               </>
                             ) : row.COD_CTA != null ? (
-                              <code className="g-mono" style={{ fontSize: 11 }}>
-                                {row.COD_CTA}
-                              </code>
+                              <>
+                                <code className="g-mono" style={{ fontSize: 11 }}>{row.COD_CTA}</code>
+                                {row.CNPJ_ESTAB && (
+                                  <><br /><span className="g-helper" style={{ fontSize: 10 }}>{row.CNPJ_ESTAB}</span></>
+                                )}
+                              </>
                             ) : "—"}
                           </td>
                           <td>
