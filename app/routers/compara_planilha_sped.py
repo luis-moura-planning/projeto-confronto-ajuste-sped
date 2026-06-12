@@ -35,24 +35,28 @@ async def comparar(
                 + resultado["divergencias_entrada_json"]
                 + resultado["divergencias_transporte_json"]
                 + resultado["divergencias_f100_json"]
+                + resultado["divergencias_c500_json"]
             ),
             "ok": (
                 resultado["ok_saida_json"]
                 + resultado["ok_entrada_json"]
                 + resultado["ok_transporte_json"]
                 + resultado["ok_f100_json"]
+                + resultado["ok_c500_json"]
             ),
             "so_sped": (
                 resultado["so_sped_saida_json"]
                 + resultado["so_sped_entrada_json"]
                 + resultado["so_sped_transporte_json"]
                 + resultado["so_sped_f100_json"]
+                + resultado["so_sped_c500_json"]
             ),
             "so_sap": (
                 resultado["so_sap_saida_json"]
                 + resultado["so_sap_entrada_json"]
                 + resultado["so_sap_transporte_json"]
                 + resultado["so_sap_f100_json"]
+                + resultado["so_sap_c500_json"]
             ),
             "lancamentos":         resultado["lancamentos_json"],
             "lancamentos_so_sped": resultado["lancamentos_so_sped_json"],

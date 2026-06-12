@@ -80,6 +80,7 @@ def extrai_dados_sped(sped_txt: str) -> dict:
     nota_atual_valida = True
     # Controle de estado para o Bloco C500
     c500_atual_chv = ""
+    c500_atual_num = ""
     c500_atual_valida = True
     # Controle de estado para o Bloco D
     d100_atual_chv = ""
@@ -122,6 +123,7 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                     cod_sit = registro.get("COD_SIT", "")
                     c500_atual_valida = cod_sit not in COD_SIT_EXCLUIR
                     c500_atual_chv = registro.get("CHV_DOCe", "")
+                    c500_atual_num = registro.get("NUM_DOC", "")
                     if not c500_atual_valida:
                         continue
                     dados["C500"].append(registro)
@@ -130,6 +132,7 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                     if not c500_atual_valida:
                         continue
                     registro["CHV_DOCe"] = c500_atual_chv
+                    registro["NUM_DOC"] = c500_atual_num
                     dados[reg].append(registro)
 
                 elif reg == "D100":

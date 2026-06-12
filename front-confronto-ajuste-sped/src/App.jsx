@@ -5,8 +5,8 @@ import "./App.css";
 const TOLERANCIA = 0.05;
 
 function _reclas(r) {
-  const vlPis    = r.VL_PIS    ?? r.VL_PIS_D    ?? 0;
-  const vlCofins = r.VL_COFINS ?? r.VL_COFINS_D ?? 0;
+  const vlPis    = r.VL_PIS    ?? r.VL_PIS_D    ?? r.VL_PIS_C5    ?? 0;
+  const vlCofins = r.VL_COFINS ?? r.VL_COFINS_D ?? r.VL_COFINS_C5 ?? 0;
   const deltaPis    = vlPis    - (r.VL_PIS_SAP    ?? 0);
   const deltaCofins = vlCofins - (r.VL_COFINS_SAP ?? 0);
   const tipo = Math.abs(deltaPis) > TOLERANCIA || Math.abs(deltaCofins) > TOLERANCIA
@@ -49,11 +49,12 @@ const TIPO_LABELS = {
 function _bloco(r) {
   if (r.COD_CTA != null) return "F100";
   if (r.CHV_CTE != null) return "D";
+  if (r._c500 || r.VL_PIS_C5 != null || r.VL_COFINS_C5 != null) return "C500";
   return "C";
 }
 
-const BLOCO_CLASS = { C: "app-bloco--c", D: "app-bloco--d", F100: "app-bloco--f100" };
-const BLOCO_LABEL = { C: "Bloco C", D: "Bloco D", F100: "F100" };
+const BLOCO_CLASS = { C: "app-bloco--c", D: "app-bloco--d", F100: "app-bloco--f100", C500: "app-bloco--c500" };
+const BLOCO_LABEL = { C: "Bloco C", D: "Bloco D", F100: "F100", C500: "C500" };
 
 const OPCOES_POR_PAGINA = [10, 20, 50, 100];
 
@@ -152,13 +153,13 @@ export default function App() {
     ? [
         // Reclassifica divergencias e ok do backend usando apenas PIS e COFINS
         ...[...(resultado.divergencias ?? []), ...(resultado.ok ?? [])].map(_reclas),
-        // Só SPED: mantém registros com PIS ou COFINS (incluindo variantes _D do Bloco D)
+        // Só SPED: mantém registros com PIS ou COFINS (incluindo variantes _D e _C5)
         ...(resultado.so_sped ?? [])
-          .filter((r) => (r.VL_PIS ?? r.VL_PIS_D ?? 0) !== 0 || (r.VL_COFINS ?? r.VL_COFINS_D ?? 0) !== 0)
+          .filter((r) => (r.VL_PIS ?? r.VL_PIS_D ?? r.VL_PIS_C5 ?? 0) !== 0 || (r.VL_COFINS ?? r.VL_COFINS_D ?? r.VL_COFINS_C5 ?? 0) !== 0)
           .map((r) => ({
             ...r,
-            VL_PIS:    r.VL_PIS    ?? r.VL_PIS_D    ?? 0,
-            VL_COFINS: r.VL_COFINS ?? r.VL_COFINS_D ?? 0,
+            VL_PIS:    r.VL_PIS    ?? r.VL_PIS_D    ?? r.VL_PIS_C5    ?? 0,
+            VL_COFINS: r.VL_COFINS ?? r.VL_COFINS_D ?? r.VL_COFINS_C5 ?? 0,
             _tipo: "so_sped",
           })),
         // Só SAP: mantém apenas registros com PIS ou COFINS

@@ -32,6 +32,11 @@ COLS_SPED_D = ["VL_SERV", "VL_PIS_D", "VL_COFINS_D"]
 #   VL_COFINS → do F100 (Cofins calculada no registro)
 COLS_SPED_F100 = ["VL_PIS", "VL_COFINS"]
 
+# Colunas SPED usadas na comparação — Bloco C500 (energia / telecom)
+#   VL_PIS_C5    → do C501 (PIS calculado no complemento)
+#   VL_COFINS_C5 → do C505 (Cofins calculada no complemento)
+COLS_SPED_C500 = ["VL_PIS_C5", "VL_COFINS_C5"]
+
 # Nomes das contas SAP que acumulam os créditos de regime misto (F100)
 CONTA_PIS_RECUPERAR    = "PIS a Recuperar"
 CONTA_COFINS_RECUPERAR = "COFINS a Recuperar"
@@ -324,6 +329,56 @@ def _agregar_sped_f100(dfs: dict) -> pd.DataFrame:
     )
 
 
+def _agregar_sped_c500(dfs: dict) -> pd.DataFrame:
+    """
+    Agrega valores do Bloco C — energia elétrica, telecomunicações, etc. (C500).
+
+    C500 não possui IND_OPER — todos os registros são entradas.
+    VL_PIS_C5 vem de C501 agrupado por NUM_DOC;
+    VL_COFINS_C5 vem de C505 agrupado por NUM_DOC.
+
+    Retorna df com colunas: NUM_DOC, VL_PIS_C5, VL_COFINS_C5.
+    """
+    c500 = dfs.get("C500", pd.DataFrame())
+    c501 = dfs.get("C501", pd.DataFrame())
+    c505 = dfs.get("C505", pd.DataFrame())
+
+    if c500.empty:
+        return pd.DataFrame(columns=["NUM_DOC"] + COLS_SPED_C500)
+
+    df = c500[["NUM_DOC"]].drop_duplicates().copy()
+
+    if not c501.empty and "NUM_DOC" in c501.columns:
+        c501 = c501.copy()
+        c501["_VL_PIS"] = c501["VL_PIS"].apply(_to_float)
+        pis = (
+            c501.groupby("NUM_DOC")["_VL_PIS"]
+            .sum()
+            .reset_index()
+            .rename(columns={"_VL_PIS": "VL_PIS_C5"})
+        )
+    else:
+        pis = pd.DataFrame(columns=["NUM_DOC", "VL_PIS_C5"])
+
+    if not c505.empty and "NUM_DOC" in c505.columns:
+        c505 = c505.copy()
+        c505["_VL_COFINS"] = c505["VL_COFINS"].apply(_to_float)
+        cofins = (
+            c505.groupby("NUM_DOC")["_VL_COFINS"]
+            .sum()
+            .reset_index()
+            .rename(columns={"_VL_COFINS": "VL_COFINS_C5"})
+        )
+    else:
+        cofins = pd.DataFrame(columns=["NUM_DOC", "VL_COFINS_C5"])
+
+    df = df.merge(pis,    on="NUM_DOC", how="left")
+    df = df.merge(cofins, on="NUM_DOC", how="left")
+    df["VL_PIS_C5"]    = df["VL_PIS_C5"].fillna(0.0)
+    df["VL_COFINS_C5"] = df["VL_COFINS_C5"].fillna(0.0)
+    return df
+
+
 def _agregar_sap_f100(df_contas: pd.DataFrame) -> pd.DataFrame:
     """
     Agrega os créditos de PIS/COFINS a Recuperar do diário SAP relacionados
@@ -584,6 +639,7 @@ def gera_lancamentos_so_sped(
     so_sped_entrada: pd.DataFrame,
     so_sped_transporte: pd.DataFrame,
     so_sped_f100: pd.DataFrame,
+    so_sped_c500: pd.DataFrame,
 ) -> pd.DataFrame:
     """
     Gera lançamentos sugeridos para registros presentes apenas no SPED.
@@ -665,6 +721,12 @@ def gera_lancamentos_so_sped(
         desc = f"F100 {cod}" + (f" - {nome}" if nome else "")
         _lanc(row.get("VL_PIS", 0), row.get("VL_COFINS", 0), desc)
 
+    # Bloco C500 — energia elétrica / telecomunicações só no SPED
+    for _, row in so_sped_c500.iterrows():
+        num  = str(row.get("NUM_DOC", ""))
+        desc = f"Energia/Telecom {num}" if num else "C500"
+        _lanc(row.get("VL_PIS_C5", 0), row.get("VL_COFINS_C5", 0), desc, num)
+
     return pd.DataFrame(linhas) if linhas else pd.DataFrame()
 
 
@@ -705,14 +767,14 @@ def compara_gera_diferenca(
 
     # ── Bloco C ──────────────────────────────────────────────────────────────
     df_sped_saidas, df_sped_entradas  = _agregar_sped(dfs)
-    df_sap_saidas,  df_sap_entradas   = _agregar_sap(df_sap, filtro_filial)
+    df_sap_saidas,  df_sap_entradas_raw = _agregar_sap(df_sap, filtro_filial)
 
     # Enriquece df_sap_entradas com CHV_NFE do SPED C100 para cruzamento
     _chv_lookup = (
         dfs["C100"][dfs["C100"]["IND_OPER"] == "0"][["NUM_DOC", "CHV_NFE"]]
         .drop_duplicates("NUM_DOC")
     )
-    df_sap_entradas = df_sap_entradas.merge(_chv_lookup, on="NUM_DOC", how="left")
+    df_sap_entradas = df_sap_entradas_raw.merge(_chv_lookup, on="NUM_DOC", how="left")
 
     # ── Bloco D ──────────────────────────────────────────────────────────────
     df_sped_transp = _agregar_sped_d(dfs)
@@ -778,7 +840,7 @@ def compara_gera_diferenca(
 
         df_so_sped = (
             df[df["_merge"] == "left_only"]
-            [id_cols + chv_col + [c for c in (COLS_SPED + COLS_SPED_D) if c in df.columns]]
+            [id_cols + chv_col + [c for c in (COLS_SPED + COLS_SPED_D + COLS_SPED_C500) if c in df.columns]]
             .reset_index(drop=True)
         )
         df_so_sap = (
@@ -824,6 +886,29 @@ def compara_gera_diferenca(
         df_sped_transp, df_sap_transp, comparacoes_transporte, chave="CHV_CTE"
     )
 
+    # ── Bloco C500 (energia elétrica / telecomunicações) ─────────────────────
+    df_sped_c500 = _agregar_sped_c500(dfs)
+
+    _c500_num_docs = set(df_sped_c500["NUM_DOC"].astype(str)) if not df_sped_c500.empty else set()
+    df_sap_c500 = (
+        df_sap_entradas_raw[df_sap_entradas_raw["NUM_DOC"].isin(_c500_num_docs)].copy()
+        if _c500_num_docs
+        else pd.DataFrame(columns=["NUM_DOC"])
+    )
+
+    comparacoes_c500 = {
+        "PIS":    ("VL_PIS_C5",    "VL_PIS_SAP"),
+        "COFINS": ("VL_COFINS_C5", "VL_COFINS_SAP"),
+    }
+    div_c5, ok_c5, so_sped_c5, so_sap_c5 = _processar_lado(
+        df_sped_c500, df_sap_c500, comparacoes_c500, chave="NUM_DOC"
+    )
+
+    # Marca registros C500 para o frontend identificar o bloco correto
+    for _df in [div_c5, ok_c5, so_sped_c5, so_sap_c5]:
+        if not _df.empty:
+            _df["_c500"] = True
+
     # ── Bloco F (F100 — demais operações sem nota fiscal) ────────────────────
     # Usa o mesmo df_sap já carregado; _agregar_sap_f100 filtra automaticamente
     # as contrapartidas contábeis (começam com dígito) das de parceiro (F…).
@@ -855,9 +940,9 @@ def compara_gera_diferenca(
         if not _df.empty and "COD_CTA" in _df.columns:
             _df.insert(1, "NOME_CONTA", _df["COD_CTA"].map(_nome_f100).fillna(""))
 
-    # Lançamentos de ajuste (NF-e saídas + CT-e + F100)
+    # Lançamentos de ajuste (NF-e saídas + CT-e + C500 + F100)
     df_lanc_nf   = gera_lancamentos_ajuste(
-        pd.concat([div_s, div_t], ignore_index=True),
+        pd.concat([div_s, div_t, div_c5], ignore_index=True),
         df_sap,
     )
     df_lanc_f100 = gera_lancamentos_ajuste_f100(div_f, df_sap)
@@ -869,10 +954,11 @@ def compara_gera_diferenca(
         so_sped_e,
         so_sped_t,
         so_sped_f,
+        so_sped_c5,
     )
 
     return {
-        # DataFrames — Bloco C
+        # DataFrames — Bloco C (NF-e)
         "divergencias_saida":       div_s,
         "divergencias_entrada":     div_e,
         "ok_saida":                 ok_s,
@@ -891,6 +977,11 @@ def compara_gera_diferenca(
         "ok_f100":                  ok_f,
         "so_sped_f100":             so_sped_f,
         "so_sap_f100":              so_sap_f,
+        # DataFrames — Bloco C500 (energia / telecom)
+        "divergencias_c500":        div_c5,
+        "ok_c500":                  ok_c5,
+        "so_sped_c500":             so_sped_c5,
+        "so_sap_c500":              so_sap_c5,
         # Lançamentos consolidados
         "lancamentos":              df_lanc,
         "lancamentos_so_sped":      df_lanc_so_sped,
@@ -911,6 +1002,10 @@ def compara_gera_diferenca(
         "ok_f100_json":                 _df_para_json(ok_f),
         "so_sped_f100_json":            _df_para_json(so_sped_f),
         "so_sap_f100_json":             _df_para_json(so_sap_f),
+        "divergencias_c500_json":       _df_para_json(div_c5),
+        "ok_c500_json":                 _df_para_json(ok_c5),
+        "so_sped_c500_json":            _df_para_json(so_sped_c5),
+        "so_sap_c500_json":             _df_para_json(so_sap_c5),
         "lancamentos_json":             _df_para_json(df_lanc),
         "lancamentos_so_sped_json":     _df_para_json(df_lanc_so_sped),
     }
