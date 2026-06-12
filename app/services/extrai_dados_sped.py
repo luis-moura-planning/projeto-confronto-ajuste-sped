@@ -48,6 +48,23 @@ def extrai_dados_sped(sped_txt: str) -> dict:
             "REG", "IND_NAT_FRT", "VL_ITEM", "CST_COFINS", "NAT_BC_CRED",
             "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS", "COD_CTA",
         ],
+        # Bloco C — Energia Elétrica / Serviços de Comunicação
+        # C500: cabeçalho do documento (energia, telecom, etc.)
+        "C500": [
+            "REG", "COD_PART", "COD_MOD", "COD_SIT", "SER", "SUB",
+            "NUM_DOC", "DT_DOC", "DT_ENT", "VL_DOC", "VL_ICMS", "COD_INF",
+            "VL_PIS", "VL_COFINS", "CHV_DOCe",
+        ],
+        # C501: complemento do C500 — PIS/Pasep
+        "C501": [
+            "REG", "CST_PIS", "VL_ITEM", "NAT_BC_CRED",
+            "VL_BC_PIS", "ALIQ_PIS", "VL_PIS", "COD_CTA",
+        ],
+        # C505: complemento do C500 — Cofins
+        "C505": [
+            "REG", "CST_COFINS", "VL_ITEM", "NAT_BC_CRED",
+            "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS", "COD_CTA",
+        ],
         # Bloco F — Demais Documentos e Operações
         # F100: demais receitas e operações geradoras de crédito
         "F100": [
@@ -58,9 +75,12 @@ def extrai_dados_sped(sped_txt: str) -> dict:
         ],
     }
 
-    dados = {"0000": [], "C100": [], "C170": [], "D100": [], "D101": [], "D105": [], "F100": []}
+    dados = {"0000": [], "C100": [], "C170": [], "C500": [], "C501": [], "C505": [], "D100": [], "D101": [], "D105": [], "F100": []}
     nota_atual_chv = ""
     nota_atual_valida = True
+    # Controle de estado para o Bloco C500
+    c500_atual_chv = ""
+    c500_atual_valida = True
     # Controle de estado para o Bloco D
     d100_atual_chv = ""
     d100_atual_valida = True
@@ -97,6 +117,20 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                         continue
                     registro["CHV_NFE"] = nota_atual_chv
                     dados["C170"].append(registro)
+
+                elif reg == "C500":
+                    cod_sit = registro.get("COD_SIT", "")
+                    c500_atual_valida = cod_sit not in COD_SIT_EXCLUIR
+                    c500_atual_chv = registro.get("CHV_DOCe", "")
+                    if not c500_atual_valida:
+                        continue
+                    dados["C500"].append(registro)
+
+                elif reg in ("C501", "C505"):
+                    if not c500_atual_valida:
+                        continue
+                    registro["CHV_DOCe"] = c500_atual_chv
+                    dados[reg].append(registro)
 
                 elif reg == "D100":
                     cod_sit = registro.get("COD_SIT", "")
