@@ -87,3 +87,19 @@
 .app-bloco--d    { background: #f3e8ff; color: #7e22ce; }
 .app-bloco--f100 { background: #d1fae5; color: #065f46; }
 .app-bloco--c500 { background: #fff7ed; color: #c2410c; }
+
+/* ── Tipo de documento SAP (só SAP) ─────────────────────────── */
+.app-tipo-doc {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.app-tipo-doc--fiscal { background: #fee2e2; color: #b91c1c; }
+.app-tipo-doc--avulso { background: #f3f4f6; color: #6b7280; }
+
+/* ── Linha de estorno só SAP ────────────────────────────────── */
+.app-row-estorno-sap td       { background: #fef2f2; }
+.app-row-estorno-sap:hover td { background: #fee2e2; }

@@ -123,6 +123,11 @@ TOLERANCIA = 0.05
 
 _COD_PN = _re.compile(r"^[CF]\d+", _re.IGNORECASE)
 
+# Prefixos reconhecidos no campo "Nº doc." do diário SAP
+_PREFIXOS_TIPO_DOC = frozenset({"DS", "NS", "NE", "LC"})
+# Tipos que exigem estorno integral quando existem só no SAP
+TIPOS_ESTORNO = frozenset({"DS", "NS", "NE"})
+
 
 # =============================================================================
 # AUXILIARES
@@ -149,24 +154,33 @@ def _limpar_valor_sap(v) -> float:
 
 def _propagar_num_doc(df_sap: pd.DataFrame) -> pd.DataFrame:
     """
-    Propaga o NUM_DOC (Ref.3) para cada linha de detalhe da planilha SAP.
+    Propaga NUM_DOC (Ref.3) e TIPO_DOC (prefixo de "Nº doc.") para cada
+    linha de detalhe da planilha SAP.
 
-    A planilha tem uma estrutura hierárquica: a linha de cabeçalho do
-    lançamento (com Nº seq. preenchido) define o NUM_DOC; as linhas de
-    detalhe abaixo herdam esse valor até o próximo cabeçalho.
+    Estrutura hierárquica: linha de cabeçalho (Nº seq. preenchido) define
+    o lançamento; linhas de detalhe herdam NUM_DOC e TIPO_DOC até o próximo
+    cabeçalho.
+
+    TIPO_DOC: DS | NS | NE | LC | OUTRO
     """
     df = df_sap.copy()
-    df["NUM_DOC"] = None
-    current_ref = None
+    df["NUM_DOC"]  = None
+    df["TIPO_DOC"] = None
+    current_ref  = None
+    current_tipo = "OUTRO"
     for idx, row in df.iterrows():
         if pd.notna(row["Nº seq."]):
             current_ref = None
+            nrdoc  = str(row.get("Nº doc.", "") or "").strip()
+            prefix = nrdoc[:2].upper() if len(nrdoc) >= 2 else ""
+            current_tipo = prefix if prefix in _PREFIXOS_TIPO_DOC else "OUTRO"
         if pd.notna(row["Ref.3 (Linha)"]):
             try:
                 current_ref = str(int(float(row["Ref.3 (Linha)"])))
             except (ValueError, TypeError):
                 pass
-        df.at[idx, "NUM_DOC"] = current_ref
+        df.at[idx, "NUM_DOC"]  = current_ref
+        df.at[idx, "TIPO_DOC"] = current_tipo
     return df
 
 
@@ -493,6 +507,9 @@ def _agregar_sap(
             rows = []
             for num_doc, grp_doc in df_linhas.groupby("NUM_DOC"):
                 row = {"NUM_DOC": num_doc}
+                if "TIPO_DOC" in grp_doc.columns:
+                    tipos = grp_doc["TIPO_DOC"].dropna()
+                    row["TIPO_DOC"] = str(tipos.iloc[0]) if not tipos.empty else "OUTRO"
                 for campo, grp_campo in grp_doc.groupby("_campo"):
                     if campo in CONTA_CANONICA_SAIDA:
                         prioridade = CONTA_CANONICA_SAIDA[campo]
@@ -510,7 +527,10 @@ def _agregar_sap(
                         row[campo] = round(total_deb - total_cred, 2)
                 rows.append(row)
 
-            return pd.DataFrame(rows).fillna(0)
+            df_res = pd.DataFrame(rows)
+            num_cols = [c for c in df_res.columns if c not in ("NUM_DOC", "TIPO_DOC")]
+            df_res[num_cols] = df_res[num_cols].fillna(0)
+            return df_res
 
     return _agg_sap(df_saidas_linhas, "saida"), _agg_sap(df_entradas_linhas, "entrada")
 
@@ -734,6 +754,74 @@ def gera_lancamentos_so_sped(
         cnpj = str(row.get("CNPJ_ESTAB", "") or "")
         desc = f"Energia/Telecom {num}" if num else "C500"
         _lanc(row.get("VL_PIS_C5", 0), row.get("VL_COFINS_C5", 0), desc, num, cnpj=cnpj)
+
+    return pd.DataFrame(linhas) if linhas else pd.DataFrame()
+
+
+def gera_lancamentos_estorno_so_sap(
+    so_sap_df: pd.DataFrame,
+    df_sap_raw: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Gera estorno integral para registros presentes apenas no SAP com tipo
+    DS (Devolução de Saída), NS (Nota de Saída) ou NE (Nota de Entrada).
+
+    Para cada NUM_DOC só-SAP desses tipos, inverte todas as linhas do
+    diário SAP que possuem contas mapeadas em MAPA_CONTAS_SAP
+    (Débito ↔ Crédito).
+
+    LC e padrão não identificado → somente advertência, sem lançamento.
+    """
+    if so_sap_df.empty or "TIPO_DOC" not in so_sap_df.columns:
+        return pd.DataFrame()
+
+    df_estorno = so_sap_df[so_sap_df["TIPO_DOC"].isin(TIPOS_ESTORNO)]
+    if df_estorno.empty:
+        return pd.DataFrame()
+
+    num_docs_alvo = set(df_estorno["NUM_DOC"].dropna().astype(str))
+
+    df_det = _propagar_num_doc(df_sap_raw)
+    df_det = df_det[
+        df_det["NUM_DOC"].isin(num_docs_alvo) &
+        df_det["NUM_DOC"].notna() &
+        df_det["Cta.cont./Nome PN"].notna()
+    ].copy()
+
+    if df_det.empty:
+        return pd.DataFrame()
+
+    linhas = []
+    for _, r in df_det.iterrows():
+        conta = str(r.get("Cta.cont./Nome PN", "")).strip()
+        cod   = str(r.get("Cta.contáb./cód.PN", "")).strip()
+        if not conta or conta not in MAPA_CONTAS_SAP:
+            continue
+        deb  = _limpar_valor_sap(r.get("Débito (MC)"))
+        cred = _limpar_valor_sap(r.get("Crédito (MC)"))
+        if deb == 0 and cred == 0:
+            continue
+        num_doc = str(r["NUM_DOC"])
+        tipo    = str(r.get("TIPO_DOC", "")).strip()
+        filial  = str(r.get("Nome da filial", "")) if pd.notna(r.get("Nome da filial")) else ""
+        cc      = str(r.get("Centro de Custo", "")) if pd.notna(r.get("Centro de Custo")) else ""
+        campo   = MAPA_CONTAS_SAP.get(conta, "")
+        imposto = campo.replace("VL_", "").replace("_SAP", "") if campo else ""
+
+        linhas.append({
+            "Código da Conta":    cod,
+            "Descrição da Conta": conta,
+            "Débito":             round(cred, 2) if cred > 0 else None,
+            "Crédito":            round(deb,  2) if deb  > 0 else None,
+            "Descrição":          f"Estorno {tipo} NF {num_doc}",
+            "Centro de Custo":    cc,
+            "Filial":             filial,
+            "NUM_DOC":            num_doc,
+            "CHV_NFE":            "",
+            "Imposto":            imposto,
+            "DELTA":              None,
+            "Sentido":            "Só SAP - Estorno",
+        })
 
     return pd.DataFrame(linhas) if linhas else pd.DataFrame()
 
@@ -966,6 +1054,14 @@ def compara_gera_diferenca(
         so_sped_c5,
     )
 
+    # Estorno integral para DS/NS/NE só no SAP (existem no SAP mas não no SPED)
+    _so_sap_com_num_doc = pd.concat(
+        [df for df in [so_sap_s, so_sap_e, so_sap_t, so_sap_c5]
+         if not df.empty and "NUM_DOC" in df.columns and "TIPO_DOC" in df.columns],
+        ignore_index=True,
+    )
+    df_lanc_estorno = gera_lancamentos_estorno_so_sap(_so_sap_com_num_doc, df_sap)
+
     return {
         # DataFrames — Bloco C (NF-e)
         "divergencias_saida":       div_s,
@@ -1015,8 +1111,9 @@ def compara_gera_diferenca(
         "ok_c500_json":                 _df_para_json(ok_c5),
         "so_sped_c500_json":            _df_para_json(so_sped_c5),
         "so_sap_c500_json":             _df_para_json(so_sap_c5),
-        "lancamentos_json":             _df_para_json(df_lanc),
-        "lancamentos_so_sped_json":     _df_para_json(df_lanc_so_sped),
+        "lancamentos_json":                  _df_para_json(df_lanc),
+        "lancamentos_so_sped_json":          _df_para_json(df_lanc_so_sped),
+        "lancamentos_estorno_so_sap_json":   _df_para_json(df_lanc_estorno),
     }
 
 

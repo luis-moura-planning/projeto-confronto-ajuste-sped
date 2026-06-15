@@ -107,6 +107,7 @@ export default function App() {
   const [filtroTexto, setFiltroTexto] = useState("");
   const [filtroLanc, setFiltroLanc] = useState("");
   const [incluirSoSped, setIncluirSoSped] = useState(false);
+  const [incluirEstornoSap, setIncluirEstornoSap] = useState(false);
 
   const sapRef = useRef(null);
   const spedRef = useRef(null);
@@ -196,8 +197,12 @@ export default function App() {
     ? (resultado?.lancamentos_so_sped ?? []).map((l) => ({ ...l, _soSped: true }))
     : [];
 
+  const lancEstornoSap = incluirEstornoSap
+    ? (resultado?.lancamentos_estorno_so_sap ?? []).map((l) => ({ ...l, _estornoSap: true }))
+    : [];
+
   const _buscaLanc = filtroLanc.trim().toLowerCase();
-  const lancamentos = [...(resultado?.lancamentos ?? []), ...lancSoSped].filter((l) => {
+  const lancamentos = [...(resultado?.lancamentos ?? []), ...lancSoSped, ...lancEstornoSap].filter((l) => {
     const impostoKey = (l["Imposto"] ?? "").replace(/_D$/, "");
     if (impostosAtivos[impostoKey] !== true) return false;
     if (!_buscaLanc) return true;
@@ -510,7 +515,18 @@ export default function App() {
                           </td>
                           <td className="app-td-origem">
                             {row._tipo === "so_sap" ? (
-                              <span>SAP</span>
+                              <>
+                                <span>SAP</span>
+                                {row.TIPO_DOC && (
+                                  <><br />
+                                  <span className={`app-tipo-doc app-tipo-doc--${
+                                    ["DS","NS","NE"].includes(row.TIPO_DOC)
+                                      ? "fiscal" : "avulso"
+                                  }`}>
+                                    {row.TIPO_DOC === "OUTRO" ? "?" : row.TIPO_DOC}
+                                  </span></>
+                                )}
+                              </>
                             ) : row._tipo === "so_sped" ? (
                               <span>SPED</span>
                             ) : (
@@ -624,6 +640,14 @@ export default function App() {
                       />
                       Incluir Só SPED
                     </label>
+                    <label className="g-check" style={{ color: "var(--g-danger)" }}>
+                      <input
+                        type="checkbox"
+                        checked={incluirEstornoSap}
+                        onChange={() => { setIncluirEstornoSap((v) => !v); setPaginaLanc(1); }}
+                      />
+                      Incluir Estorno Só SAP
+                    </label>
                   </div>
                   <div
                     className="g-cluster"
@@ -668,6 +692,13 @@ export default function App() {
                     antes de importar no SAP.
                   </div>
                 )}
+                {incluirEstornoSap && (
+                  <div className="app-alert-err">
+                    <strong>Atenção — Estorno Só SAP (DS / NS / NE):</strong> esses
+                    lançamentos revertem documentos fiscais que existem no SAP mas não foram
+                    incluídos no SPED. Confira cada nota antes de importar o estorno.
+                  </div>
+                )}
 
                 {lancamentos.length === 0 ? (
                   <p className="g-empty">
@@ -704,7 +735,11 @@ export default function App() {
                         </thead>
                         <tbody>
                           {lancPag.map((l, i) => (
-                            <tr key={i} className={l._soSped ? "app-row-so-sped" : ""}>
+                            <tr key={i} className={
+                              l._soSped ? "app-row-so-sped"
+                              : l._estornoSap ? "app-row-estorno-sap"
+                              : ""
+                            }>
                               <td>
                                 <code className="g-mono">
                                   {l["Código da Conta"]}
