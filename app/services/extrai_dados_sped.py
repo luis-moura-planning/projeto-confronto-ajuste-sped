@@ -73,9 +73,37 @@ def extrai_dados_sped(sped_txt: str) -> dict:
             "CST_COFINS", "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS",
             "NAT_BC_CRED", "IND_ORIG_CRED", "COD_CTA", "COD_CCUS", "DESC_DOC_OPER",
         ],
+        # F120: bens incorporados ao ativo imobilizado (crédito 48 meses)
+        "F120": [
+            "REG", "NAT_BC_CRED", "IDENT_BEM_IMOB", "IND_ORIG_CRED",
+            "IND_UTIL_BEM_IMOB", "VL_OPER_DEP", "PARC_OPER_NAO_BC_CRED",
+            "CST_PIS", "VL_BC_PIS", "ALIQ_PIS", "VL_PIS",
+            "CST_COFINS", "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS",
+            "COD_CTA", "COD_CCUS", "DESC_BEM_IMOB",
+        ],
+        # Bloco M — Apuração da Contribuição e Crédito do PIS/Pasep
+        # M110: ajuste da base de crédito PIS (filho de M100)
+        "M110": [
+            "REG", "IND_AJ", "VL_AJ", "COD_AJ", "NUM_DOC", "DESCR_AJ", "DT_REF",
+        ],
+        # M215: ajuste da base de contribuição PIS (filho de M210)
+        "M215": [
+            "REG", "IND_AJ_BC", "VL_AJ_BC", "COD_AJ_BC", "NUM_DOC",
+            "DESCR_AJ_BC", "DT_REF", "COD_CTA", "CNPJ", "INFO_COMPL",
+        ],
+        # Bloco M — Apuração da Contribuição e Crédito da COFINS
+        # M510: ajuste da base de crédito COFINS (filho de M500)
+        "M510": [
+            "REG", "IND_AJ", "VL_AJ", "COD_AJ", "NUM_DOC", "DESCR_AJ", "DT_REF",
+        ],
+        # M615: ajuste da base de contribuição COFINS (filho de M610)
+        "M615": [
+            "REG", "IND_AJ_BC", "VL_AJ_BC", "COD_AJ_BC", "NUM_DOC",
+            "DESCR_AJ_BC", "DT_REF", "COD_CTA", "CNPJ", "INFO_COMPL",
+        ],
     }
 
-    dados = {"0000": [], "C100": [], "C170": [], "C500": [], "C501": [], "C505": [], "D100": [], "D101": [], "D105": [], "F100": []}
+    dados = {"0000": [], "C100": [], "C170": [], "C500": [], "C501": [], "C505": [], "D100": [], "D101": [], "D105": [], "F100": [], "F120": [], "M110": [], "M215": [], "M510": [], "M615": []}
     # CNPJ do estabelecimento atual — atualizado a cada C010
     cnpj_atual = ""
     nota_atual_chv = ""
@@ -98,8 +126,8 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                 campos = linha.strip("|").split("|")
                 reg = campos[0]
 
-                # C010 / D010 / F010 — atualiza o CNPJ do estabelecimento ativo
-                if reg in ("C010", "D010", "F010"):
+                # C010 / D010 / F010 / M010 — atualiza o CNPJ do estabelecimento ativo
+                if reg in ("C010", "D010", "F010", "M010"):
                     cnpj_atual = campos[1] if len(campos) > 1 else ""
                     continue
 
@@ -167,6 +195,14 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                 elif reg == "F100":
                     registro["CNPJ_ESTAB"] = cnpj_atual
                     dados["F100"].append(registro)
+
+                elif reg == "F120":
+                    registro["CNPJ_ESTAB"] = cnpj_atual
+                    dados["F120"].append(registro)
+
+                elif reg in ("M110", "M215", "M510", "M615"):
+                    registro["CNPJ_ESTAB"] = cnpj_atual
+                    dados[reg].append(registro)
 
                 else:
                     dados[reg].append(registro)
