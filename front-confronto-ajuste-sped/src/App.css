@@ -87,6 +87,8 @@
 .app-bloco--d    { background: #f3e8ff; color: #7e22ce; }
 .app-bloco--f100 { background: #d1fae5; color: #065f46; }
 .app-bloco--c500 { background: #fff7ed; color: #c2410c; }
+.app-bloco--m    { background: #fef3c7; color: #92400e; }
+.app-bloco--f120c{ background: #e0f2fe; color: #0c4a6e; }
 
 /* ── Tipo de documento SAP (só SAP) ─────────────────────────── */
 .app-tipo-doc {
@@ -103,3 +105,42 @@
 /* ── Linha de estorno só SAP ────────────────────────────────── */
 .app-row-estorno-sap td       { background: #fef2f2; }
 .app-row-estorno-sap:hover td { background: #fee2e2; }
+
+/* ── Linhas de lançamentos avulsos Bloco M / F120 ───────────── */
+.app-row-m-cred td       { background: #d1fae5; }   /* M110/M510 crédito — verde */
+.app-row-m-cred:hover td { background: #a7f3d0; }
+.app-row-m-deb td        { background: #ede9fe; }   /* M215/M615 débito base — roxo */
+.app-row-m-deb:hover td  { background: #ddd6fe; }
+.app-row-f120 td         { background: #e0f2fe; }   /* F120 imobilizado — azul */
+.app-row-f120:hover td   { background: #bae6fd; }
+
+/* ── Alertas de lançamentos avulsos ─────────────────────────── */
+.app-alert-m-cred {
+  background: #d1fae5;
+  border: 1px solid #6ee7b7;
+  color: #065f46;
+  border-radius: var(--g-radius-sm);
+  padding: 12px 16px;
+  font-size: var(--g-fs-14);
+}
+.app-alert-m-deb {
+  background: #ede9fe;
+  border: 1px solid #c4b5fd;
+  color: #5b21b6;
+  border-radius: var(--g-radius-sm);
+  padding: 12px 16px;
+  font-size: var(--g-fs-14);
+}
+.app-alert-f120 {
+  background: #e0f2fe;
+  border: 1px solid #7dd3fc;
+  color: #0c4a6e;
+  border-radius: var(--g-radius-sm);
+  padding: 12px 16px;
+  font-size: var(--g-fs-14);
+}
+
+/* ── Cores dos checkboxes avulsos ───────────────────────────── */
+.app-check-m-cred { color: #065f46; }
+.app-check-m-deb  { color: #5b21b6; }
+.app-check-f120   { color: #0c4a6e; }

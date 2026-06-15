@@ -50,6 +50,8 @@ async def comparar(
                 + resultado["so_sped_transporte_json"]
                 + resultado["so_sped_f100_json"]
                 + resultado["so_sped_c500_json"]
+                + resultado["so_sped_m_json"]
+                + resultado["so_sped_f120_json"]
             ),
             "so_sap": (
                 resultado["so_sap_saida_json"]
@@ -61,6 +63,9 @@ async def comparar(
             "lancamentos":                resultado["lancamentos_json"],
             "lancamentos_so_sped":        resultado["lancamentos_so_sped_json"],
             "lancamentos_estorno_so_sap": resultado["lancamentos_estorno_so_sap_json"],
+            "lancamentos_m110_m510":      resultado["lancamentos_m110_m510_json"],
+            "lancamentos_m215_m615":      resultado["lancamentos_m215_m615_json"],
+            "lancamentos_f120":           resultado["lancamentos_f120_json"],
         }
 
     except ValueError as exc:

@@ -46,15 +46,25 @@ const TIPO_LABELS = {
   ok: "OK",
 };
 
+const _M_REGS = new Set(["M110", "M215", "M510", "M615"]);
+
 function _bloco(r) {
+  if (_M_REGS.has(r.REG)) return "M";
+  if (r.REG === "F120") return "F120";
   if (r.COD_CTA != null) return "F100";
   if (r.CHV_CTE != null) return "D";
   if (r._c500 || r.VL_PIS_C5 != null || r.VL_COFINS_C5 != null) return "C500";
   return "C";
 }
 
-const BLOCO_CLASS = { C: "app-bloco--c", D: "app-bloco--d", F100: "app-bloco--f100", C500: "app-bloco--c500" };
-const BLOCO_LABEL = { C: "Bloco C", D: "Bloco D", F100: "F100", C500: "C500" };
+const BLOCO_CLASS = {
+  C: "app-bloco--c", D: "app-bloco--d", F100: "app-bloco--f100",
+  C500: "app-bloco--c500", M: "app-bloco--m", F120: "app-bloco--f120c",
+};
+const BLOCO_LABEL = {
+  C: "Bloco C", D: "Bloco D", F100: "F100",
+  C500: "C500", M: "Bloco M", F120: "F120",
+};
 
 const OPCOES_POR_PAGINA = [10, 20, 50, 100];
 
@@ -108,6 +118,9 @@ export default function App() {
   const [filtroLanc, setFiltroLanc] = useState("");
   const [incluirSoSped, setIncluirSoSped] = useState(false);
   const [incluirEstornoSap, setIncluirEstornoSap] = useState(false);
+  const [incluirM110M510, setIncluirM110M510] = useState(false);
+  const [incluirM215M615, setIncluirM215M615] = useState(false);
+  const [incluirF120, setIncluirF120] = useState(false);
 
   const sapRef = useRef(null);
   const spedRef = useRef(null);
@@ -125,6 +138,9 @@ export default function App() {
     setPorPaginaLanc(20);
     setFiltroTexto("");
     setFiltroLanc("");
+    setIncluirM110M510(false);
+    setIncluirM215M615(false);
+    setIncluirF120(false);
 
     const form = new FormData();
     form.append("planilha_sap", sapFile);
@@ -180,6 +196,8 @@ export default function App() {
       String(r.COD_CTA    ?? "").toLowerCase().includes(_busca) ||
       String(r.NOME_CONTA ?? "").toLowerCase().includes(_busca) ||
       String(r.CNPJ_ESTAB ?? "").toLowerCase().includes(_busca) ||
+      String(r.COD_AJ ?? r.COD_AJ_BC ?? r.IDENT_BEM_IMOB ?? "").toLowerCase().includes(_busca) ||
+      String(r.DESCR_AJ ?? r.DESCR_AJ_BC ?? r.DESC_BEM_IMOB ?? "").toLowerCase().includes(_busca) ||
       BLOCO_LABEL[_bloco(r)].toLowerCase().includes(_busca)
     );
   });
@@ -201,8 +219,27 @@ export default function App() {
     ? (resultado?.lancamentos_estorno_so_sap ?? []).map((l) => ({ ...l, _estornoSap: true }))
     : [];
 
+  const lancM110M510 = incluirM110M510
+    ? (resultado?.lancamentos_m110_m510 ?? []).map((l) => ({ ...l, _m110m510: true }))
+    : [];
+
+  const lancM215M615 = incluirM215M615
+    ? (resultado?.lancamentos_m215_m615 ?? []).map((l) => ({ ...l, _m215m615: true }))
+    : [];
+
+  const lancF120 = incluirF120
+    ? (resultado?.lancamentos_f120 ?? []).map((l) => ({ ...l, _f120: true }))
+    : [];
+
   const _buscaLanc = filtroLanc.trim().toLowerCase();
-  const lancamentos = [...(resultado?.lancamentos ?? []), ...lancSoSped, ...lancEstornoSap].filter((l) => {
+  const lancamentos = [
+    ...(resultado?.lancamentos ?? []),
+    ...lancSoSped,
+    ...lancEstornoSap,
+    ...lancM110M510,
+    ...lancM215M615,
+    ...lancF120,
+  ].filter((l) => {
     const impostoKey = (l["Imposto"] ?? "").replace(/_D$/, "");
     if (impostosAtivos[impostoKey] !== true) return false;
     if (!_buscaLanc) return true;
@@ -474,7 +511,27 @@ export default function App() {
                           }
                         >
                           <td>
-                            {row.NUM_DOC != null ? (
+                            {_M_REGS.has(row.REG) ? (
+                              <>
+                                <span className="g-helper" style={{ fontSize: 10 }}>{row.REG}</span>
+                                {(row.COD_AJ || row.COD_AJ_BC) && (
+                                  <> <code className="g-mono" style={{ fontSize: 11 }}>{row.COD_AJ ?? row.COD_AJ_BC}</code></>
+                                )}
+                                {row.CNPJ_ESTAB && (
+                                  <><br /><span className="g-helper" style={{ fontSize: 10 }}>{row.CNPJ_ESTAB}</span></>
+                                )}
+                              </>
+                            ) : row.REG === "F120" ? (
+                              <>
+                                <span className="g-helper" style={{ fontSize: 10 }}>F120</span>
+                                {row.IDENT_BEM_IMOB && (
+                                  <> <code className="g-mono" style={{ fontSize: 11 }}>{row.IDENT_BEM_IMOB}</code></>
+                                )}
+                                {row.CNPJ_ESTAB && (
+                                  <><br /><span className="g-helper" style={{ fontSize: 10 }}>{row.CNPJ_ESTAB}</span></>
+                                )}
+                              </>
+                            ) : row.NUM_DOC != null ? (
                               <>
                                 {row.NUM_DOC}
                                 {row.CNPJ_ESTAB && (
@@ -497,6 +554,8 @@ export default function App() {
                               </code>
                             ) : row.NOME_CONTA ? (
                               <span style={{ fontSize: 12 }}>{row.NOME_CONTA}</span>
+                            ) : (row.DESCR_AJ || row.DESCR_AJ_BC || row.DESC_BEM_IMOB) ? (
+                              <span style={{ fontSize: 12 }}>{row.DESCR_AJ ?? row.DESCR_AJ_BC ?? row.DESC_BEM_IMOB}</span>
                             ) : "—"}
                           </td>
                           <td>
@@ -648,6 +707,30 @@ export default function App() {
                       />
                       Incluir Estorno Só SAP
                     </label>
+                    <label className="g-check app-check-m-cred">
+                      <input
+                        type="checkbox"
+                        checked={incluirM110M510}
+                        onChange={() => { setIncluirM110M510((v) => !v); setPaginaLanc(1); }}
+                      />
+                      M110 / M510
+                    </label>
+                    <label className="g-check app-check-m-deb">
+                      <input
+                        type="checkbox"
+                        checked={incluirM215M615}
+                        onChange={() => { setIncluirM215M615((v) => !v); setPaginaLanc(1); }}
+                      />
+                      M215 / M615
+                    </label>
+                    <label className="g-check app-check-f120">
+                      <input
+                        type="checkbox"
+                        checked={incluirF120}
+                        onChange={() => { setIncluirF120((v) => !v); setPaginaLanc(1); }}
+                      />
+                      F120
+                    </label>
                   </div>
                   <div
                     className="g-cluster"
@@ -699,6 +782,27 @@ export default function App() {
                     incluídos no SPED. Confira cada nota antes de importar o estorno.
                   </div>
                 )}
+                {incluirM110M510 && (
+                  <div className="app-alert-m-cred">
+                    <strong>M110 / M510 — Ajuste de crédito PIS / COFINS:</strong> lançamentos
+                    avulsos gerados a partir dos registros de ajuste de crédito do Bloco M.
+                    Db <code>4.01.01.01.0001</code> / Cr conta de aproveitamento.
+                  </div>
+                )}
+                {incluirM215M615 && (
+                  <div className="app-alert-m-deb">
+                    <strong>M215 / M615 — Ajuste de base PIS / COFINS:</strong> valor calculado
+                    como VL_AJ_BC × alíquota (PIS 1,65 % · COFINS 7,6 %).
+                    Db conta a pagar / Cr <code>4.01.01.01.0001</code>.
+                  </div>
+                )}
+                {incluirF120 && (
+                  <div className="app-alert-f120">
+                    <strong>F120 — Ativo imobilizado (crédito 48 meses):</strong> lançamentos
+                    avulsos de depreciação de bens do ativo. Valores VL_PIS e VL_COFINS diretos
+                    do registro.
+                  </div>
+                )}
 
                 {lancamentos.length === 0 ? (
                   <p className="g-empty">
@@ -736,8 +840,11 @@ export default function App() {
                         <tbody>
                           {lancPag.map((l, i) => (
                             <tr key={i} className={
-                              l._soSped ? "app-row-so-sped"
+                              l._soSped     ? "app-row-so-sped"
                               : l._estornoSap ? "app-row-estorno-sap"
+                              : l._m110m510  ? "app-row-m-cred"
+                              : l._m215m615  ? "app-row-m-deb"
+                              : l._f120      ? "app-row-f120"
                               : ""
                             }>
                               <td>

@@ -1082,6 +1082,90 @@ def gera_lancamentos_estorno_so_sap(
     return pd.DataFrame(linhas) if linhas else pd.DataFrame()
 
 
+def _normaliza_m_para_comparacao(dfs: dict) -> list:
+    """
+    Converte M110/M215/M510/M615 para o formato de linha da aba Comparação
+    (só SPED — sem contrapartida SAP).
+
+    Campos retornados: REG, NUM_DOC, VL_PIS, VL_COFINS, CNPJ_ESTAB +
+    campos específicos de cada REG para exibição.
+    """
+    linhas = []
+
+    for reg in ("M110", "M510"):
+        df_m = dfs.get(reg, pd.DataFrame())
+        if df_m.empty:
+            continue
+        for _, row in df_m.iterrows():
+            vl_aj = _to_float(row.get("VL_AJ", 0))
+            if abs(vl_aj) <= TOLERANCIA:
+                continue
+            linhas.append({
+                "REG":        reg,
+                "NUM_DOC":    str(row.get("NUM_DOC",  "") or ""),
+                "VL_PIS":     round(abs(vl_aj), 2) if reg == "M110" else 0.0,
+                "VL_COFINS":  round(abs(vl_aj), 2) if reg == "M510" else 0.0,
+                "CNPJ_ESTAB": str(row.get("CNPJ_ESTAB", "") or ""),
+                "COD_AJ":     str(row.get("COD_AJ",   "") or ""),
+                "DESCR_AJ":   str(row.get("DESCR_AJ",  "") or ""),
+                "IND_AJ":     str(row.get("IND_AJ",    "") or ""),
+            })
+
+    for reg, aliq in (("M215", ALIQ_M215), ("M615", ALIQ_M615)):
+        df_m = dfs.get(reg, pd.DataFrame())
+        if df_m.empty:
+            continue
+        for _, row in df_m.iterrows():
+            ind_aj  = str(row.get("IND_AJ_BC", "0"))
+            cod_aj  = str(row.get("COD_AJ_BC", "")).strip()
+            vl_ajbc = _to_float(row.get("VL_AJ_BC", 0))
+            if ind_aj == "0" and not cod_aj:
+                continue
+            valor = round(abs(vl_ajbc) * aliq, 2)
+            if valor <= TOLERANCIA:
+                continue
+            linhas.append({
+                "REG":         reg,
+                "NUM_DOC":     str(row.get("NUM_DOC", "") or ""),
+                "VL_PIS":      valor if reg == "M215" else 0.0,
+                "VL_COFINS":   valor if reg == "M615" else 0.0,
+                "CNPJ_ESTAB":  str(row.get("CNPJ_ESTAB",   "") or ""),
+                "COD_AJ_BC":   cod_aj,
+                "DESCR_AJ_BC": str(row.get("DESCR_AJ_BC",  "") or ""),
+                "IND_AJ_BC":   ind_aj,
+            })
+
+    return linhas
+
+
+def _normaliza_f120_para_comparacao(dfs: dict) -> list:
+    """
+    Converte F120 para o formato de linha da aba Comparação
+    (só SPED — sem contrapartida SAP).
+    """
+    df_f120 = dfs.get("F120", pd.DataFrame())
+    if df_f120.empty:
+        return []
+
+    linhas = []
+    for _, row in df_f120.iterrows():
+        vl_pis    = _to_float(row.get("VL_PIS",   0))
+        vl_cofins = _to_float(row.get("VL_COFINS", 0))
+        if abs(vl_pis) <= TOLERANCIA and abs(vl_cofins) <= TOLERANCIA:
+            continue
+        linhas.append({
+            "REG":            "F120",
+            "NUM_DOC":        "",
+            "VL_PIS":         round(abs(vl_pis),    2),
+            "VL_COFINS":      round(abs(vl_cofins),  2),
+            "CNPJ_ESTAB":     str(row.get("CNPJ_ESTAB",    "") or ""),
+            "IDENT_BEM_IMOB": str(row.get("IDENT_BEM_IMOB", "") or ""),
+            "DESC_BEM_IMOB":  str(row.get("DESC_BEM_IMOB",  "") or ""),
+            "IND_ORIG_CRED":  str(row.get("IND_ORIG_CRED",  "") or ""),
+        })
+    return linhas
+
+
 def compara_gera_diferenca(
     arquivo_sped: str,
     planilha_diario: str,
@@ -1321,7 +1405,11 @@ def compara_gera_diferenca(
     df_lanc_m2 = gera_lancamentos_m215_m615(dfs)
     # Lançamentos avulsos F120 (ativo imobilizado — crédito 48 meses)
     df_lanc_f120 = gera_lancamentos_f120(dfs)
-    df_lanc_so_sped = pd.concat([df_lanc_so_sped, df_lanc_m, df_lanc_m2, df_lanc_f120], ignore_index=True)
+    # M/F120 têm checkboxes próprios no front — não mesclar com só-SPED de NF-e/CT-e
+
+    # Registros M110/M215/M510/M615 e F120 normalizados para a aba Comparação
+    so_sped_m    = _normaliza_m_para_comparacao(dfs)
+    so_sped_f120 = _normaliza_f120_para_comparacao(dfs)
 
     # Estorno integral para DS/NS/NE só no SAP (existem no SAP mas não no SPED)
     _so_sap_com_num_doc = pd.concat(
@@ -1386,6 +1474,8 @@ def compara_gera_diferenca(
         "lancamentos_m110_m510_json":        _df_para_json(df_lanc_m),
         "lancamentos_m215_m615_json":        _df_para_json(df_lanc_m2),
         "lancamentos_f120_json":             _df_para_json(df_lanc_f120),
+        "so_sped_m_json":                    so_sped_m,
+        "so_sped_f120_json":                 so_sped_f120,
     }
 
 
