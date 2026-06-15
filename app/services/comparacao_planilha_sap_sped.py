@@ -58,6 +58,41 @@ CONTAS_F100_AVULSO = {
     },
 }
 
+# Contas fixas para lançamentos avulsos M110 (PIS) e M510 (COFINS)
+#   IND_AJ=0: Db 4.01.01.01.0001 / Cr conta PIS ou COFINS
+#   IND_AJ=1: Db conta PIS ou COFINS / Cr 4.01.01.01.0001
+CONTA_CONTRAPARTIDA_M = {"cod": "4.01.01.01.0001", "nome": ""}
+
+# M110 (PIS crédito) e M510 (COFINS crédito)
+CONTAS_M_CREDITO = {
+    "M110": {"cod": "1.01.05.01.0003", "nome": "contas pis aproveitamento"},
+    "M510": {"cod": "1.01.05.01.0004", "nome": "contas Cofins aproveitamento"},
+}
+
+# M215 (PIS débito) e M615 (COFINS débito)
+#   Valor = VL_AJ_BC × alíquota
+ALIQ_M215 = 1.65 / 100   # PIS não-cumulativo
+ALIQ_M615 = 7.6  / 100   # COFINS não-cumulativo
+CONTAS_M_DEBITO = {
+    "M215": {"cod": "2.01.01.04.0002", "nome": "contas pis tem que pagar"},
+    "M615": {"cod": "2.01.01.04.0003", "nome": "contas cofins tem que pagar"},
+}
+
+# Contas fixas para lançamentos avulsos F120 (ativo imobilizado — crédito 48 meses)
+# Direção determinada por IND_ORIG_CRED (0=mercado interno, 1=importação)
+#   IND_ORIG_CRED=0: Db 5.01.01.06.000x / Cr 1.01.05.01.000x
+#   IND_ORIG_CRED=1: Db 1.01.05.01.000x / Cr 5.01.01.06.000x
+CONTAS_F120 = {
+    "PIS": {
+        "dep":  {"cod": "5.01.01.06.0003", "nome": ""},
+        "cred": {"cod": "1.01.05.01.0003", "nome": "contas pis aproveitamento"},
+    },
+    "COFINS": {
+        "dep":  {"cod": "5.01.01.06.0004", "nome": ""},
+        "cred": {"cod": "1.01.05.01.0004", "nome": "contas Cofins aproveitamento"},
+    },
+}
+
 # Nomes das contas SAP que acumulam os créditos de regime misto (F100)
 CONTA_PIS_RECUPERAR    = "PIS a Recuperar"
 CONTA_COFINS_RECUPERAR = "COFINS a Recuperar"
@@ -809,6 +844,176 @@ def gera_lancamentos_so_sped(
     return pd.DataFrame(linhas) if linhas else pd.DataFrame()
 
 
+def gera_lancamentos_m110_m510(dfs: dict) -> pd.DataFrame:
+    """
+    Gera lançamentos avulsos para ajustes de crédito M110 (PIS) e M510 (COFINS).
+
+    Empresa: CNPJ_ESTAB herdado do M010.
+    Centro de Custo: OBRAS (sempre).
+
+    IND_AJ=0 → Db 4.01.01.01.0001  /  Cr conta PIS ou COFINS
+    IND_AJ=1 → Db conta PIS ou COFINS  /  Cr 4.01.01.01.0001
+    """
+    linhas = []
+    for reg, imposto in [("M110", "PIS"), ("M510", "COFINS")]:
+        df_m = dfs.get(reg, pd.DataFrame())
+        if df_m.empty:
+            continue
+        conta_info = CONTAS_M_CREDITO[reg]
+        for _, row in df_m.iterrows():
+            ind_aj   = str(row.get("IND_AJ", "0"))
+            vl_aj    = _to_float(row.get("VL_AJ", 0))
+            if abs(vl_aj) <= TOLERANCIA:
+                continue
+            cnpj     = str(row.get("CNPJ_ESTAB", "") or "")
+            num_doc  = str(row.get("NUM_DOC", ""))
+            cod_aj   = str(row.get("COD_AJ", ""))
+            descr_aj = str(row.get("DESCR_AJ", ""))
+            desc     = f"{reg} {cod_aj}" + (f" - {descr_aj}" if descr_aj else "")
+            valor    = round(abs(vl_aj), 2)
+
+            if ind_aj == "0":
+                lado_cred   = "C"
+                lado_contra = "D"
+            else:
+                lado_cred   = "D"
+                lado_contra = "C"
+
+            for cod_c, nome_c, lado in [
+                (conta_info["cod"],            conta_info["nome"],            lado_cred),
+                (CONTA_CONTRAPARTIDA_M["cod"], CONTA_CONTRAPARTIDA_M["nome"], lado_contra),
+            ]:
+                linhas.append({
+                    "Código da Conta":    cod_c,
+                    "Descrição da Conta": nome_c,
+                    "Débito":             valor if lado == "D" else None,
+                    "Crédito":            valor if lado == "C" else None,
+                    "Descrição":          desc,
+                    "Centro de Custo":    "OBRAS",
+                    "Filial":             cnpj,
+                    "NUM_DOC":            num_doc,
+                    "CHV_NFE":            "",
+                    "Imposto":            imposto,
+                    "DELTA":              None,
+                    "Sentido":            "Só SPED",
+                })
+    return pd.DataFrame(linhas) if linhas else pd.DataFrame()
+
+
+def gera_lancamentos_f120(dfs: dict) -> pd.DataFrame:
+    """
+    Gera lançamentos avulsos para F120 (bens do ativo imobilizado — crédito 48 meses).
+
+    Valores: VL_PIS e VL_COFINS diretos do registro.
+    Direção: IND_ORIG_CRED (0=mercado interno, 1=importação).
+      0: Db 5.01.01.06.000x / Cr 1.01.05.01.000x
+      1: Db 1.01.05.01.000x / Cr 5.01.01.06.000x
+    Centro de Custo: OBRAS. Empresa: CNPJ_ESTAB do F010.
+    """
+    df_f120 = dfs.get("F120", pd.DataFrame())
+    if df_f120.empty:
+        return pd.DataFrame()
+
+    linhas = []
+    for _, row in df_f120.iterrows():
+        ind      = str(row.get("IND_ORIG_CRED", "0"))
+        cnpj     = str(row.get("CNPJ_ESTAB", "") or "")
+        ident    = str(row.get("IDENT_BEM_IMOB", ""))
+        desc_bem = str(row.get("DESC_BEM_IMOB", ""))
+        desc     = f"F120 {ident}" + (f" - {desc_bem}" if desc_bem else "")
+
+        for imposto, col in [("PIS", "VL_PIS"), ("COFINS", "VL_COFINS")]:
+            valor = _to_float(row.get(col, 0))
+            if abs(valor) <= TOLERANCIA:
+                continue
+            contas  = CONTAS_F120[imposto]
+            valor_r = round(abs(valor), 2)
+            lado_dep  = "D" if ind == "0" else "C"
+            lado_cred = "C" if ind == "0" else "D"
+
+            for cod_c, nome_c, lado in [
+                (contas["dep"]["cod"],  contas["dep"]["nome"],  lado_dep),
+                (contas["cred"]["cod"], contas["cred"]["nome"], lado_cred),
+            ]:
+                linhas.append({
+                    "Código da Conta":    cod_c,
+                    "Descrição da Conta": nome_c,
+                    "Débito":             valor_r if lado == "D" else None,
+                    "Crédito":            valor_r if lado == "C" else None,
+                    "Descrição":          desc,
+                    "Centro de Custo":    "OBRAS",
+                    "Filial":             cnpj,
+                    "NUM_DOC":            "",
+                    "CHV_NFE":            "",
+                    "Imposto":            imposto,
+                    "DELTA":              None,
+                    "Sentido":            "Só SPED",
+                })
+    return pd.DataFrame(linhas) if linhas else pd.DataFrame()
+
+
+def gera_lancamentos_m215_m615(dfs: dict) -> pd.DataFrame:
+    """
+    Gera lançamentos avulsos para ajustes de base M215 (PIS) e M615 (COFINS).
+
+    Valor = VL_AJ_BC × alíquota (PIS: 1,65%; COFINS: 7,6%).
+    Centro de Custo: OBRAS.
+
+    IND_AJ=0 (e COD_AJ_BC preenchido): Db 2.01.01.04.000x / Cr 4.01.01.01.0001
+    IND_AJ=1:                           Db 4.01.01.01.0001 / Cr 2.01.01.04.000x
+    """
+    linhas = []
+    for reg, imposto, aliq in [("M215", "PIS", ALIQ_M215), ("M615", "COFINS", ALIQ_M615)]:
+        df_m = dfs.get(reg, pd.DataFrame())
+        if df_m.empty:
+            continue
+        conta_info = CONTAS_M_DEBITO[reg]
+        for _, row in df_m.iterrows():
+            ind_aj   = str(row.get("IND_AJ_BC", "0"))
+            cod_aj   = str(row.get("COD_AJ_BC", "")).strip()
+            vl_aj_bc = _to_float(row.get("VL_AJ_BC", 0))
+
+            # IND_AJ=0 exige COD_AJ_BC preenchido
+            if ind_aj == "0" and not cod_aj:
+                continue
+
+            valor = round(abs(vl_aj_bc) * aliq, 2)
+            if valor <= TOLERANCIA:
+                continue
+
+            num_doc  = str(row.get("NUM_DOC", ""))
+            descr_aj = str(row.get("DESCR_AJ_BC", ""))
+            cnpj     = str(row.get("CNPJ_ESTAB", "") or "")
+            desc     = f"{reg} {cod_aj}" + (f" - {descr_aj}" if descr_aj else "")
+
+            if ind_aj == "0":
+                lado_conta  = "D"
+                lado_contra = "C"
+            else:
+                lado_conta  = "C"
+                lado_contra = "D"
+
+            for cod_c, nome_c, lado in [
+                (conta_info["cod"],            conta_info["nome"],            lado_conta),
+                (CONTA_CONTRAPARTIDA_M["cod"], CONTA_CONTRAPARTIDA_M["nome"], lado_contra),
+            ]:
+                linhas.append({
+                    "Código da Conta":    cod_c,
+                    "Descrição da Conta": nome_c,
+                    "Débito":             valor if lado == "D" else None,
+                    "Crédito":            valor if lado == "C" else None,
+                    "Descrição":          desc,
+                    "Centro de Custo":    "OBRAS",
+                    "Filial":             cnpj,
+                    "NUM_DOC":            num_doc,
+                    "CHV_NFE":            "",
+                    "Imposto":            imposto,
+                    "DELTA":              None,
+                    "Sentido":            "Só SPED",
+                })
+    return pd.DataFrame(linhas) if linhas else pd.DataFrame()
+
+
 def gera_lancamentos_estorno_so_sap(
     so_sap_df: pd.DataFrame,
     df_sap_raw: pd.DataFrame,
@@ -1110,6 +1315,14 @@ def compara_gera_diferenca(
         so_sped_c5,
     )
 
+    # Lançamentos avulsos M110 (PIS crédito) e M510 (COFINS crédito)
+    df_lanc_m = gera_lancamentos_m110_m510(dfs)
+    # Lançamentos avulsos M215 (PIS débito) e M615 (COFINS débito)
+    df_lanc_m2 = gera_lancamentos_m215_m615(dfs)
+    # Lançamentos avulsos F120 (ativo imobilizado — crédito 48 meses)
+    df_lanc_f120 = gera_lancamentos_f120(dfs)
+    df_lanc_so_sped = pd.concat([df_lanc_so_sped, df_lanc_m, df_lanc_m2, df_lanc_f120], ignore_index=True)
+
     # Estorno integral para DS/NS/NE só no SAP (existem no SAP mas não no SPED)
     _so_sap_com_num_doc = pd.concat(
         [df for df in [so_sap_s, so_sap_e, so_sap_t, so_sap_c5]
@@ -1170,6 +1383,9 @@ def compara_gera_diferenca(
         "lancamentos_json":                  _df_para_json(df_lanc),
         "lancamentos_so_sped_json":          _df_para_json(df_lanc_so_sped),
         "lancamentos_estorno_so_sap_json":   _df_para_json(df_lanc_estorno),
+        "lancamentos_m110_m510_json":        _df_para_json(df_lanc_m),
+        "lancamentos_m215_m615_json":        _df_para_json(df_lanc_m2),
+        "lancamentos_f120_json":             _df_para_json(df_lanc_f120),
     }
 
 
