@@ -1041,34 +1041,41 @@ def gera_lancamentos_estorno_so_sap(
     df_det = df_det[
         df_det["NUM_DOC"].isin(num_docs_alvo) &
         df_det["NUM_DOC"].notna() &
-        df_det["Cta.cont./Nome PN"].notna()
+        df_det["Cta.cont./Nome PN"].notna() &
+        df_det["TIPO_DOC"].isin(TIPOS_ESTORNO)   # exclui LC e OUTRO
     ].copy()
 
     if df_det.empty:
         return pd.DataFrame()
 
+    # Agrega por (NUM_DOC, conta, cod, cc, filial) calculando NET = Σ Débito - Σ Crédito.
+    # Se o SAP já tem o original + um estorno para o mesmo NUM_DOC, o NET é 0
+    # e nenhum lançamento é gerado (evita estornos que se anulam).
+    df_det["_deb"] = df_det["Débito (MC)"].apply(_limpar_valor_sap)
+    df_det["_cred"] = df_det["Crédito (MC)"].apply(_limpar_valor_sap)
+
     linhas = []
-    for _, r in df_det.iterrows():
-        conta = str(r.get("Cta.cont./Nome PN", "")).strip()
-        cod   = str(r.get("Cta.contáb./cód.PN", "")).strip()
-        if not conta or conta not in MAPA_CONTAS_SAP:
-            continue
-        deb  = _limpar_valor_sap(r.get("Débito (MC)"))
-        cred = _limpar_valor_sap(r.get("Crédito (MC)"))
-        if deb == 0 and cred == 0:
-            continue
-        num_doc = str(r["NUM_DOC"])
-        tipo    = str(r.get("TIPO_DOC", "")).strip()
-        filial  = str(r.get("Nome da filial", "")) if pd.notna(r.get("Nome da filial")) else ""
-        cc      = str(r.get("Centro de Custo", "")) if pd.notna(r.get("Centro de Custo")) else ""
-        campo   = MAPA_CONTAS_SAP.get(conta, "")
+    for (num_doc, conta), grp in df_det[
+        df_det["Cta.cont./Nome PN"].isin(MAPA_CONTAS_SAP)
+    ].groupby(["NUM_DOC", "Cta.cont./Nome PN"]):
+        net_deb  = round(grp["_deb"].sum() - grp["_cred"].sum(), 2)
+        if abs(net_deb) <= TOLERANCIA:
+            continue  # já estornado no SAP — net zero, nada a fazer
+
+        cod    = str(grp["Cta.contáb./cód.PN"].iloc[0]).strip()
+        tipo   = str(grp["TIPO_DOC"].iloc[0]).strip()
+        _filial_val = grp["Nome da filial"].iloc[0] if "Nome da filial" in grp.columns else None
+        filial = str(_filial_val) if pd.notna(_filial_val) else ""
+        _cc_val = grp["Centro de Custo"].iloc[0] if "Centro de Custo" in grp.columns else None
+        cc     = str(_cc_val) if pd.notna(_cc_val) else ""
+        campo   = MAPA_CONTAS_SAP.get(str(conta), "")
         imposto = campo.replace("VL_", "").replace("_SAP", "") if campo else ""
 
         linhas.append({
             "Código da Conta":    cod,
             "Descrição da Conta": conta,
-            "Débito":             round(cred, 2) if cred > 0 else None,
-            "Crédito":            round(deb,  2) if deb  > 0 else None,
+            "Débito":             round(-net_deb, 2) if net_deb < 0 else None,
+            "Crédito":            round( net_deb, 2) if net_deb > 0 else None,
             "Descrição":          f"Estorno {tipo} NF {num_doc}",
             "Centro de Custo":    cc,
             "Filial":             filial,
