@@ -1205,12 +1205,25 @@ def compara_gera_diferenca(
     df_sped_saidas, df_sped_entradas  = _agregar_sped(dfs)
     df_sap_saidas,  df_sap_entradas_raw = _agregar_sap(df_sap, filtro_filial)
 
+    # Documentos CT-e (D100) e energia/telecom (C500) têm comparações próprias;
+    # excluí-los aqui evita que apareçam como só-SAP na comparação NF-e (entradas)
+    # enquanto df_sap_entradas_raw permanece intacto para o bloco C500 abaixo.
+    _excluir_de_entradas_nfe = (
+        set(dfs["D100"]["NUM_DOC"].astype(str)) if not dfs["D100"].empty else set()
+    ) | (
+        set(dfs["C500"]["NUM_DOC"].astype(str)) if not dfs["C500"].empty else set()
+    )
+    _df_entradas_nfe = (
+        df_sap_entradas_raw[~df_sap_entradas_raw["NUM_DOC"].isin(_excluir_de_entradas_nfe)]
+        if _excluir_de_entradas_nfe else df_sap_entradas_raw
+    )
+
     # Enriquece df_sap_entradas com CHV_NFE do SPED C100 para cruzamento
     _chv_lookup = (
         dfs["C100"][dfs["C100"]["IND_OPER"] == "0"][["NUM_DOC", "CHV_NFE"]]
         .drop_duplicates("NUM_DOC")
     )
-    df_sap_entradas = df_sap_entradas_raw.merge(_chv_lookup, on="NUM_DOC", how="left")
+    df_sap_entradas = _df_entradas_nfe.merge(_chv_lookup, on="NUM_DOC", how="left")
 
     # ── Bloco D ──────────────────────────────────────────────────────────────
     df_sped_transp = _agregar_sped_d(dfs)
@@ -1417,6 +1430,26 @@ def compara_gera_diferenca(
          if not df.empty and "NUM_DOC" in df.columns and "TIPO_DOC" in df.columns],
         ignore_index=True,
     )
+    # Documentos que existem no SPED (qualquer bloco) devem gerar divergência,
+    # não estorno — evita estornos falsos para devoluções, fretes e energia/telecom
+    _sped_todos_num_docs = (
+        set(dfs["C100"]["NUM_DOC"].astype(str)) if not dfs["C100"].empty else set()
+    ) | (
+        set(dfs["D100"]["NUM_DOC"].astype(str)) if not dfs["D100"].empty else set()
+    ) | (
+        set(dfs["C500"]["NUM_DOC"].astype(str)) if not dfs["C500"].empty else set()
+    )
+    if _sped_todos_num_docs:
+        _so_sap_com_num_doc = _so_sap_com_num_doc[
+            ~_so_sap_com_num_doc["NUM_DOC"].isin(_sped_todos_num_docs)
+        ].copy()
+        # Remove do "Só SAP" de saídas documentos que existem no SPED com
+        # classificação diferente (ex: DS no SAP = C100 IND_OPER=0 no SPED).
+        # Esses documentos não são genuinamente "só SAP".
+        if "NUM_DOC" in so_sap_s.columns:
+            so_sap_s = so_sap_s[
+                ~so_sap_s["NUM_DOC"].isin(_sped_todos_num_docs)
+            ].reset_index(drop=True)
     df_lanc_estorno = gera_lancamentos_estorno_so_sap(_so_sap_com_num_doc, df_sap)
 
     return {
