@@ -78,6 +78,16 @@ CONTAS_M_DEBITO = {
     "M615": {"cod": "2.01.01.04.0003", "nome": "contas cofins tem que pagar"},
 }
 
+# Histórico dos códigos de ajuste de base de cálculo M215/M615 (COD_AJ_BC)
+DESCR_COD_AJ_BC = {
+    "01": "Vendas canceladas de receitas tributadas em períodos anteriores",
+    "02": "Devoluções de vendas tributadas em períodos anteriores",
+    "21": "ICMS a recolher sobre Operações próprias (PJs com decisão judicial transitada em julgado)",
+    "25": "ICMS destacado em documento fiscal complementar, referente a receitas tributadas em períodos anteriores",
+    "41": "Outros valores a excluir, vinculados a decisão judicial com trânsito em julgado",
+    "42": "Outros valores a excluir, não vinculados a decisão judicial",
+}
+
 # Contas fixas para lançamentos avulsos F120 (ativo imobilizado — crédito 48 meses)
 # Direção determinada por IND_ORIG_CRED (0=mercado interno, 1=importação)
 #   IND_ORIG_CRED=0: Db 5.01.01.06.000x / Cr 1.01.05.01.000x
@@ -989,7 +999,7 @@ def gera_lancamentos_m215_m615(dfs: dict) -> pd.DataFrame:
                 continue
 
             num_doc  = str(row.get("NUM_DOC", ""))
-            descr_aj = str(row.get("DESCR_AJ_BC", ""))
+            descr_aj = DESCR_COD_AJ_BC.get(cod_aj, str(row.get("DESCR_AJ_BC", "") or ""))
             cnpj     = cnpj_matriz
             desc     = f"{reg} {cod_aj}" + (f" - {descr_aj}" if descr_aj else "")
 
@@ -1149,7 +1159,7 @@ def _normaliza_m_para_comparacao(dfs: dict) -> list:
                 "VL_COFINS":   valor if reg == "M615" else 0.0,
                 "CNPJ_ESTAB":  cnpj_matriz,
                 "COD_AJ_BC":   cod_aj,
-                "DESCR_AJ_BC": str(row.get("DESCR_AJ_BC",  "") or ""),
+                "DESCR_AJ_BC": DESCR_COD_AJ_BC.get(cod_aj, str(row.get("DESCR_AJ_BC", "") or "")),
                 "IND_AJ_BC":   ind_aj,
             })
 

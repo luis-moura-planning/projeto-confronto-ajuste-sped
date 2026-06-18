@@ -549,13 +549,13 @@ export default function App() {
                           </td>
                           <td>
                             {row.CHV_NFE || row.CHV_CTE ? (
-                              <code className="g-mono" style={{ fontSize: 11 }}>
+                              <code className="g-mono" style={{ fontSize: 11, whiteSpace: "nowrap" }}>
                                 {row.CHV_NFE ?? row.CHV_CTE}
                               </code>
                             ) : row.NOME_CONTA ? (
-                              <span style={{ fontSize: 12 }}>{row.NOME_CONTA}</span>
+                              <Trunc maxW={250}><span style={{ fontSize: 12 }}>{row.NOME_CONTA}</span></Trunc>
                             ) : (row.DESCR_AJ || row.DESCR_AJ_BC || row.DESC_BEM_IMOB) ? (
-                              <span style={{ fontSize: 12 }}>{row.DESCR_AJ ?? row.DESCR_AJ_BC ?? row.DESC_BEM_IMOB}</span>
+                              <Trunc maxW={250}>{row.DESCR_AJ ?? row.DESCR_AJ_BC ?? row.DESC_BEM_IMOB}</Trunc>
                             ) : "—"}
                           </td>
                           <td>
@@ -852,7 +852,9 @@ export default function App() {
                                   {l["Código da Conta"]}
                                 </code>
                               </td>
-                              <td>{l["Descrição da Conta"]}</td>
+                              <td style={{ maxWidth: 200 }}>
+                                <Trunc>{l["Descrição da Conta"]}</Trunc>
+                              </td>
                               <td
                                 className={
                                   l["Débito"] != null ? "app-td-debito" : ""
@@ -867,7 +869,9 @@ export default function App() {
                               >
                                 {fmt(l["Crédito"])}
                               </td>
-                              <td>{l["Descrição"]}</td>
+                              <td style={{ maxWidth: 240 }}>
+                                <Trunc maxW={230}>{l["Descrição"]}</Trunc>
+                              </td>
                               <td>{l["Centro de Custo"]}</td>
                               <td>{l["Filial"]}</td>
                               <td>
@@ -1036,5 +1040,23 @@ function ResumoCard({ label, valor, cor }) {
       <span className="g-stat-card__label">{label}</span>
       <span className="g-stat-card__value">{valor}</span>
     </div>
+  );
+}
+
+function Trunc({ children, maxW = 220 }) {
+  const text = typeof children === "string" ? children : undefined;
+  return (
+    <span
+      title={text}
+      style={{
+        display: "block",
+        maxWidth: maxW,
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {children}
+    </span>
   );
 }
