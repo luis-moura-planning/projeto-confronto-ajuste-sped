@@ -101,10 +101,38 @@ def extrai_dados_sped(sped_txt: str) -> dict:
             "REG", "IND_AJ_BC", "VL_AJ_BC", "COD_AJ_BC", "NUM_DOC",
             "DESCR_AJ_BC", "DT_REF", "COD_CTA", "CNPJ", "INFO_COMPL",
         ],
+        # Bloco A — Serviços (NFS-e)
+        # A100: cabeçalho do documento de serviço
+        "A100": [
+            "REG", "IND_OPER", "IND_EMIT", "COD_PART", "COD_SIT", "SER", "SUB",
+            "NUM_DOC", "CHV_NFSE", "DT_DOC", "DT_EXE_SERV", "VL_DOC",
+            "IND_PGTO", "VL_DESC", "VL_BC_PIS", "VL_PIS", "VL_BC_COFINS",
+            "VL_COFINS", "VL_PIS_RET", "VL_COFINS_RET", "VL_ISS",
+        ],
+        # A110: informações complementares (filho de A100)
+        "A110": [
+            "REG", "COD_INF", "TXT_COMPL",
+        ],
+        # A111: processo referenciado (filho de A100)
+        "A111": [
+            "REG", "NUM_PROC", "IND_PROC",
+        ],
+        # A120: apuração da contribuição (filho de A100)
+        "A120": [
+            "REG", "VL_TOT_SERV", "VL_BC_PIS", "VL_PIS_IMP", "DT_PAG_PIS",
+            "VL_BC_COFINS", "VL_COFINS_IMP", "DT_PAG_COFINS", "LOC_EXE_SERV",
+        ],
+        # A170: itens do documento de serviço (filho de A100)
+        "A170": [
+            "REG", "NUM_ITEM", "COD_ITEM", "DESCR_COMPL", "VL_ITEM", "VL_DESC",
+            "NAT_BC_CRED", "IND_ORIG_CRED", "CST_PIS", "VL_BC_PIS", "ALIQ_PIS",
+            "VL_PIS", "CST_COFINS", "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS",
+            "COD_CTA", "COD_CCUS",
+        ],
     }
 
-    dados = {"0000": [], "C100": [], "C170": [], "C500": [], "C501": [], "C505": [], "D100": [], "D101": [], "D105": [], "F100": [], "F120": [], "M110": [], "M215": [], "M510": [], "M615": []}
-    # CNPJ do estabelecimento atual — atualizado a cada C010
+    dados = {"0000": [], "C100": [], "C170": [], "C500": [], "C501": [], "C505": [], "D100": [], "D101": [], "D105": [], "F100": [], "F120": [], "M110": [], "M215": [], "M510": [], "M615": [], "A100": [], "A110": [], "A111": [], "A120": [], "A170": []}
+    # CNPJ do estabelecimento atual — atualizado a cada C010 / A010 / etc.
     cnpj_atual = ""
     nota_atual_chv = ""
     nota_atual_valida = True
@@ -115,6 +143,10 @@ def extrai_dados_sped(sped_txt: str) -> dict:
     # Controle de estado para o Bloco D
     d100_atual_chv = ""
     d100_atual_valida = True
+    # Controle de estado para o Bloco A
+    a100_atual_chv = ""
+    a100_atual_num = ""
+    a100_atual_valida = True
 
     try:
         with open(sped_txt, "r", encoding="latin1") as arquivo:
@@ -126,8 +158,8 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                 campos = linha.strip("|").split("|")
                 reg = campos[0]
 
-                # C010 / D010 / F010 / M010 — atualiza o CNPJ do estabelecimento ativo
-                if reg in ("C010", "D010", "F010", "M010"):
+                # A010 / C010 / D010 / F010 / M010 — atualiza o CNPJ do estabelecimento ativo
+                if reg in ("A010", "C010", "D010", "F010", "M010"):
                     cnpj_atual = campos[1] if len(campos) > 1 else ""
                     continue
 
@@ -201,6 +233,24 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                     dados["F120"].append(registro)
 
                 elif reg in ("M110", "M215", "M510", "M615"):
+                    registro["CNPJ_ESTAB"] = cnpj_atual
+                    dados[reg].append(registro)
+
+                elif reg == "A100":
+                    cod_sit = registro.get("COD_SIT", "")
+                    a100_atual_valida = cod_sit not in COD_SIT_EXCLUIR
+                    a100_atual_chv = registro.get("CHV_NFSE", "")
+                    a100_atual_num = registro.get("NUM_DOC", "")
+                    if not a100_atual_valida:
+                        continue
+                    registro["CNPJ_ESTAB"] = cnpj_atual
+                    dados["A100"].append(registro)
+
+                elif reg in ("A110", "A111", "A120", "A170"):
+                    if not a100_atual_valida:
+                        continue
+                    registro["CHV_NFSE"] = a100_atual_chv
+                    registro["NUM_DOC"]  = a100_atual_num
                     registro["CNPJ_ESTAB"] = cnpj_atual
                     dados[reg].append(registro)
 
