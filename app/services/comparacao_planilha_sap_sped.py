@@ -9,40 +9,19 @@ from services.extrai_dados_sped import extrai_dados_sped
 from services.extrai_dados_planilha_sap import extrai_dados_planilha_sap
 
 
-# =============================================================================
-# CONFIGURAÇÕES
-# =============================================================================
 
-# Colunas SPED usadas na comparação — Bloco C (NF-e)
-#   VL_ITEM  → agregado do C170 (VL_ITEM por item, somado por CHV_NFE)
-#   VL_ICMS  → do C100 (cabeçalho da nota)
-#   VL_IPI   → do C100
-#   VL_PIS   → do C100
-#   VL_COFINS→ do C100
 COLS_SPED = ["VL_ITEM", "VL_ICMS", "VL_IPI", "VL_PIS", "VL_COFINS"]
 
-# Colunas SPED usadas na comparação — Bloco D (CT-e / transporte)
-#   VL_SERV   → do D100 (valor do serviço de transporte)
-#   VL_PIS_D  → do D101 (PIS calculado no complemento)
-#   VL_COFINS_D → do D105 (Cofins calculada no complemento)
 COLS_SPED_D = ["VL_SERV", "VL_PIS_D", "VL_COFINS_D"]
 
-# Colunas SPED usadas na comparação — Bloco F (F100)
-#   VL_PIS    → do F100 (PIS calculado no registro)
-#   VL_COFINS → do F100 (Cofins calculada no registro)
 COLS_SPED_F100 = ["VL_PIS", "VL_COFINS"]
 
-# Colunas SPED usadas na comparação — Bloco C500 (energia / telecom)
-#   VL_PIS_C5    → do C501 (PIS calculado no complemento)
-#   VL_COFINS_C5 → do C505 (Cofins calculada no complemento)
 COLS_SPED_C500 = ["VL_PIS_C5", "VL_COFINS_C5"]
 
-# Centro de Custo padrão para lançamentos F100 derivado do IND_OPER do SPED
+COLS_SPED_A100 = ["VL_PIS", "VL_COFINS"]
+
 CC_F100 = {"0": "OBRAS", "1": "ADMIN"}
 
-# Contas contábeis fixas para lançamentos F100 por IND_OPER (partida dobrada)
-#   IND_OPER=0 (Direito): Db conta_fixa / Cr COD_CTA
-#   IND_OPER=1 (Obrigação): Db COD_CTA / Cr conta_fixa
 CONTAS_F100_AVULSO = {
     "0": {
         "PIS":    {"cod": "1.01.05.01.0003", "nome": "contas pis aproveitamento"},
@@ -58,27 +37,21 @@ CONTAS_F100_AVULSO = {
     },
 }
 
-# Contas fixas para lançamentos avulsos M110 (PIS) e M510 (COFINS)
-#   IND_AJ=0: Db 4.01.01.01.0001 / Cr conta PIS ou COFINS
-#   IND_AJ=1: Db conta PIS ou COFINS / Cr 4.01.01.01.0001
 CONTA_CONTRAPARTIDA_M = {"cod": "4.01.01.01.0001", "nome": ""}
 
-# M110 (PIS crédito) e M510 (COFINS crédito)
 CONTAS_M_CREDITO = {
     "M110": {"cod": "1.01.05.01.0003", "nome": "contas pis aproveitamento"},
     "M510": {"cod": "1.01.05.01.0004", "nome": "contas Cofins aproveitamento"},
 }
 
-# M215 (PIS débito) e M615 (COFINS débito)
-#   Valor = VL_AJ_BC × alíquota
-ALIQ_M215 = 1.65 / 100   # PIS não-cumulativo
-ALIQ_M615 = 7.6  / 100   # COFINS não-cumulativo
+ALIQ_M215 = 1.65 / 100   
+ALIQ_M615 = 7.6  / 100   
 CONTAS_M_DEBITO = {
     "M215": {"cod": "2.01.01.04.0002", "nome": "contas pis tem que pagar"},
     "M615": {"cod": "2.01.01.04.0003", "nome": "contas cofins tem que pagar"},
 }
 
-# Histórico dos códigos de ajuste de base de cálculo M215/M615 (COD_AJ_BC)
+
 DESCR_COD_AJ_BC = {
     "01": "Vendas canceladas de receitas tributadas em períodos anteriores",
     "02": "Devoluções de vendas tributadas em períodos anteriores",
@@ -88,10 +61,6 @@ DESCR_COD_AJ_BC = {
     "42": "Outros valores a excluir, não vinculados a decisão judicial",
 }
 
-# Contas fixas para lançamentos avulsos F120 (ativo imobilizado — crédito 48 meses)
-# Direção determinada por IND_ORIG_CRED (0=mercado interno, 1=importação)
-#   IND_ORIG_CRED=0: Db 5.01.01.06.000x / Cr 1.01.05.01.000x
-#   IND_ORIG_CRED=1: Db 1.01.05.01.000x / Cr 5.01.01.06.000x
 CONTAS_F120 = {
     "PIS": {
         "dep":  {"cod": "5.01.01.06.0003", "nome": ""},
@@ -103,40 +72,30 @@ CONTAS_F120 = {
     },
 }
 
-# Nomes das contas SAP que acumulam os créditos de regime misto (F100)
 CONTA_PIS_RECUPERAR    = "PIS a Recuperar"
 CONTA_COFINS_RECUPERAR = "COFINS a Recuperar"
 
-# Mapeamento nome-de-conta-SAP → campo interno de comparação.
-# Cada campo agrupa contas que representam o mesmo tributo, mas em
-# naturezas opostas (saída × entrada).  A separação por natureza é
-# feita em _agregar_sap usando CONTAS_SAIDA / CONTAS_ENTRADA.
 MAPA_CONTAS_SAP = {
-    # ICMS
     "( - ) ICMS":                       "VL_ICMS_SAP",
     "ICMS e Contribuições a Recolher":   "VL_ICMS_SAP",
     "ICMS e Contribuições a Recuperar":  "VL_ICMS_SAP",
-    # PIS
+    
     "( - ) PIS/PASEP":                   "VL_PIS_SAP",
     "PIS a Recolher":                    "VL_PIS_SAP",
     "PIS a Recuperar":                   "VL_PIS_SAP",
-    # COFINS
+    
     "( - ) COFINS":                      "VL_COFINS_SAP",
     "COFINS a Recolher":                 "VL_COFINS_SAP",
     "COFINS a Recuperar":                "VL_COFINS_SAP",
-    # Mercadorias (saída)
+    
     "Vendas de Mercadorias":             "VL_ITEM_SAP",
-    # Transporte (fretes pagos — entradas do Bloco D)
+
     "Fretes e Carretos":                 "VL_SERV_SAP",
     "Frete sobre Compras":               "VL_SERV_SAP",
     "Fretes sobre compras":              "VL_SERV_SAP",
     "Despesas com Fretes":               "VL_SERV_SAP",
 }
 
-# Contas que representam saídas (IND_OPER = 1).
-# Para essas contas o valor fiscal correto é o CRÉDITO do lançamento
-# (exceto "( - ) ICMS" etc. que lança a DÉBITO, mas com mesmo valor
-#  que o crédito espelho em "ICMS a Recolher" — veja FIX-2 abaixo).
 CONTAS_SAIDA = {
     "( - ) COFINS",
     "( - ) ICMS",
@@ -147,33 +106,27 @@ CONTAS_SAIDA = {
     "Vendas de Mercadorias",
 }
 
-# Contas que representam entradas/créditos (IND_OPER = 0).
-# O valor fiscal correto é o DÉBITO do lançamento.
 CONTAS_ENTRADA = {
     "COFINS a Recuperar",
     "ICMS e Contribuições a Recuperar",
     "PIS a Recuperar",
-    # Fretes pagos (CT-e aquisição — Bloco D)
+
     "Fretes e Carretos",
     "Frete sobre Compras",
     "Fretes sobre compras",
     "Despesas com Fretes",
 }
 
-# Conta canônica de saída por campo — usada para evitar duplicação.
-# Para cada campo, apenas UMA das contas simétricas é contabilizada.
-# Preferência: "a Recolher" (crédito direto do passivo).
-# Se ausente, usa "( - )" (débito na receita, mesmo valor).
+
 CONTA_CANONICA_SAIDA = {
     "VL_COFINS_SAP": ["COFINS a Recolher",                 "( - ) COFINS"],
     "VL_PIS_SAP":    ["PIS a Recolher",                    "( - ) PIS/PASEP"],
     "VL_ICMS_SAP":   ["ICMS e Contribuições a Recolher",   "( - ) ICMS"],
     "VL_ITEM_SAP":   ["Vendas de Mercadorias"],
-    # Frete: sem conta canônica (usa a primeira encontrada)
     "VL_SERV_SAP":   ["Fretes e Carretos", "Frete sobre Compras", "Fretes sobre compras", "Despesas com Fretes"],
 }
 
-# Mapeamento delta → campo SAP (usado em gera_lancamentos_ajuste)
+
 DELTA_PARA_CAMPO = {
     "DELTA_ICMS":   "VL_ICMS_SAP",
     "DELTA_PIS":    "VL_PIS_SAP",
@@ -189,9 +142,8 @@ TOLERANCIA = 0.05
 
 _COD_PN = _re.compile(r"^[CF]\d+", _re.IGNORECASE)
 
-# Prefixos reconhecidos no campo "Nº doc." do diário SAP
+
 _PREFIXOS_TIPO_DOC = frozenset({"DS", "NS", "NE", "LC"})
-# Tipos que exigem estorno integral quando existem só no SAP
 TIPOS_ESTORNO = frozenset({"DS", "NS", "NE"})
 
 
@@ -219,16 +171,7 @@ def _limpar_valor_sap(v) -> float:
 
 
 def _propagar_num_doc(df_sap: pd.DataFrame) -> pd.DataFrame:
-    """
-    Propaga NUM_DOC (Ref.3) e TIPO_DOC (prefixo de "Nº doc.") para cada
-    linha de detalhe da planilha SAP.
 
-    Estrutura hierárquica: linha de cabeçalho (Nº seq. preenchido) define
-    o lançamento; linhas de detalhe herdam NUM_DOC e TIPO_DOC até o próximo
-    cabeçalho.
-
-    TIPO_DOC: DS | NS | NE | LC | OUTRO
-    """
     df = df_sap.copy()
     df["NUM_DOC"]  = None
     df["TIPO_DOC"] = None
@@ -251,37 +194,23 @@ def _propagar_num_doc(df_sap: pd.DataFrame) -> pd.DataFrame:
 
 
 def _valor_sap_correto(row: pd.Series) -> float:
-    """
-    Retorna o valor monetário correto de uma linha SAP com base na
-    natureza da conta (saída → crédito; entrada → débito).
-    """
+
     conta = str(row.get("Cta.cont./Nome PN", "")).strip()
     deb  = _limpar_valor_sap(row.get("Débito (MC)"))
     cred = _limpar_valor_sap(row.get("Crédito (MC)"))
     if conta in CONTAS_SAIDA:
-        # Obrigação de saída: lançamento padrão é crédito no passivo.
-        # "( - ) ICMS" etc. lançam a débito com mesmo valor — usamos o
-        # lado que tiver valor (apenas um deles será > 0 por linha).
         return cred if cred > 0 else deb
     if conta in CONTAS_ENTRADA:
-        # Crédito a recuperar: lançamento padrão é débito no ativo.
         return deb if deb > 0 else cred
-    # Fallback para contas não classificadas
+  
     return deb if deb > 0 else cred
 
 
-# CSTs que não geram crédito de PIS/COFINS — entradas com esses CSTs
-# em todos os itens não produzem lançamento de "a Recuperar" no SAP
-# e devem ser excluídas da comparação de entradas.
 CST_SEM_CREDITO = {"70", "71", "72", "73", "74", "75", "98", "99"}
 
 
 def _agregar_sped(dfs: dict) -> tuple:
-    """
-    Agrega valores do SPED separando saídas de entradas.
 
-    Retorna (df_saidas, df_entradas).
-    """
     c100 = dfs["C100"].copy()
     c170 = dfs["C170"].copy()
 
@@ -296,7 +225,6 @@ def _agregar_sped(dfs: dict) -> tuple:
     for col in ["VL_ICMS", "VL_IPI", "VL_PIS", "VL_COFINS", "VL_MERC"]:
         c100[col] = c100[col].apply(_to_float)
 
-    # Adiciona VL_ITEM do C170 ao C100 (join por CHV_NFE)
     c100 = c100.merge(vl_item_por_chv, on="CHV_NFE", how="left")
     c100["VL_ITEM"] = c100["VL_ITEM"].fillna(0.0)
 
@@ -327,17 +255,7 @@ def _agregar_sped(dfs: dict) -> tuple:
 
 
 def _agregar_sped_d(dfs: dict) -> pd.DataFrame:
-    """
-    Agrega valores do Bloco D (aquisição de serviços de transporte).
 
-    Os registros D100 sempre representam entradas (IND_OPER = "0").
-    O valor do serviço vem do D100.VL_SERV; os créditos de PIS e Cofins
-    vêm dos filhos D101.VL_PIS e D105.VL_COFINS, respectivamente.
-
-    Retorna df com colunas: CHV_CTE, NUM_DOC, VL_SERV, VL_PIS_D, VL_COFINS_D.
-    CSTs sem crédito (D101/D105 com VL_PIS/VL_COFINS = 0) são incluídos
-    apenas para o valor do serviço; o crédito ficará zerado.
-    """
     d100 = dfs.get("D100", pd.DataFrame())
     d101 = dfs.get("D101", pd.DataFrame())
     d105 = dfs.get("D105", pd.DataFrame())
@@ -348,7 +266,7 @@ def _agregar_sped_d(dfs: dict) -> pd.DataFrame:
     d100 = d100.copy()
     d100["VL_SERV"] = d100["VL_SERV"].apply(_to_float)
 
-    # Agrega PIS por CT-e (D101)
+
     if not d101.empty:
         d101 = d101.copy()
         d101["_VL_PIS"] = d101["VL_PIS"].apply(_to_float)
@@ -361,7 +279,7 @@ def _agregar_sped_d(dfs: dict) -> pd.DataFrame:
     else:
         pis_por_cte = pd.DataFrame(columns=["CHV_CTE", "VL_PIS_D"])
 
-    # Agrega Cofins por CT-e (D105)
+  
     if not d105.empty:
         d105 = d105.copy()
         d105["_VL_COFINS"] = d105["VL_COFINS"].apply(_to_float)
@@ -390,15 +308,7 @@ def _agregar_sped_d(dfs: dict) -> pd.DataFrame:
 
 
 def _agregar_sped_f100(dfs: dict) -> pd.DataFrame:
-    """
-    Agrega F100 por (COD_CTA, IND_OPER).
 
-    IND_OPER=0 → entradas (crédito PIS/COFINS — CC: OBRAS), agregadas por COD_CTA.
-    IND_OPER=1 → saídas/avulsos (CC: ADMIN), mantidas linha a linha com DESC_DOC_OPER
-                 para exibição individual no "Só SPED".
-
-    Retorna df com colunas: COD_CTA, IND_OPER, VL_PIS, VL_COFINS [, DESC_DOC_OPER, CNPJ_ESTAB].
-    """
     f100 = dfs.get("F100", pd.DataFrame())
     if f100.empty:
         return pd.DataFrame(columns=["COD_CTA", "IND_OPER"] + COLS_SPED_F100)
@@ -410,7 +320,7 @@ def _agregar_sped_f100(dfs: dict) -> pd.DataFrame:
     _cnpj = ["CNPJ_ESTAB"] if "CNPJ_ESTAB" in f100.columns else []
     _grp  = ["COD_CTA", "IND_OPER"]
 
-    # IND_OPER=0 (créditos/direitos): agrega por COD_CTA
+
     df_oper0 = f100[f100["IND_OPER"].astype(str) == "0"]
     if not df_oper0.empty:
         df_agg0 = df_oper0.groupby(_grp)[COLS_SPED_F100].sum().reset_index()
@@ -420,7 +330,7 @@ def _agregar_sped_f100(dfs: dict) -> pd.DataFrame:
     else:
         df_agg0 = pd.DataFrame(columns=_grp + COLS_SPED_F100 + _cnpj)
 
-    # IND_OPER=1 (receitas financeiras/avulsos): mantém linha a linha
+
     df_oper1 = f100[f100["IND_OPER"].astype(str) == "1"].copy()
     if not df_oper1.empty:
         _desc = ["DESC_DOC_OPER"] if "DESC_DOC_OPER" in df_oper1.columns else []
@@ -433,15 +343,7 @@ def _agregar_sped_f100(dfs: dict) -> pd.DataFrame:
 
 
 def _agregar_sped_c500(dfs: dict) -> pd.DataFrame:
-    """
-    Agrega valores do Bloco C — energia elétrica, telecomunicações, etc. (C500).
 
-    C500 não possui IND_OPER — todos os registros são entradas.
-    VL_PIS_C5 vem de C501 agrupado por NUM_DOC;
-    VL_COFINS_C5 vem de C505 agrupado por NUM_DOC.
-
-    Retorna df com colunas: NUM_DOC, VL_PIS_C5, VL_COFINS_C5.
-    """
     c500 = dfs.get("C500", pd.DataFrame())
     c501 = dfs.get("C501", pd.DataFrame())
     c505 = dfs.get("C505", pd.DataFrame())
@@ -483,23 +385,104 @@ def _agregar_sped_c500(dfs: dict) -> pd.DataFrame:
     return df
 
 
+def _agregar_sped_a100(dfs: dict) -> tuple:
+
+    a100 = dfs.get("A100", pd.DataFrame())
+    _empty_s = pd.DataFrame(columns=["NUM_DOC"] + COLS_SPED_A100)
+    _empty_e = pd.DataFrame(columns=["CHV_NFSE", "NUM_DOC"] + COLS_SPED_A100)
+    if a100.empty:
+        return _empty_s, _empty_e
+
+    a100 = a100.copy()
+    for col in COLS_SPED_A100:
+        a100[col] = a100[col].apply(_to_float)
+
+    _cnpj = ["CNPJ_ESTAB"] if "CNPJ_ESTAB" in a100.columns else []
+
+    a100_s = a100[a100["IND_OPER"].astype(str) == "1"]
+    if not a100_s.empty:
+        df_saidas = a100_s.groupby(["NUM_DOC"] + _cnpj)[COLS_SPED_A100].sum().reset_index()
+    else:
+        df_saidas = _empty_s
+
+    a100_e = a100[
+        (a100["IND_OPER"].astype(str) == "0") &
+        ((a100["VL_PIS"] > 0) | (a100["VL_COFINS"] > 0))
+    ]
+    if not a100_e.empty:
+        df_entradas = (
+            a100_e.groupby(["CHV_NFSE", "NUM_DOC"] + _cnpj)[COLS_SPED_A100]
+            .sum().reset_index()
+        )
+    else:
+        df_entradas = _empty_e
+
+    return df_saidas, df_entradas
+
+
+def _valor_match_a100(
+    so_sped: pd.DataFrame,
+    so_sap: pd.DataFrame,
+    col_pis_sped: str = "VL_PIS",
+    col_cof_sped: str = "VL_COFINS",
+    col_pis_sap:  str = "VL_PIS_SAP",
+    col_cof_sap:  str = "VL_COFINS_SAP",
+) -> tuple:
+
+    if so_sped.empty or so_sap.empty:
+        return pd.DataFrame(), so_sped.reset_index(drop=True), so_sap.reset_index(drop=True)
+
+    sped = so_sped.copy().reset_index(drop=True)
+    sap  = so_sap.copy().reset_index(drop=True)
+
+    _use_cnpj = "CNPJ_ESTAB" in sped.columns and "CNPJ_ESTAB" in sap.columns
+    cnpj_sped = sped["CNPJ_ESTAB"].fillna("") if _use_cnpj else pd.Series([""] * len(sped))
+    cnpj_sap  = sap["CNPJ_ESTAB"].fillna("")  if _use_cnpj else pd.Series([""] * len(sap))
+
+    sped["_vk"] = (
+        cnpj_sped + "|" +
+        sped[col_pis_sped].fillna(0).round(2).astype(str) + "|" +
+        sped[col_cof_sped].fillna(0).round(2).astype(str)
+    )
+    sap["_vk"] = (
+        cnpj_sap + "|" +
+        sap[col_pis_sap].fillna(0).round(2).astype(str) + "|" +
+        sap[col_cof_sap].fillna(0).round(2).astype(str)
+    )
+
+    common = (
+        set(sped.loc[~sped["_vk"].duplicated(keep=False), "_vk"]) &
+        set(sap.loc[~sap["_vk"].duplicated(keep=False),  "_vk"])
+    )
+
+    if not common:
+        return (
+            pd.DataFrame(),
+            so_sped.reset_index(drop=True),
+            so_sap.reset_index(drop=True),
+        )
+
+    sped_hit = sped[sped["_vk"].isin(common)].copy()
+    sap_hit  = sap[sap["_vk"].isin(common)].copy()
+
+
+    sap_extra_cols = [c for c in sap_hit.columns if c != "_vk" and c not in sped_hit.columns]
+    ok = (
+        sped_hit
+        .merge(sap_hit[["_vk"] + sap_extra_cols], on="_vk", how="inner")
+        .drop(columns=["_vk"])
+        .reset_index(drop=True)
+    )
+    ok["_a100"] = True
+
+    so_sped_rest = sped[~sped["_vk"].isin(common)].drop(columns=["_vk"]).reset_index(drop=True)
+    so_sap_rest  = sap[~sap["_vk"].isin(common)].drop(columns=["_vk"]).reset_index(drop=True)
+
+    return ok, so_sped_rest, so_sap_rest
+
+
 def _agregar_sap_f100(df_contas: pd.DataFrame) -> pd.DataFrame:
-    """
-    Agrega os créditos de PIS/COFINS a Recuperar do diário SAP relacionados
-    a operações do Bloco F (regime misto não-NF-e).
 
-    Critério de identificação automática: a 'Conta de contrapartida' de
-    cada lançamento é um código contábil quando começa com dígito
-    (ex: '4.01.03.03.0001'), e um código de parceiro quando começa com
-    letra (ex: 'F04989').  Apenas os primeiros são de natureza F100.
-
-    Lógica de valor líquido por conta de contrapartida:
-      NET = sum(Débito) − sum(Crédito)
-    Apenas entradas com NET > 0 são retornadas (créditos efetivos).
-
-    Retorna df com colunas: COD_CTA, NOME_CONTA, VL_PIS_SAP, VL_COFINS_SAP.
-    """
-    # Lookup: código SAP → nome da conta (exclui as contas de recuperação)
     _excluir = {CONTA_PIS_RECUPERAR, CONTA_COFINS_RECUPERAR}
     _nome_lookup: dict = {}
     for _, r in df_contas.iterrows():
@@ -515,8 +498,7 @@ def _agregar_sap_f100(df_contas: pd.DataFrame) -> pd.DataFrame:
         rows = []
         for contra, grp in linhas.groupby("Conta de contrapartida"):
             contra_str = str(contra).strip()
-            # Aceita apenas contrapartidas que são códigos contábeis (começam
-            # com dígito).  Códigos de parceiro (F00019…) são de NF-e/D100.
+
             if not contra_str[:1].isdigit():
                 continue
             deb  = grp["Débito (MC)"].apply(_limpar_valor_sap).sum()
@@ -543,20 +525,10 @@ def _agregar_sap(
     df_sap: pd.DataFrame,
     filtro_filial: Optional[str] = None,
 ) -> tuple:
-    """
-    Agrega valores do diário SAP separando saídas de entradas, e
-    retorna (df_saidas_agg, df_entradas_agg).
 
-    Parâmetros
-    ----------
-    df_sap : planilha do diário SAP (extrai_dados_planilha_sap).
-    filtro_filial : substring do nome da filial a incluir (ex: 'Goiânia').
-        Útil quando o SPED cobre apenas um estabelecimento e o diário
-        consolida múltiplas filiais. Se None, usa todas as linhas.
-    """
     df = _propagar_num_doc(df_sap)
 
-    # [FIX-6] Filtro de filial
+
     if filtro_filial and "Nome da filial" in df.columns:
         df = df[df["Nome da filial"].str.contains(filtro_filial, na=False)]
 
@@ -577,16 +549,12 @@ def _agregar_sap(
                     return grupo[grupo["Cta.cont./Nome PN"] == conta_pref]
         return grupo
 
-    # Agrupa por (NUM_DOC, campo, conta) e aplica filtro canônico
+
     df_saidas_linhas  = df[df["Cta.cont./Nome PN"].isin(CONTAS_SAIDA)]
     df_entradas_linhas = df[df["Cta.cont./Nome PN"].isin(CONTAS_ENTRADA)]
 
     def _agg_sap(df_linhas: pd.DataFrame, natureza: str) -> pd.DataFrame:
-            """
-            natureza='saida'   → valor líquido = soma(Crédito) − soma(Débito)
-            natureza='entrada' → valor líquido = soma(Débito)  − soma(Crédito)
-            Estornos (lançamentos invertidos) se anulam automaticamente.
-            """
+
             if df_linhas.empty:
                 return pd.DataFrame(columns=["NUM_DOC"])
 
@@ -621,15 +589,10 @@ def _agregar_sap(
     return _agg_sap(df_saidas_linhas, "saida"), _agg_sap(df_entradas_linhas, "entrada")
 
 
-# =============================================================================
-# METADADOS (usados em gera_lancamentos_ajuste — sem alterações de lógica)
-# =============================================================================
+
 
 def _extrair_contrapartidas(df_sap: pd.DataFrame) -> dict:
-    """
-    Identifica dinamicamente a conta de contrapartida para lançamentos
-    unilaterais (saídas: conta do cliente; entradas: Mercadorias para Revenda).
-    """
+
     df = _propagar_num_doc(df_sap)
     if "Nome da filial" not in df.columns:
         df["Nome da filial"] = ""
@@ -694,10 +657,7 @@ def _extrair_contrapartidas(df_sap: pd.DataFrame) -> dict:
 
 
 def _extrair_metadados_contas(df_sap: pd.DataFrame) -> dict:
-    """
-    Extrai metadados (código, lado, CC, filial, obs) de cada conta de
-    imposto mapeada, por (num_doc, campo). Usado em gera_lancamentos_ajuste.
-    """
+
     df = _propagar_num_doc(df_sap)
     if "Nome da filial" not in df.columns:
         df["Nome da filial"] = ""
@@ -731,18 +691,10 @@ def _extrair_metadados_contas(df_sap: pd.DataFrame) -> dict:
     return idx
 
 
-# =============================================================================
-# SERIALIZAÇÃO
-# =============================================================================
-
 def _df_para_json(df: pd.DataFrame) -> list:
     """Converte DataFrame para lista de dicts JSON-safe."""
     return json.loads(df.to_json(orient="records", force_ascii=False, date_format="iso"))
 
-
-# =============================================================================
-# FUNÇÕES PRINCIPAIS
-# =============================================================================
 
 def gera_lancamentos_so_sped(
     df_sap_raw: pd.DataFrame,
@@ -751,18 +703,7 @@ def gera_lancamentos_so_sped(
     so_sped_f100: pd.DataFrame,
     so_sped_c500: pd.DataFrame,
 ) -> pd.DataFrame:
-    """
-    Gera lançamentos sugeridos para registros presentes apenas no SPED.
 
-    Como não há lançamento SAP de referência, os códigos das contas de
-    PIS/COFINS a Recuperar são extraídos de outros lançamentos do diário SAP.
-    A conta de contrapartida fica em branco — deve ser preenchida manualmente
-    antes da importação.
-
-    Colunas do DataFrame retornado: mesmas de gera_lancamentos_ajuste, com
-    Sentido = "Só SPED".
-    """
-    # Extrai código contábil das contas de recuperação do diário SAP
     _cod_pis = _cod_cofins = ""
     for _, r in df_sap_raw.iterrows():
         nome = str(r.get("Cta.cont./Nome PN", "")).strip()
@@ -810,7 +751,6 @@ def gera_lancamentos_so_sped(
                 "Sentido":            "Só SPED",
             })
 
-    # Bloco C — entradas (NF-e recebidas só no SPED)
     for _, row in so_sped_entrada.iterrows():
         num  = str(row.get("NUM_DOC", ""))
         chv  = str(row.get("CHV_NFE", ""))
@@ -818,7 +758,6 @@ def gera_lancamentos_so_sped(
         desc = f"NF {num}" if num else f"CHV {chv[:20]}"
         _lanc(row.get("VL_PIS", 0), row.get("VL_COFINS", 0), desc, num, chv, cnpj)
 
-    # Bloco D — transporte (CT-e só no SPED)
     for _, row in so_sped_transporte.iterrows():
         num  = str(row.get("NUM_DOC", ""))
         chv  = str(row.get("CHV_CTE", ""))
@@ -826,7 +765,6 @@ def gera_lancamentos_so_sped(
         desc = f"CT-e {num}" if num else f"CTE {chv[:20]}"
         _lanc(row.get("VL_PIS_D", 0), row.get("VL_COFINS_D", 0), desc, num, chv, cnpj)
 
-    # Bloco F — F100 só no SPED (partida dobrada com contas fixas por IND_OPER)
     for _, row in so_sped_f100.iterrows():
         cod_cta  = str(row.get("COD_CTA", ""))
         nome_cta = str(row.get("NOME_CONTA", ""))
@@ -873,15 +811,7 @@ def gera_lancamentos_so_sped(
 
 
 def gera_lancamentos_m110_m510(dfs: dict) -> pd.DataFrame:
-    """
-    Gera lançamentos avulsos para ajustes de crédito M110 (PIS) e M510 (COFINS).
 
-    Empresa: CNPJ da matriz (registro 0000 do SPED).
-    Centro de Custo: OBRAS (sempre).
-
-    IND_AJ=0 → Db 4.01.01.01.0001  /  Cr conta PIS ou COFINS
-    IND_AJ=1 → Db conta PIS ou COFINS  /  Cr 4.01.01.01.0001
-    """
     _df0 = dfs.get("0000", pd.DataFrame())
     cnpj_matriz = str(_df0["CNPJ"].iloc[0]).strip() if not _df0.empty and "CNPJ" in _df0.columns else ""
 
@@ -932,15 +862,7 @@ def gera_lancamentos_m110_m510(dfs: dict) -> pd.DataFrame:
 
 
 def gera_lancamentos_f120(dfs: dict) -> pd.DataFrame:
-    """
-    Gera lançamentos avulsos para F120 (bens do ativo imobilizado — crédito 48 meses).
 
-    Valores: VL_PIS e VL_COFINS diretos do registro.
-    Direção: IND_ORIG_CRED (0=mercado interno, 1=importação).
-      0: Db 5.01.01.06.000x / Cr 1.01.05.01.000x
-      1: Db 1.01.05.01.000x / Cr 5.01.01.06.000x
-    Centro de Custo: OBRAS. Empresa: CNPJ_ESTAB do F010.
-    """
     df_f120 = dfs.get("F120", pd.DataFrame())
     if df_f120.empty:
         return pd.DataFrame()
@@ -984,16 +906,7 @@ def gera_lancamentos_f120(dfs: dict) -> pd.DataFrame:
 
 
 def gera_lancamentos_m215_m615(dfs: dict) -> pd.DataFrame:
-    """
-    Gera lançamentos avulsos para ajustes de base M215 (PIS) e M615 (COFINS).
 
-    Valor = VL_AJ_BC × alíquota (PIS: 1,65%; COFINS: 7,6%).
-    Centro de Custo: OBRAS.
-    Empresa: CNPJ da matriz (registro 0000 do SPED).
-
-    IND_AJ=0 (e COD_AJ_BC preenchido): Db 2.01.01.04.000x / Cr 4.01.01.01.0001
-    IND_AJ=1:                           Db 4.01.01.01.0001 / Cr 2.01.01.04.000x
-    """
     _df0 = dfs.get("0000", pd.DataFrame())
     cnpj_matriz = str(_df0["CNPJ"].iloc[0]).strip() if not _df0.empty and "CNPJ" in _df0.columns else ""
 
@@ -1053,16 +966,7 @@ def gera_lancamentos_estorno_so_sap(
     so_sap_df: pd.DataFrame,
     df_sap_raw: pd.DataFrame,
 ) -> pd.DataFrame:
-    """
-    Gera estorno integral para registros presentes apenas no SAP com tipo
-    DS (Devolução de Saída), NS (Nota de Saída) ou NE (Nota de Entrada).
 
-    Para cada NUM_DOC só-SAP desses tipos, inverte todas as linhas do
-    diário SAP que possuem contas mapeadas em MAPA_CONTAS_SAP
-    (Débito ↔ Crédito).
-
-    LC e padrão não identificado → somente advertência, sem lançamento.
-    """
     if so_sap_df.empty or "TIPO_DOC" not in so_sap_df.columns:
         return pd.DataFrame()
 
@@ -1083,9 +987,6 @@ def gera_lancamentos_estorno_so_sap(
     if df_det.empty:
         return pd.DataFrame()
 
-    # Agrega por (NUM_DOC, conta, cod, cc, filial) calculando NET = Σ Débito - Σ Crédito.
-    # Se o SAP já tem o original + um estorno para o mesmo NUM_DOC, o NET é 0
-    # e nenhum lançamento é gerado (evita estornos que se anulam).
     df_det["_deb"] = df_det["Débito (MC)"].apply(_limpar_valor_sap)
     df_det["_cred"] = df_det["Crédito (MC)"].apply(_limpar_valor_sap)
 
@@ -1095,7 +996,7 @@ def gera_lancamentos_estorno_so_sap(
     ].groupby(["NUM_DOC", "Cta.cont./Nome PN"]):
         net_deb  = round(grp["_deb"].sum() - grp["_cred"].sum(), 2)
         if abs(net_deb) <= TOLERANCIA:
-            continue  # já estornado no SAP — net zero, nada a fazer
+            continue  
 
         cod    = str(grp["Cta.contáb./cód.PN"].iloc[0]).strip()
         tipo   = str(grp["TIPO_DOC"].iloc[0]).strip()
@@ -1125,14 +1026,7 @@ def gera_lancamentos_estorno_so_sap(
 
 
 def _normaliza_m_para_comparacao(dfs: dict) -> list:
-    """
-    Converte M110/M215/M510/M615 para o formato de linha da aba Comparação
-    (só SPED — sem contrapartida SAP).
 
-    Campos retornados: REG, NUM_DOC, VL_PIS, VL_COFINS, CNPJ_ESTAB +
-    campos específicos de cada REG para exibição.
-    CNPJ_ESTAB: sempre o CNPJ da matriz (registro 0000 do SPED).
-    """
     _df0 = dfs.get("0000", pd.DataFrame())
     cnpj_matriz = str(_df0["CNPJ"].iloc[0]).strip() if not _df0.empty and "CNPJ" in _df0.columns else ""
 
@@ -1185,10 +1079,7 @@ def _normaliza_m_para_comparacao(dfs: dict) -> list:
 
 
 def _normaliza_f120_para_comparacao(dfs: dict) -> list:
-    """
-    Converte F120 para o formato de linha da aba Comparação
-    (só SPED — sem contrapartida SAP).
-    """
+
     df_f120 = dfs.get("F120", pd.DataFrame())
     if df_f120.empty:
         return []
@@ -1217,65 +1108,77 @@ def compara_gera_diferenca(
     planilha_diario: str,
     filtro_filial: Optional[str] = None,
 ) -> dict:
-    """
-    Compara valores de impostos entre SPED (C100/C170 e D100/D101/D105)
-    e planilha SAP, separando saídas, entradas NF-e e entradas CT-e.
-
-    Parâmetros
-    ----------
-    arquivo_sped    : caminho do arquivo EFD-Contribuições (.txt).
-    planilha_diario : caminho da planilha do diário SAP (.xlsx).
-    filtro_filial   : substring do nome da filial no SAP (ex: 'Goiânia').
-        Use quando o SPED cobre apenas um estabelecimento e o diário
-        consolida múltiplas filiais. Se None, usa todas as linhas SAP.
-
-    Chaves de cruzamento
-    --------------------
-    SPED Bloco C (saída)   → C100.NUM_DOC       × SAP Ref.3 (Linha)
-    SPED Bloco C (entrada) → C100.CHV_NFE        × SAP CHV_NFE (via lookup)
-    SPED Bloco D (CT-e)    → D100.CHV_CTE        × SAP CHV_CTE (via lookup NUM_DOC)
-
-    Retorna dict com grupos de chaves:
-    - DataFrames: 'divergencias_saida', 'divergencias_entrada',
-                  'divergencias_transporte',
-                  'ok_saida', 'ok_entrada', 'ok_transporte',
-                  'so_sped_saida', 'so_sped_entrada', 'so_sped_transporte',
-                  'so_sap_saida', 'so_sap_entrada', 'so_sap_transporte',
-                  'lancamentos'.
-    - JSON equivalente: sufixo '_json' em cada chave acima.
-    """
+ 
     dfs    = extrai_dados_sped(arquivo_sped)
     df_sap = extrai_dados_planilha_sap(planilha_diario)
 
-    # ── Bloco C ──────────────────────────────────────────────────────────────
     df_sped_saidas, df_sped_entradas  = _agregar_sped(dfs)
     df_sap_saidas,  df_sap_entradas_raw = _agregar_sap(df_sap, filtro_filial)
 
-    # Documentos CT-e (D100) e energia/telecom (C500) têm comparações próprias;
-    # excluí-los aqui evita que apareçam como só-SAP na comparação NF-e (entradas)
-    # enquanto df_sap_entradas_raw permanece intacto para o bloco C500 abaixo.
+    df_sped_a100_s, df_sped_a100_e = _agregar_sped_a100(dfs)
+
+    ok_a_s_val, df_sped_a100_s, df_sap_saidas = _valor_match_a100(
+        df_sped_a100_s, df_sap_saidas
+    )
+
+    _sap_entradas_pool = df_sap_entradas_raw.copy()
+    ok_a_e_val, df_sped_a100_e, _sap_entradas_pool = _valor_match_a100(
+        df_sped_a100_e, _sap_entradas_pool
+    )
+
+    _a100_saida_nums  = (
+        set(df_sped_a100_s["NUM_DOC"].astype(str)) if not df_sped_a100_s.empty else set()
+    )
+    _a100_entrada_nums = (
+        set(df_sped_a100_e["NUM_DOC"].astype(str)) if not df_sped_a100_e.empty else set()
+    )
+
+    df_sap_a100_s = (
+        df_sap_saidas[df_sap_saidas["NUM_DOC"].isin(_a100_saida_nums)].copy()
+        if _a100_saida_nums
+        else pd.DataFrame(columns=list(df_sap_saidas.columns))
+    )
+    if _a100_saida_nums:
+        df_sap_saidas = df_sap_saidas[
+            ~df_sap_saidas["NUM_DOC"].isin(_a100_saida_nums)
+        ].copy()
+
+    _a100_raw = dfs.get("A100", pd.DataFrame())
+    _chv_nfse_lookup = (
+        _a100_raw[
+            (_a100_raw["IND_OPER"].astype(str) == "0") & _a100_raw["CHV_NFSE"].notna()
+        ][["NUM_DOC", "CHV_NFSE"]]
+        .drop_duplicates("NUM_DOC")
+        if not _a100_raw.empty
+        else pd.DataFrame(columns=["NUM_DOC", "CHV_NFSE"])
+    )
+    df_sap_a100_e = (
+        _sap_entradas_pool[_sap_entradas_pool["NUM_DOC"].isin(_a100_entrada_nums)]
+        .merge(_chv_nfse_lookup, on="NUM_DOC", how="left")
+        .pipe(lambda d: d[d["CHV_NFSE"].notna()].copy())
+        if _a100_entrada_nums
+        else pd.DataFrame(columns=list(df_sap_entradas_raw.columns) + ["CHV_NFSE"])
+    )
+
     _excluir_de_entradas_nfe = (
         set(dfs["D100"]["NUM_DOC"].astype(str)) if not dfs["D100"].empty else set()
     ) | (
         set(dfs["C500"]["NUM_DOC"].astype(str)) if not dfs["C500"].empty else set()
-    )
+    ) | _a100_entrada_nums
     _df_entradas_nfe = (
         df_sap_entradas_raw[~df_sap_entradas_raw["NUM_DOC"].isin(_excluir_de_entradas_nfe)]
         if _excluir_de_entradas_nfe else df_sap_entradas_raw
     )
 
-    # Enriquece df_sap_entradas com CHV_NFE do SPED C100 para cruzamento
     _chv_lookup = (
         dfs["C100"][dfs["C100"]["IND_OPER"] == "0"][["NUM_DOC", "CHV_NFE"]]
         .drop_duplicates("NUM_DOC")
     )
     df_sap_entradas = _df_entradas_nfe.merge(_chv_lookup, on="NUM_DOC", how="left")
 
-    # ── Bloco D ──────────────────────────────────────────────────────────────
+
     df_sped_transp = _agregar_sped_d(dfs)
 
-    # Agrega SAP para transporte: contas de frete (entradas) filtradas por
-    # NUM_DOC que também aparecem no D100, depois enriquecidas com CHV_CTE.
     _chv_cte_lookup = pd.DataFrame()
     if not dfs["D100"].empty:
         _chv_cte_lookup = (
@@ -1283,13 +1186,11 @@ def compara_gera_diferenca(
             .drop_duplicates("NUM_DOC")
         )
 
-    # Usa _agregar_sap mas só com as contas de frete; depois faz lookup da chave
     df_sap_transp_saida, df_sap_transp_entrada = _agregar_sap(df_sap, filtro_filial)
-    # Mantém apenas entradas com conta de frete (VL_SERV_SAP presente)
     df_sap_transp = df_sap_transp_entrada.copy()
     if "VL_SERV_SAP" not in df_sap_transp.columns:
         df_sap_transp["VL_SERV_SAP"] = 0.0
-    # Remove linhas sem valor de frete
+
     df_sap_transp = df_sap_transp[df_sap_transp.get("VL_SERV_SAP", 0) != 0].copy()
 
     if not _chv_cte_lookup.empty:
@@ -1297,7 +1198,7 @@ def compara_gera_diferenca(
     if "CHV_CTE" not in df_sap_transp.columns:
         df_sap_transp["CHV_CTE"] = pd.Series(dtype=str)
 
-    # ── Comparações ──────────────────────────────────────────────────────────
+
     comparacoes_saida = {
         "ICMS":   ("VL_ICMS",   "VL_ICMS_SAP"),
         "PIS":    ("VL_PIS",    "VL_PIS_SAP"),
@@ -1316,16 +1217,7 @@ def compara_gera_diferenca(
     }
 
     def _processar_lado(df_sped_agg, df_sap_agg, comparacoes, chave="NUM_DOC", extra_cols=None):
-        """
-        Faz o merge, calcula deltas e separa divergências/ok/só-um-lado.
 
-        chave="NUM_DOC"  → saídas (emissão própria, número único por empresa)
-        chave="CHV_NFE"  → entradas NF-e
-        chave="CHV_CTE"  → entradas CT-e (Bloco D)
-        chave="COD_CTA"  → F100 (com extra_cols=["IND_OPER"] para carregar o IND_OPER)
-
-        extra_cols: colunas adicionais do lado SPED a preservar nos DataFrames de saída.
-        """
         df = pd.merge(df_sped_agg, df_sap_agg, on=chave, how="outer", indicator=True)
 
         if "NUM_DOC_x" in df.columns:
@@ -1404,18 +1296,13 @@ def compara_gera_diferenca(
         df_sped_c500, df_sap_c500, comparacoes_c500, chave="NUM_DOC"
     )
 
-    # Marca registros C500 para o frontend identificar o bloco correto
     for _df in [div_c5, ok_c5, so_sped_c5, so_sap_c5]:
         if not _df.empty:
             _df["_c500"] = True
 
-    # ── Bloco F (F100 — demais operações sem nota fiscal) ────────────────────
-    # Usa o mesmo df_sap já carregado; _agregar_sap_f100 filtra automaticamente
-    # as contrapartidas contábeis (começam com dígito) das de parceiro (F…).
     df_sped_f100 = _agregar_sped_f100(dfs)
     df_sap_f100  = _agregar_sap_f100(df_sap)
 
-    # Lookup código → nome a partir do próprio diário SAP
     _excluir_f = {CONTA_PIS_RECUPERAR, CONTA_COFINS_RECUPERAR}
     _nome_f100 = {
         str(r.get("Cta.contáb./cód.PN", "")).strip(): str(r.get("Cta.cont./Nome PN", "")).strip()
@@ -1435,13 +1322,30 @@ def compara_gera_diferenca(
         extra_cols=["IND_OPER", "DESC_DOC_OPER"],
     )
 
-    # Adiciona nome da conta em div, ok e só-SPED (só-SAP já tem NOME_CONTA
-    # via _agregar_sap_f100)
     for _df in [div_f, ok_f, so_sped_f]:
         if not _df.empty and "COD_CTA" in _df.columns:
             _df.insert(1, "NOME_CONTA", _df["COD_CTA"].map(_nome_f100).fillna(""))
 
-    # Lançamentos de ajuste (NF-e saídas + CT-e + C500 + F100)
+    comparacoes_a100 = {
+        "PIS":    ("VL_PIS",    "VL_PIS_SAP"),
+        "COFINS": ("VL_COFINS", "VL_COFINS_SAP"),
+    }
+
+    div_a_s, ok_a_s_num, so_sped_a_s, so_sap_a_s = _processar_lado(
+        df_sped_a100_s, df_sap_a100_s, comparacoes_a100, chave="NUM_DOC"
+    )
+    div_a_e, ok_a_e_num, so_sped_a_e, so_sap_a_e = _processar_lado(
+        df_sped_a100_e, df_sap_a100_e, comparacoes_a100, chave="CHV_NFSE"
+    )
+
+    ok_a_s = pd.concat([ok_a_s_val, ok_a_s_num], ignore_index=True)
+    ok_a_e = pd.concat([ok_a_e_val, ok_a_e_num], ignore_index=True)
+
+    for _df in [div_a_s, ok_a_s, so_sped_a_s, so_sap_a_s,
+                div_a_e, ok_a_e, so_sped_a_e, so_sap_a_e]:
+        if not _df.empty:
+            _df["_a100"] = True
+
     df_lanc_nf   = gera_lancamentos_ajuste(
         pd.concat([div_s, div_t, div_c5], ignore_index=True),
         df_sap,
@@ -1449,7 +1353,6 @@ def compara_gera_diferenca(
     df_lanc_f100 = gera_lancamentos_ajuste_f100(div_f)
     df_lanc = pd.concat([df_lanc_nf, df_lanc_f100], ignore_index=True)
 
-    # Lançamentos sugeridos para registros só no SPED (sem contrapartida SAP)
     df_lanc_so_sped = gera_lancamentos_so_sped(
         df_sap,
         so_sped_e,
@@ -1458,40 +1361,33 @@ def compara_gera_diferenca(
         so_sped_c5,
     )
 
-    # Lançamentos avulsos M110 (PIS crédito) e M510 (COFINS crédito)
     df_lanc_m = gera_lancamentos_m110_m510(dfs)
-    # Lançamentos avulsos M215 (PIS débito) e M615 (COFINS débito)
-    df_lanc_m2 = gera_lancamentos_m215_m615(dfs)
-    # Lançamentos avulsos F120 (ativo imobilizado — crédito 48 meses)
-    df_lanc_f120 = gera_lancamentos_f120(dfs)
-    # M/F120 têm checkboxes próprios no front — não mesclar com só-SPED de NF-e/CT-e
 
-    # Registros M110/M215/M510/M615 e F120 normalizados para a aba Comparação
+    df_lanc_m2 = gera_lancamentos_m215_m615(dfs)
+
+    df_lanc_f120 = gera_lancamentos_f120(dfs)
+
     so_sped_m    = _normaliza_m_para_comparacao(dfs)
     so_sped_f120 = _normaliza_f120_para_comparacao(dfs)
 
-    # Estorno integral para DS/NS/NE só no SAP (existem no SAP mas não no SPED)
     _so_sap_com_num_doc = pd.concat(
         [df for df in [so_sap_s, so_sap_e, so_sap_t, so_sap_c5]
          if not df.empty and "NUM_DOC" in df.columns and "TIPO_DOC" in df.columns],
         ignore_index=True,
     )
-    # Documentos que existem no SPED (qualquer bloco) devem gerar divergência,
-    # não estorno — evita estornos falsos para devoluções, fretes e energia/telecom
+
     _sped_todos_num_docs = (
         set(dfs["C100"]["NUM_DOC"].astype(str)) if not dfs["C100"].empty else set()
     ) | (
         set(dfs["D100"]["NUM_DOC"].astype(str)) if not dfs["D100"].empty else set()
     ) | (
         set(dfs["C500"]["NUM_DOC"].astype(str)) if not dfs["C500"].empty else set()
-    )
+    ) | _a100_saida_nums | _a100_entrada_nums
     if _sped_todos_num_docs:
         _so_sap_com_num_doc = _so_sap_com_num_doc[
             ~_so_sap_com_num_doc["NUM_DOC"].isin(_sped_todos_num_docs)
         ].copy()
-        # Remove do "Só SAP" de saídas documentos que existem no SPED com
-        # classificação diferente (ex: DS no SAP = C100 IND_OPER=0 no SPED).
-        # Esses documentos não são genuinamente "só SAP".
+
         if "NUM_DOC" in so_sap_s.columns:
             so_sap_s = so_sap_s[
                 ~so_sap_s["NUM_DOC"].isin(_sped_todos_num_docs)
@@ -1499,7 +1395,6 @@ def compara_gera_diferenca(
     df_lanc_estorno = gera_lancamentos_estorno_so_sap(_so_sap_com_num_doc, df_sap)
 
     return {
-        # DataFrames — Bloco C (NF-e)
         "divergencias_saida":       div_s,
         "divergencias_entrada":     div_e,
         "ok_saida":                 ok_s,
@@ -1507,26 +1402,25 @@ def compara_gera_diferenca(
         "so_sped_saida":            so_sped_s,
         "so_sped_entrada":          so_sped_e,
         "so_sap_saida":             so_sap_s,
-        "so_sap_entrada":           so_sap_e,
-        # DataFrames — Bloco D (CT-e / transporte)
+
         "divergencias_transporte":  div_t,
         "ok_transporte":            ok_t,
         "so_sped_transporte":       so_sped_t,
         "so_sap_transporte":        so_sap_t,
-        # DataFrames — Bloco F (F100)
+
         "divergencias_f100":        div_f,
         "ok_f100":                  ok_f,
         "so_sped_f100":             so_sped_f,
         "so_sap_f100":              so_sap_f,
-        # DataFrames — Bloco C500 (energia / telecom)
+
         "divergencias_c500":        div_c5,
         "ok_c500":                  ok_c5,
         "so_sped_c500":             so_sped_c5,
         "so_sap_c500":              so_sap_c5,
-        # Lançamentos consolidados
+   
         "lancamentos":              df_lanc,
         "lancamentos_so_sped":      df_lanc_so_sped,
-        # JSON equivalentes
+
         "divergencias_saida_json":      _df_para_json(div_s),
         "divergencias_entrada_json":    _df_para_json(div_e),
         "ok_saida_json":                _df_para_json(ok_s),
@@ -1555,6 +1449,14 @@ def compara_gera_diferenca(
         "lancamentos_f120_json":             _df_para_json(df_lanc_f120),
         "so_sped_m_json":                    so_sped_m,
         "so_sped_f120_json":                 so_sped_f120,
+        "divergencias_a100_saida_json":      _df_para_json(div_a_s),
+        "ok_a100_saida_json":                _df_para_json(ok_a_s),
+        "so_sped_a100_saida_json":           _df_para_json(so_sped_a_s),
+        "so_sap_a100_saida_json":            _df_para_json(so_sap_a_s),
+        "divergencias_a100_entrada_json":    _df_para_json(div_a_e),
+        "ok_a100_entrada_json":              _df_para_json(ok_a_e),
+        "so_sped_a100_entrada_json":         _df_para_json(so_sped_a_e),
+        "so_sap_a100_entrada_json":          _df_para_json(so_sap_a_e),
     }
 
 
@@ -1562,23 +1464,7 @@ def gera_lancamentos_ajuste(
     df_divergencias: pd.DataFrame,
     df_sap_raw: pd.DataFrame,
 ) -> pd.DataFrame:
-    """
-    Gera lançamentos de ajuste no formato de importação SAP para todas
-    as notas com divergência de saída.
 
-    Lógica do ajuste (SPED é considerado correto):
-      DELTA = SPED - SAP
-      DELTA < 0 → SAP a maior → estorno: inverte os lados
-      DELTA > 0 → SAP a menor → complemento: mantém os lados
-      Valor do lançamento = |DELTA|
-
-    Contas e metadados vêm exclusivamente da planilha SAP.
-
-    Colunas do DataFrame retornado:
-      Formato importação : Código da Conta, Descrição da Conta,
-                           Débito, Crédito, Descrição, Centro de Custo, Filial
-      Rastreabilidade    : NUM_DOC, CHV_NFE, Imposto, DELTA, Sentido
-    """
     idx_meta          = _extrair_metadados_contas(df_sap_raw)
     idx_contrapartida = _extrair_contrapartidas(df_sap_raw)
     linhas = []
@@ -1643,17 +1529,7 @@ def gera_lancamentos_ajuste(
 def gera_lancamentos_ajuste_f100(
     df_divergencias_f100: pd.DataFrame,
 ) -> pd.DataFrame:
-    """
-    Gera lançamentos de ajuste para divergências F100 (Bloco F).
 
-    Usa contas fixas de CONTAS_F100_AVULSO por IND_OPER:
-      IND_OPER=0 (Direito):
-        DELTA > 0 → Db conta_fixa / Cr COD_CTA
-        DELTA < 0 → Cr conta_fixa / Db COD_CTA
-      IND_OPER=1 (Obrigação):
-        DELTA > 0 → Db COD_CTA / Cr conta_fixa
-        DELTA < 0 → Cr COD_CTA / Db conta_fixa
-    """
     if df_divergencias_f100.empty:
         return pd.DataFrame()
 

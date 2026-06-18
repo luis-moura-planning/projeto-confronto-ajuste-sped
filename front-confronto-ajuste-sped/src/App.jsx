@@ -51,6 +51,7 @@ const _M_REGS = new Set(["M110", "M215", "M510", "M615"]);
 function _bloco(r) {
   if (_M_REGS.has(r.REG)) return "M";
   if (r.REG === "F120") return "F120";
+  if (r._a100 || r.CHV_NFSE != null) return "A100";
   if (r.COD_CTA != null) return "F100";
   if (r.CHV_CTE != null) return "D";
   if (r._c500 || r.VL_PIS_C5 != null || r.VL_COFINS_C5 != null) return "C500";
@@ -60,10 +61,11 @@ function _bloco(r) {
 const BLOCO_CLASS = {
   C: "app-bloco--c", D: "app-bloco--d", F100: "app-bloco--f100",
   C500: "app-bloco--c500", M: "app-bloco--m", F120: "app-bloco--f120c",
+  A100: "app-bloco--a100",
 };
 const BLOCO_LABEL = {
   C: "C100", D: "D100", F100: "F100",
-  C500: "C500", M: "M", F120: "F120",
+  C500: "C500", M: "M", F120: "F120", A100: "A100",
 };
 
 function _blocoLabel(r) {
@@ -197,7 +199,7 @@ export default function App() {
     if (!_busca) return true;
     return (
       String(r.NUM_DOC    ?? "").toLowerCase().includes(_busca) ||
-      String(r.CHV_NFE    ?? r.CHV_CTE ?? "").toLowerCase().includes(_busca) ||
+      String(r.CHV_NFE    ?? r.CHV_CTE ?? r.CHV_NFSE ?? "").toLowerCase().includes(_busca) ||
       String(r.COD_CTA    ?? "").toLowerCase().includes(_busca) ||
       String(r.NOME_CONTA ?? "").toLowerCase().includes(_busca) ||
       String(r.CNPJ_ESTAB ?? "").toLowerCase().includes(_busca) ||
@@ -553,9 +555,9 @@ export default function App() {
                             ) : "—"}
                           </td>
                           <td>
-                            {row.CHV_NFE || row.CHV_CTE ? (
+                            {row.CHV_NFE || row.CHV_CTE || row.CHV_NFSE ? (
                               <code className="g-mono" style={{ fontSize: 11, whiteSpace: "nowrap" }}>
-                                {row.CHV_NFE ?? row.CHV_CTE}
+                                {row.CHV_NFE ?? row.CHV_CTE ?? row.CHV_NFSE}
                               </code>
                             ) : (row.NOME_CONTA || row.DESC_DOC_OPER) ? (
                               <Trunc maxW={250}><span style={{ fontSize: 12 }}>{row.DESC_DOC_OPER || row.NOME_CONTA}</span></Trunc>

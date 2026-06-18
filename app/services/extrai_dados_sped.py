@@ -29,8 +29,7 @@ def extrai_dados_sped(sped_txt: str) -> dict:
             "VL_BC_COFINS", "ALIQ_COFINS", "QUANT_BC_COFINS", "ALIQ_COFINS_QUANT",
             "VL_COFINS", "COD_CTA",
         ],
-        # Bloco D — Serviços de Transporte
-        # D100: cabeçalho do documento (CT-e, CRT, etc.)
+
         "D100": [
             "REG", "IND_OPER", "IND_EMIT", "COD_PART", "COD_MOD", "COD_SIT",
             "SER", "SUB", "NUM_DOC", "CHV_CTE", "DT_DOC", "DT_A_P",
@@ -38,42 +37,40 @@ def extrai_dados_sped(sped_txt: str) -> dict:
             "VL_SERV", "VL_BC_ICMS", "VL_ICMS", "VL_NT", "COD_INF",
             "COD_CTA",
         ],
-        # D101: complemento do D100 — PIS/Pasep
+
         "D101": [
             "REG", "IND_NAT_FRT", "VL_ITEM", "CST_PIS", "NAT_BC_CRED",
             "VL_BC_PIS", "ALIQ_PIS", "VL_PIS", "COD_CTA",
         ],
-        # D105: complemento do D100 — Cofins
+
         "D105": [
             "REG", "IND_NAT_FRT", "VL_ITEM", "CST_COFINS", "NAT_BC_CRED",
             "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS", "COD_CTA",
         ],
-        # Bloco C — Energia Elétrica / Serviços de Comunicação
-        # C500: cabeçalho do documento (energia, telecom, etc.)
+
         "C500": [
             "REG", "COD_PART", "COD_MOD", "COD_SIT", "SER", "SUB",
             "NUM_DOC", "DT_DOC", "DT_ENT", "VL_DOC", "VL_ICMS", "COD_INF",
             "VL_PIS", "VL_COFINS", "CHV_DOCe",
         ],
-        # C501: complemento do C500 — PIS/Pasep
+
         "C501": [
             "REG", "CST_PIS", "VL_ITEM", "NAT_BC_CRED",
             "VL_BC_PIS", "ALIQ_PIS", "VL_PIS", "COD_CTA",
         ],
-        # C505: complemento do C500 — Cofins
+  
         "C505": [
             "REG", "CST_COFINS", "VL_ITEM", "NAT_BC_CRED",
             "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS", "COD_CTA",
         ],
-        # Bloco F — Demais Documentos e Operações
-        # F100: demais receitas e operações geradoras de crédito
+
         "F100": [
             "REG", "IND_OPER", "COD_PART", "COD_ITEM", "DT_OPER", "VL_OPER",
             "CST_PIS", "VL_BC_PIS", "ALIQ_PIS", "VL_PIS",
             "CST_COFINS", "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS",
             "NAT_BC_CRED", "IND_ORIG_CRED", "COD_CTA", "COD_CCUS", "DESC_DOC_OPER",
         ],
-        # F120: bens incorporados ao ativo imobilizado (crédito 48 meses)
+
         "F120": [
             "REG", "NAT_BC_CRED", "IDENT_BEM_IMOB", "IND_ORIG_CRED",
             "IND_UTIL_BEM_IMOB", "VL_OPER_DEP", "PARC_OPER_NAO_BC_CRED",
@@ -81,48 +78,45 @@ def extrai_dados_sped(sped_txt: str) -> dict:
             "CST_COFINS", "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS",
             "COD_CTA", "COD_CCUS", "DESC_BEM_IMOB",
         ],
-        # Bloco M — Apuração da Contribuição e Crédito do PIS/Pasep
-        # M110: ajuste da base de crédito PIS (filho de M100)
+
         "M110": [
             "REG", "IND_AJ", "VL_AJ", "COD_AJ", "NUM_DOC", "DESCR_AJ", "DT_REF",
         ],
-        # M215: ajuste da base de contribuição PIS (filho de M210)
+
         "M215": [
             "REG", "IND_AJ_BC", "VL_AJ_BC", "COD_AJ_BC", "NUM_DOC",
             "DESCR_AJ_BC", "DT_REF", "COD_CTA", "CNPJ", "INFO_COMPL",
         ],
-        # Bloco M — Apuração da Contribuição e Crédito da COFINS
-        # M510: ajuste da base de crédito COFINS (filho de M500)
+
         "M510": [
             "REG", "IND_AJ", "VL_AJ", "COD_AJ", "NUM_DOC", "DESCR_AJ", "DT_REF",
         ],
-        # M615: ajuste da base de contribuição COFINS (filho de M610)
+
         "M615": [
             "REG", "IND_AJ_BC", "VL_AJ_BC", "COD_AJ_BC", "NUM_DOC",
             "DESCR_AJ_BC", "DT_REF", "COD_CTA", "CNPJ", "INFO_COMPL",
         ],
-        # Bloco A — Serviços (NFS-e)
-        # A100: cabeçalho do documento de serviço
+
         "A100": [
             "REG", "IND_OPER", "IND_EMIT", "COD_PART", "COD_SIT", "SER", "SUB",
             "NUM_DOC", "CHV_NFSE", "DT_DOC", "DT_EXE_SERV", "VL_DOC",
             "IND_PGTO", "VL_DESC", "VL_BC_PIS", "VL_PIS", "VL_BC_COFINS",
             "VL_COFINS", "VL_PIS_RET", "VL_COFINS_RET", "VL_ISS",
         ],
-        # A110: informações complementares (filho de A100)
+
         "A110": [
             "REG", "COD_INF", "TXT_COMPL",
         ],
-        # A111: processo referenciado (filho de A100)
+
         "A111": [
             "REG", "NUM_PROC", "IND_PROC",
         ],
-        # A120: apuração da contribuição (filho de A100)
+
         "A120": [
             "REG", "VL_TOT_SERV", "VL_BC_PIS", "VL_PIS_IMP", "DT_PAG_PIS",
             "VL_BC_COFINS", "VL_COFINS_IMP", "DT_PAG_COFINS", "LOC_EXE_SERV",
         ],
-        # A170: itens do documento de serviço (filho de A100)
+
         "A170": [
             "REG", "NUM_ITEM", "COD_ITEM", "DESCR_COMPL", "VL_ITEM", "VL_DESC",
             "NAT_BC_CRED", "IND_ORIG_CRED", "CST_PIS", "VL_BC_PIS", "ALIQ_PIS",
@@ -132,18 +126,18 @@ def extrai_dados_sped(sped_txt: str) -> dict:
     }
 
     dados = {"0000": [], "C100": [], "C170": [], "C500": [], "C501": [], "C505": [], "D100": [], "D101": [], "D105": [], "F100": [], "F120": [], "M110": [], "M215": [], "M510": [], "M615": [], "A100": [], "A110": [], "A111": [], "A120": [], "A170": []}
-    # CNPJ do estabelecimento atual — atualizado a cada C010 / A010 / etc.
+
     cnpj_atual = ""
     nota_atual_chv = ""
     nota_atual_valida = True
-    # Controle de estado para o Bloco C500
+
     c500_atual_chv = ""
     c500_atual_num = ""
     c500_atual_valida = True
-    # Controle de estado para o Bloco D
+
     d100_atual_chv = ""
     d100_atual_valida = True
-    # Controle de estado para o Bloco A
+
     a100_atual_chv = ""
     a100_atual_num = ""
     a100_atual_valida = True
@@ -158,7 +152,7 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                 campos = linha.strip("|").split("|")
                 reg = campos[0]
 
-                # A010 / C010 / D010 / F010 / M010 — atualiza o CNPJ do estabelecimento ativo
+
                 if reg in ("A010", "C010", "D010", "F010", "M010"):
                     cnpj_atual = campos[1] if len(campos) > 1 else ""
                     continue
@@ -217,7 +211,6 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                     dados["D100"].append(registro)
 
                 elif reg in ("D101", "D105"):
-                    # Filhos do D100 — herdam a chave do CT-e pai
                     if not d100_atual_valida:
                         continue
                     registro["CHV_CTE"] = d100_atual_chv

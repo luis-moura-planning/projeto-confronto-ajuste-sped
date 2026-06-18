@@ -36,6 +36,8 @@ async def comparar(
                 + resultado["divergencias_transporte_json"]
                 + resultado["divergencias_f100_json"]
                 + resultado["divergencias_c500_json"]
+                + resultado["divergencias_a100_saida_json"]
+                + resultado["divergencias_a100_entrada_json"]
             ),
             "ok": (
                 resultado["ok_saida_json"]
@@ -43,6 +45,8 @@ async def comparar(
                 + resultado["ok_transporte_json"]
                 + resultado["ok_f100_json"]
                 + resultado["ok_c500_json"]
+                + resultado["ok_a100_saida_json"]
+                + resultado["ok_a100_entrada_json"]
             ),
             "so_sped": (
                 resultado["so_sped_saida_json"]
@@ -52,6 +56,8 @@ async def comparar(
                 + resultado["so_sped_c500_json"]
                 + resultado["so_sped_m_json"]
                 + resultado["so_sped_f120_json"]
+                + resultado["so_sped_a100_saida_json"]
+                + resultado["so_sped_a100_entrada_json"]
             ),
             "so_sap": (
                 resultado["so_sap_saida_json"]
@@ -59,6 +65,8 @@ async def comparar(
                 + resultado["so_sap_transporte_json"]
                 + resultado["so_sap_f100_json"]
                 + resultado["so_sap_c500_json"]
+                + resultado["so_sap_a100_saida_json"]
+                + resultado["so_sap_a100_entrada_json"]
             ),
             "lancamentos":                resultado["lancamentos_json"],
             "lancamentos_so_sped":        resultado["lancamentos_so_sped_json"],
