@@ -393,10 +393,11 @@ def _agregar_sped_f100(dfs: dict) -> pd.DataFrame:
     """
     Agrega F100 por (COD_CTA, IND_OPER).
 
-    IND_OPER=0 → entradas (crédito PIS/COFINS — CC: OBRAS)
-    IND_OPER=1 → saídas/avulsos                (CC: ADMIN)
+    IND_OPER=0 → entradas (crédito PIS/COFINS — CC: OBRAS), agregadas por COD_CTA.
+    IND_OPER=1 → saídas/avulsos (CC: ADMIN), mantidas linha a linha com DESC_DOC_OPER
+                 para exibição individual no "Só SPED".
 
-    Retorna df com colunas: COD_CTA, IND_OPER, VL_PIS, VL_COFINS.
+    Retorna df com colunas: COD_CTA, IND_OPER, VL_PIS, VL_COFINS [, DESC_DOC_OPER, CNPJ_ESTAB].
     """
     f100 = dfs.get("F100", pd.DataFrame())
     if f100.empty:
@@ -406,12 +407,29 @@ def _agregar_sped_f100(dfs: dict) -> pd.DataFrame:
     f100["VL_PIS"]    = f100["VL_PIS"].apply(_to_float)
     f100["VL_COFINS"] = f100["VL_COFINS"].apply(_to_float)
 
-    _grp = ["COD_CTA", "IND_OPER"]
-    df_f = f100.groupby(_grp)[COLS_SPED_F100].sum().reset_index()
-    if "CNPJ_ESTAB" in f100.columns:
-        cnpj_f = f100.groupby(_grp)["CNPJ_ESTAB"].first().reset_index()
-        df_f = df_f.merge(cnpj_f, on=_grp, how="left")
-    return df_f
+    _cnpj = ["CNPJ_ESTAB"] if "CNPJ_ESTAB" in f100.columns else []
+    _grp  = ["COD_CTA", "IND_OPER"]
+
+    # IND_OPER=0 (créditos/direitos): agrega por COD_CTA
+    df_oper0 = f100[f100["IND_OPER"].astype(str) == "0"]
+    if not df_oper0.empty:
+        df_agg0 = df_oper0.groupby(_grp)[COLS_SPED_F100].sum().reset_index()
+        if _cnpj:
+            cnpj_f = df_oper0.groupby(_grp)["CNPJ_ESTAB"].first().reset_index()
+            df_agg0 = df_agg0.merge(cnpj_f, on=_grp, how="left")
+    else:
+        df_agg0 = pd.DataFrame(columns=_grp + COLS_SPED_F100 + _cnpj)
+
+    # IND_OPER=1 (receitas financeiras/avulsos): mantém linha a linha
+    df_oper1 = f100[f100["IND_OPER"].astype(str) == "1"].copy()
+    if not df_oper1.empty:
+        _desc = ["DESC_DOC_OPER"] if "DESC_DOC_OPER" in df_oper1.columns else []
+        _keep = _grp + COLS_SPED_F100 + _cnpj + _desc
+        df_oper1 = df_oper1[[c for c in _keep if c in df_oper1.columns]].reset_index(drop=True)
+    else:
+        df_oper1 = pd.DataFrame(columns=_grp + COLS_SPED_F100 + _cnpj)
+
+    return pd.concat([df_agg0, df_oper1], ignore_index=True)
 
 
 def _agregar_sped_c500(dfs: dict) -> pd.DataFrame:
@@ -1414,7 +1432,7 @@ def compara_gera_diferenca(
         df_sap_f100,
         comparacoes_f100,
         chave="COD_CTA",
-        extra_cols=["IND_OPER"],
+        extra_cols=["IND_OPER", "DESC_DOC_OPER"],
     )
 
     # Adiciona nome da conta em div, ok e só-SPED (só-SAP já tem NOME_CONTA

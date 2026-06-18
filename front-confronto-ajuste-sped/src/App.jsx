@@ -62,9 +62,14 @@ const BLOCO_CLASS = {
   C500: "app-bloco--c500", M: "app-bloco--m", F120: "app-bloco--f120c",
 };
 const BLOCO_LABEL = {
-  C: "Bloco C", D: "Bloco D", F100: "F100",
-  C500: "C500", M: "Bloco M", F120: "F120",
+  C: "C100", D: "D100", F100: "F100",
+  C500: "C500", M: "M", F120: "F120",
 };
+
+function _blocoLabel(r) {
+  const b = _bloco(r);
+  return b === "M" ? (r.REG ?? "M") : BLOCO_LABEL[b];
+}
 
 const OPCOES_POR_PAGINA = [10, 20, 50, 100];
 
@@ -198,7 +203,7 @@ export default function App() {
       String(r.CNPJ_ESTAB ?? "").toLowerCase().includes(_busca) ||
       String(r.COD_AJ ?? r.COD_AJ_BC ?? r.IDENT_BEM_IMOB ?? "").toLowerCase().includes(_busca) ||
       String(r.DESCR_AJ ?? r.DESCR_AJ_BC ?? r.DESC_BEM_IMOB ?? "").toLowerCase().includes(_busca) ||
-      BLOCO_LABEL[_bloco(r)].toLowerCase().includes(_busca)
+      _blocoLabel(r).toLowerCase().includes(_busca)
     );
   });
 
@@ -552,16 +557,16 @@ export default function App() {
                               <code className="g-mono" style={{ fontSize: 11, whiteSpace: "nowrap" }}>
                                 {row.CHV_NFE ?? row.CHV_CTE}
                               </code>
-                            ) : row.NOME_CONTA ? (
-                              <Trunc maxW={250}><span style={{ fontSize: 12 }}>{row.NOME_CONTA}</span></Trunc>
+                            ) : (row.NOME_CONTA || row.DESC_DOC_OPER) ? (
+                              <Trunc maxW={250}><span style={{ fontSize: 12 }}>{row.DESC_DOC_OPER || row.NOME_CONTA}</span></Trunc>
                             ) : (row.DESCR_AJ || row.DESCR_AJ_BC || row.DESC_BEM_IMOB) ? (
                               <Trunc maxW={250}>{row.DESCR_AJ ?? row.DESCR_AJ_BC ?? row.DESC_BEM_IMOB}</Trunc>
                             ) : "—"}
                           </td>
                           <td>
-                            {(() => { const b = _bloco(row); return (
+                            {row._tipo !== "so_sap" && (() => { const b = _bloco(row); return (
                               <span className={`app-bloco ${BLOCO_CLASS[b]}`}>
-                                {BLOCO_LABEL[b]}
+                                {_blocoLabel(row)}
                               </span>
                             ); })()}
                           </td>
