@@ -848,12 +848,15 @@ def gera_lancamentos_m110_m510(dfs: dict) -> pd.DataFrame:
     """
     Gera lançamentos avulsos para ajustes de crédito M110 (PIS) e M510 (COFINS).
 
-    Empresa: CNPJ_ESTAB herdado do M010.
+    Empresa: CNPJ da matriz (registro 0000 do SPED).
     Centro de Custo: OBRAS (sempre).
 
     IND_AJ=0 → Db 4.01.01.01.0001  /  Cr conta PIS ou COFINS
     IND_AJ=1 → Db conta PIS ou COFINS  /  Cr 4.01.01.01.0001
     """
+    _df0 = dfs.get("0000", pd.DataFrame())
+    cnpj_matriz = str(_df0["CNPJ"].iloc[0]).strip() if not _df0.empty and "CNPJ" in _df0.columns else ""
+
     linhas = []
     for reg, imposto in [("M110", "PIS"), ("M510", "COFINS")]:
         df_m = dfs.get(reg, pd.DataFrame())
@@ -865,7 +868,7 @@ def gera_lancamentos_m110_m510(dfs: dict) -> pd.DataFrame:
             vl_aj    = _to_float(row.get("VL_AJ", 0))
             if abs(vl_aj) <= TOLERANCIA:
                 continue
-            cnpj     = str(row.get("CNPJ_ESTAB", "") or "")
+            cnpj     = cnpj_matriz
             num_doc  = str(row.get("NUM_DOC", ""))
             cod_aj   = str(row.get("COD_AJ", ""))
             descr_aj = str(row.get("DESCR_AJ", ""))
@@ -958,10 +961,14 @@ def gera_lancamentos_m215_m615(dfs: dict) -> pd.DataFrame:
 
     Valor = VL_AJ_BC × alíquota (PIS: 1,65%; COFINS: 7,6%).
     Centro de Custo: OBRAS.
+    Empresa: CNPJ da matriz (registro 0000 do SPED).
 
     IND_AJ=0 (e COD_AJ_BC preenchido): Db 2.01.01.04.000x / Cr 4.01.01.01.0001
     IND_AJ=1:                           Db 4.01.01.01.0001 / Cr 2.01.01.04.000x
     """
+    _df0 = dfs.get("0000", pd.DataFrame())
+    cnpj_matriz = str(_df0["CNPJ"].iloc[0]).strip() if not _df0.empty and "CNPJ" in _df0.columns else ""
+
     linhas = []
     for reg, imposto, aliq in [("M215", "PIS", ALIQ_M215), ("M615", "COFINS", ALIQ_M615)]:
         df_m = dfs.get(reg, pd.DataFrame())
@@ -983,7 +990,7 @@ def gera_lancamentos_m215_m615(dfs: dict) -> pd.DataFrame:
 
             num_doc  = str(row.get("NUM_DOC", ""))
             descr_aj = str(row.get("DESCR_AJ_BC", ""))
-            cnpj     = str(row.get("CNPJ_ESTAB", "") or "")
+            cnpj     = cnpj_matriz
             desc     = f"{reg} {cod_aj}" + (f" - {descr_aj}" if descr_aj else "")
 
             if ind_aj == "0":
@@ -1096,7 +1103,11 @@ def _normaliza_m_para_comparacao(dfs: dict) -> list:
 
     Campos retornados: REG, NUM_DOC, VL_PIS, VL_COFINS, CNPJ_ESTAB +
     campos específicos de cada REG para exibição.
+    CNPJ_ESTAB: sempre o CNPJ da matriz (registro 0000 do SPED).
     """
+    _df0 = dfs.get("0000", pd.DataFrame())
+    cnpj_matriz = str(_df0["CNPJ"].iloc[0]).strip() if not _df0.empty and "CNPJ" in _df0.columns else ""
+
     linhas = []
 
     for reg in ("M110", "M510"):
@@ -1112,7 +1123,7 @@ def _normaliza_m_para_comparacao(dfs: dict) -> list:
                 "NUM_DOC":    str(row.get("NUM_DOC",  "") or ""),
                 "VL_PIS":     round(abs(vl_aj), 2) if reg == "M110" else 0.0,
                 "VL_COFINS":  round(abs(vl_aj), 2) if reg == "M510" else 0.0,
-                "CNPJ_ESTAB": str(row.get("CNPJ_ESTAB", "") or ""),
+                "CNPJ_ESTAB": cnpj_matriz,
                 "COD_AJ":     str(row.get("COD_AJ",   "") or ""),
                 "DESCR_AJ":   str(row.get("DESCR_AJ",  "") or ""),
                 "IND_AJ":     str(row.get("IND_AJ",    "") or ""),
@@ -1136,7 +1147,7 @@ def _normaliza_m_para_comparacao(dfs: dict) -> list:
                 "NUM_DOC":     str(row.get("NUM_DOC", "") or ""),
                 "VL_PIS":      valor if reg == "M215" else 0.0,
                 "VL_COFINS":   valor if reg == "M615" else 0.0,
-                "CNPJ_ESTAB":  str(row.get("CNPJ_ESTAB",   "") or ""),
+                "CNPJ_ESTAB":  cnpj_matriz,
                 "COD_AJ_BC":   cod_aj,
                 "DESCR_AJ_BC": str(row.get("DESCR_AJ_BC",  "") or ""),
                 "IND_AJ_BC":   ind_aj,
