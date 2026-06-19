@@ -146,6 +146,9 @@ _COD_PN = _re.compile(r"^[CF]\d+", _re.IGNORECASE)
 _PREFIXOS_TIPO_DOC = frozenset({"DS", "NS", "NE", "LC"})
 TIPOS_ESTORNO = frozenset({"DS", "NS", "NE"})
 
+# Contas SAP de depreciação (F120) — excluídas do agrupamento F100
+_CONTAS_SAP_F120 = frozenset({"5.01.01.06.0003", "5.01.01.06.0004"})
+
 
 # =============================================================================
 # AUXILIARES
@@ -481,8 +484,14 @@ def _valor_match_a100(
     return ok, so_sped_rest, so_sap_rest
 
 
-def _agregar_sap_f100(df_contas: pd.DataFrame) -> pd.DataFrame:
+def _agregar_sap_f100(df_contas: pd.DataFrame) -> tuple:
+    """Retorna (df_all, lc_only_contas).
 
+    df_all          — totais SAP considerando todos os tipos de documento (DS/NS/NE + LC + OUTRO).
+    lc_only_contas  — frozenset de COD_CTAs que possuem APENAS lançamentos avulsos (LC/OUTRO)
+                      no SAP, sem nenhuma entrada de documento fiscal (DS/NS/NE). Para essas
+                      contas a divergência gera somente advertência, sem lançamento contábil.
+    """
     _excluir = {CONTA_PIS_RECUPERAR, CONTA_COFINS_RECUPERAR}
     _nome_lookup: dict = {}
     for _, r in df_contas.iterrows():
@@ -491,15 +500,19 @@ def _agregar_sap_f100(df_contas: pd.DataFrame) -> pd.DataFrame:
         if cod and nome not in _excluir:
             _nome_lookup[cod] = nome
 
-    def _net(conta_nome: str, campo: str) -> pd.DataFrame:
-        linhas = df_contas[df_contas["Cta.cont./Nome PN"] == conta_nome]
+    df_prop        = _propagar_num_doc(df_contas)
+    df_fiscal_prop = df_prop[df_prop["TIPO_DOC"].isin(TIPOS_ESTORNO)]
+
+    def _net(df_src: pd.DataFrame, conta_nome: str, campo: str) -> pd.DataFrame:
+        linhas = df_src[df_src["Cta.cont./Nome PN"] == conta_nome]
         if linhas.empty:
             return pd.DataFrame(columns=["COD_CTA", campo])
         rows = []
         for contra, grp in linhas.groupby("Conta de contrapartida"):
             contra_str = str(contra).strip()
-
             if not contra_str[:1].isdigit():
+                continue
+            if contra_str in _CONTAS_SAP_F120:
                 continue
             deb  = grp["Débito (MC)"].apply(_limpar_valor_sap).sum()
             cred = grp["Crédito (MC)"].apply(_limpar_valor_sap).sum()
@@ -508,17 +521,28 @@ def _agregar_sap_f100(df_contas: pd.DataFrame) -> pd.DataFrame:
                 rows.append({"COD_CTA": contra_str, campo: net})
         return pd.DataFrame(rows) if rows else pd.DataFrame(columns=["COD_CTA", campo])
 
-    df_pis = _net(CONTA_PIS_RECUPERAR,    "VL_PIS_SAP")
-    df_cof = _net(CONTA_COFINS_RECUPERAR, "VL_COFINS_SAP")
+    def _merge(df_src: pd.DataFrame) -> pd.DataFrame:
+        df_pis = _net(df_src, CONTA_PIS_RECUPERAR,    "VL_PIS_SAP")
+        df_cof = _net(df_src, CONTA_COFINS_RECUPERAR, "VL_COFINS_SAP")
+        if df_pis.empty and df_cof.empty:
+            return pd.DataFrame(columns=["COD_CTA", "VL_PIS_SAP", "VL_COFINS_SAP"])
+        df = df_pis.merge(df_cof, on="COD_CTA", how="outer")
+        df["VL_PIS_SAP"]    = df["VL_PIS_SAP"].fillna(0.0)
+        df["VL_COFINS_SAP"] = df["VL_COFINS_SAP"].fillna(0.0)
+        return df
 
-    if df_pis.empty and df_cof.empty:
-        return pd.DataFrame(columns=["COD_CTA", "NOME_CONTA", "VL_PIS_SAP", "VL_COFINS_SAP"])
+    df_all    = _merge(df_prop)
+    df_fiscal = _merge(df_fiscal_prop)
 
-    df = df_pis.merge(df_cof, on="COD_CTA", how="outer")
-    df["VL_PIS_SAP"]    = df["VL_PIS_SAP"].fillna(0.0)
-    df["VL_COFINS_SAP"] = df["VL_COFINS_SAP"].fillna(0.0)
-    df.insert(1, "NOME_CONTA", df["COD_CTA"].map(_nome_lookup).fillna(""))
-    return df
+    if df_all.empty:
+        return pd.DataFrame(columns=["COD_CTA", "NOME_CONTA", "VL_PIS_SAP", "VL_COFINS_SAP"]), frozenset()
+
+    df_all.insert(1, "NOME_CONTA", df_all["COD_CTA"].map(_nome_lookup).fillna(""))
+
+    fiscal_contas  = frozenset(df_fiscal["COD_CTA"].tolist()) if not df_fiscal.empty else frozenset()
+    lc_only_contas = frozenset(df_all["COD_CTA"].tolist()) - fiscal_contas
+
+    return df_all, lc_only_contas
 
 
 def _agregar_sap(
@@ -1301,7 +1325,7 @@ def compara_gera_diferenca(
             _df["_c500"] = True
 
     df_sped_f100 = _agregar_sped_f100(dfs)
-    df_sap_f100  = _agregar_sap_f100(df_sap)
+    df_sap_f100, lc_contas_f100 = _agregar_sap_f100(df_sap)
 
     _excluir_f = {CONTA_PIS_RECUPERAR, CONTA_COFINS_RECUPERAR}
     _nome_f100 = {
@@ -1350,7 +1374,7 @@ def compara_gera_diferenca(
         pd.concat([div_s, div_t, div_c5], ignore_index=True),
         df_sap,
     )
-    df_lanc_f100 = gera_lancamentos_ajuste_f100(div_f)
+    df_lanc_f100 = gera_lancamentos_ajuste_f100(div_f, lc_contas=lc_contas_f100)
     df_lanc = pd.concat([df_lanc_nf, df_lanc_f100], ignore_index=True)
 
     df_lanc_so_sped = gera_lancamentos_so_sped(
@@ -1528,6 +1552,7 @@ def gera_lancamentos_ajuste(
 
 def gera_lancamentos_ajuste_f100(
     df_divergencias_f100: pd.DataFrame,
+    lc_contas: frozenset = frozenset(),
 ) -> pd.DataFrame:
 
     if df_divergencias_f100.empty:
@@ -1538,12 +1563,14 @@ def gera_lancamentos_ajuste_f100(
     linhas = []
     for _, row in df_divergencias_f100.iterrows():
         cod_cta    = str(row["COD_CTA"])
+        if cod_cta in lc_contas:
+            continue
         nome_cta   = str(row.get("NOME_CONTA", ""))
         cnpj_estab = str(row.get("CNPJ_ESTAB", "") or "")
         ind_oper   = str(row.get("IND_OPER", "0"))
         cc         = CC_F100.get(ind_oper, "OBRAS")
         regra      = CONTAS_F100_AVULSO.get(ind_oper, CONTAS_F100_AVULSO["0"])
-        desc       = f"F100 {cod_cta}" + (f" - {nome_cta}" if nome_cta else "")
+        desc       = f"F100" + (f" - {nome_cta}" if nome_cta else "")
 
         for delta_col, imposto in _DELTA_F100.items():
             if delta_col not in row.index:
