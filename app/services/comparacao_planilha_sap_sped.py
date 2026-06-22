@@ -1526,6 +1526,20 @@ def compara_gera_diferenca(
     so_sped_m    = _normaliza_m_para_comparacao(dfs)
     so_sped_f120 = _normaliza_f120_para_comparacao(dfs)
 
+    _f120_df = dfs.get("F120", pd.DataFrame())
+    if not _f120_df.empty:
+        _sped_pis_f120 = round(_f120_df["VL_PIS"].apply(_to_float).sum(), 2)
+        _sped_cof_f120 = round(_f120_df["VL_COFINS"].apply(_to_float).sum(), 2)
+        comparacao_f120 = [{
+            "REG":          "F120",
+            "VL_PIS":       _sped_pis_f120,
+            "VL_PIS_SAP":   sap_f120_totais.get("VL_PIS_SAP",    0.0),
+            "VL_COFINS":    _sped_cof_f120,
+            "VL_COFINS_SAP": sap_f120_totais.get("VL_COFINS_SAP", 0.0),
+        }]
+    else:
+        comparacao_f120 = []
+
     _so_sap_com_num_doc = pd.concat(
         [df for df in [so_sap_s, so_sap_e, so_sap_t, so_sap_c5]
          if not df.empty and "NUM_DOC" in df.columns and "TIPO_DOC" in df.columns],
@@ -1606,6 +1620,7 @@ def compara_gera_diferenca(
         "lancamentos_f120_delta_json":       _df_para_json(df_lanc_f120_delta),
         "so_sped_m_json":                    so_sped_m,
         "so_sped_f120_json":                 so_sped_f120,
+        "comparacao_f120_json":              comparacao_f120,
         "divergencias_a100_saida_json":      _df_para_json(div_a_s),
         "ok_a100_saida_json":                _df_para_json(ok_a_s),
         "so_sped_a100_saida_json":           _df_para_json(so_sped_a_s),

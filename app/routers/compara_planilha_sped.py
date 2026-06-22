@@ -38,6 +38,7 @@ async def comparar(
                 + resultado["divergencias_c500_json"]
                 + resultado["divergencias_a100_saida_json"]
                 + resultado["divergencias_a100_entrada_json"]
+                + resultado["comparacao_f120_json"]
             ),
             "ok": (
                 resultado["ok_saida_json"]
