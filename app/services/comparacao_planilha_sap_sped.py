@@ -453,10 +453,14 @@ def _valor_match_a100(
         sap[col_cof_sap].fillna(0).round(2).astype(str)
     )
 
-    common = (
-        set(sped.loc[~sped["_vk"].duplicated(keep=False), "_vk"]) &
-        set(sap.loc[~sap["_vk"].duplicated(keep=False),  "_vk"])
-    )
+    # Chaves que aparecem com a mesma contagem nos dois lados são casáveis
+    # (inclui o caso de duplicatas simétricas, ex.: dois A100 com mesmo PIS/COFINS).
+    sped_cnt = sped["_vk"].value_counts()
+    sap_cnt  = sap["_vk"].value_counts()
+    common = {
+        k for k in set(sped_cnt.index) & set(sap_cnt.index)
+        if sped_cnt[k] == sap_cnt[k]
+    }
 
     if not common:
         return (
@@ -468,12 +472,21 @@ def _valor_match_a100(
     sped_hit = sped[sped["_vk"].isin(common)].copy()
     sap_hit  = sap[sap["_vk"].isin(common)].copy()
 
+    # Para duplicatas simétricas, o merge simples geraria produto cartesiano.
+    # Usamos índice posicional dentro de cada grupo de chaves para evitar isso.
+    sped_hit["_vk_pos"] = sped_hit.groupby("_vk").cumcount()
+    sap_hit["_vk_pos"]  = sap_hit.groupby("_vk").cumcount()
+    sped_hit["_vk_full"] = sped_hit["_vk"] + "|" + sped_hit["_vk_pos"].astype(str)
+    sap_hit["_vk_full"]  = sap_hit["_vk"] + "|" + sap_hit["_vk_pos"].astype(str)
 
-    sap_extra_cols = [c for c in sap_hit.columns if c != "_vk" and c not in sped_hit.columns]
+    sap_extra_cols = [
+        c for c in sap_hit.columns
+        if c not in ("_vk", "_vk_pos", "_vk_full") and c not in sped_hit.columns
+    ]
     ok = (
         sped_hit
-        .merge(sap_hit[["_vk"] + sap_extra_cols], on="_vk", how="inner")
-        .drop(columns=["_vk"])
+        .merge(sap_hit[["_vk_full"] + sap_extra_cols], on="_vk_full", how="inner")
+        .drop(columns=["_vk", "_vk_pos", "_vk_full"])
         .reset_index(drop=True)
     )
     ok["_a100"] = True
@@ -1306,9 +1319,14 @@ def compara_gera_diferenca(
         if _excluir_de_entradas_nfe else df_sap_entradas_raw
     )
 
+    # Use only creditable SPED entries to build the CHV lookup.
+    # Non-creditable C100 entries (CST_PIS 70-75/98/99) are excluded from
+    # df_sped_entradas; using them here would assign a SPED CHV to an SAP
+    # entry that never appears on the SPED side, causing a false "SÓ SAP".
     _chv_lookup = (
-        dfs["C100"][dfs["C100"]["IND_OPER"] == "0"][["NUM_DOC", "CHV_NFE"]]
-        .drop_duplicates("NUM_DOC")
+        df_sped_entradas[["NUM_DOC", "CHV_NFE"]].drop_duplicates("NUM_DOC")
+        if not df_sped_entradas.empty and "CHV_NFE" in df_sped_entradas.columns
+        else pd.DataFrame(columns=["NUM_DOC", "CHV_NFE"])
     )
     df_sap_entradas = _df_entradas_nfe.merge(_chv_lookup, on="NUM_DOC", how="left")
 
