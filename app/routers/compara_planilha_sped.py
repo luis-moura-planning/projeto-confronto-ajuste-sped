@@ -74,6 +74,7 @@ async def comparar(
             "lancamentos_m110_m510":      resultado["lancamentos_m110_m510_json"],
             "lancamentos_m215_m615":      resultado["lancamentos_m215_m615_json"],
             "lancamentos_f120":           resultado["lancamentos_f120_json"],
+            "lancamentos_f120_delta":     resultado["lancamentos_f120_delta_json"],
         }
 
     except ValueError as exc:

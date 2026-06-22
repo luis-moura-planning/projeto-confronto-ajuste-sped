@@ -141,7 +141,22 @@
   font-size: var(--g-fs-14);
 }
 
+/* ── Linhas F120 Delta ──────────────────────────────────────── */
+.app-row-f120-delta td       { background: #f0f9ff; }
+.app-row-f120-delta:hover td { background: #e0f2fe; }
+
+/* ── Alerta F120 Delta ──────────────────────────────────────── */
+.app-alert-f120-delta {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  color: #075985;
+  border-radius: var(--g-radius-sm);
+  padding: 12px 16px;
+  font-size: var(--g-fs-14);
+}
+
 /* ── Cores dos checkboxes avulsos ───────────────────────────── */
-.app-check-m-cred { color: #065f46; }
-.app-check-m-deb  { color: #5b21b6; }
-.app-check-f120   { color: #0c4a6e; }
+.app-check-m-cred      { color: #065f46; }
+.app-check-m-deb       { color: #5b21b6; }
+.app-check-f120        { color: #0c4a6e; }
+.app-check-f120-delta  { color: #075985; }

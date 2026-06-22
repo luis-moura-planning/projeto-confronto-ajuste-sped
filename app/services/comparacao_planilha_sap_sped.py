@@ -545,13 +545,37 @@ def _agregar_sap_f100(df_contas: pd.DataFrame) -> tuple:
     return df_all, lc_only_contas
 
 
+def _agregar_sap_f120(df_contas: pd.DataFrame) -> dict:
+    """Soma PIS/COFINS creditados em contas de depreciação SAP (_CONTAS_SAP_F120)."""
+    pis = cof = 0.0
+    for conta_nome in (CONTA_PIS_RECUPERAR, CONTA_COFINS_RECUPERAR):
+        linhas = df_contas[df_contas["Cta.cont./Nome PN"] == conta_nome]
+        if linhas.empty:
+            continue
+        for contra, grp in linhas.groupby("Conta de contrapartida"):
+            if str(contra).strip() not in _CONTAS_SAP_F120:
+                continue
+            deb = grp["Débito (MC)"].apply(_limpar_valor_sap).sum()
+            cred = grp["Crédito (MC)"].apply(_limpar_valor_sap).sum()
+            net = round(deb - cred, 2)
+            if net <= 0:
+                continue
+            if "PIS" in conta_nome:
+                pis += net
+            else:
+                cof += net
+    return {"VL_PIS_SAP": round(pis, 2), "VL_COFINS_SAP": round(cof, 2)}
+
+
 def _agregar_sap(
     df_sap: pd.DataFrame,
     filtro_filial: Optional[str] = None,
 ) -> tuple:
 
+
     df = _propagar_num_doc(df_sap)
 
+    df = df[df["TIPO_DOC"].isin(TIPOS_ESTORNO)].copy()
 
     if filtro_filial and "Nome da filial" in df.columns:
         df = df[df["Nome da filial"].str.contains(filtro_filial, na=False)]
@@ -796,7 +820,7 @@ def gera_lancamentos_so_sped(
         ind_oper = str(row.get("IND_OPER", "0"))
         cc       = CC_F100.get(ind_oper, "OBRAS")
         regra    = CONTAS_F100_AVULSO.get(ind_oper, CONTAS_F100_AVULSO["0"])
-        desc     = f"F100 {cod_cta}" + (f" - {nome_cta}" if nome_cta else "")
+        desc     = f"F100" + (f" - {nome_cta}" if nome_cta else "")
         for imposto, col in [("PIS", "VL_PIS"), ("COFINS", "VL_COFINS")]:
             valor = _to_float(row.get(col, 0))
             if abs(valor) <= TOLERANCIA:
@@ -929,6 +953,47 @@ def gera_lancamentos_f120(dfs: dict) -> pd.DataFrame:
     return pd.DataFrame(linhas) if linhas else pd.DataFrame()
 
 
+def gera_lancamentos_f120_delta(dfs: dict, sap_f120: dict) -> pd.DataFrame:
+    """Delta entre SPED F120 total e SAP depreciação (5.01.01.06.x)."""
+    f120 = dfs.get("F120", pd.DataFrame())
+    if f120.empty:
+        return pd.DataFrame()
+    sped_pis = round(f120["VL_PIS"].apply(_to_float).sum(), 2)
+    sped_cof = round(f120["VL_COFINS"].apply(_to_float).sum(), 2)
+    sap_pis  = sap_f120.get("VL_PIS_SAP",    0.0)
+    sap_cof  = sap_f120.get("VL_COFINS_SAP", 0.0)
+    _df0 = dfs.get("0000", pd.DataFrame())
+    cnpj = str(_df0["CNPJ"].iloc[0]).strip() if not _df0.empty and "CNPJ" in _df0.columns else ""
+    linhas = []
+    for imposto, delta in [("PIS", round(sped_pis - sap_pis, 2)), ("COFINS", round(sped_cof - sap_cof, 2))]:
+        if abs(delta) <= TOLERANCIA:
+            continue
+        contas   = CONTAS_F120[imposto]
+        valor    = round(abs(delta), 2)
+        sentido  = "SAP a menor (complemento)" if delta > 0 else "SAP a maior (estorno)"
+        lado_dep  = "D" if delta > 0 else "C"
+        lado_cred = "C" if delta > 0 else "D"
+        for cod_c, nome_c, lado in [
+            (contas["dep"]["cod"],  contas["dep"]["nome"],  lado_dep),
+            (contas["cred"]["cod"], contas["cred"]["nome"], lado_cred),
+        ]:
+            linhas.append({
+                "Código da Conta":    cod_c,
+                "Descrição da Conta": nome_c,
+                "Débito":             valor if lado == "D" else None,
+                "Crédito":            valor if lado == "C" else None,
+                "Descrição":          f"F120 {imposto} - ajuste depreciacao",
+                "Centro de Custo":    "OBRAS",
+                "Filial":             cnpj,
+                "NUM_DOC":            "",
+                "CHV_NFE":            "",
+                "Imposto":            imposto,
+                "DELTA":              delta,
+                "Sentido":            sentido,
+            })
+    return pd.DataFrame(linhas) if linhas else pd.DataFrame()
+
+
 def gera_lancamentos_m215_m615(dfs: dict) -> pd.DataFrame:
 
     _df0 = dfs.get("0000", pd.DataFrame())
@@ -1046,7 +1111,54 @@ def gera_lancamentos_estorno_so_sap(
             "Sentido":            "Só SAP - Estorno",
         })
 
-    return pd.DataFrame(linhas) if linhas else pd.DataFrame()
+    if not linhas:
+        return pd.DataFrame()
+
+    # Balancear lançamentos de estorno: se um NUM_DOC ficou desbalanceado
+    # (típico em NE onde PIS/COFINS a Recuperar não têm contrapartida em MAPA_CONTAS_SAP),
+    # busca a conta de contrapartida no SAP e adiciona o lado faltante.
+    idx_cp = _extrair_contrapartidas(df_sap_raw)
+    from collections import defaultdict
+    bal_doc: dict = defaultdict(float)
+    meta_doc: dict = {}
+    for l in linhas:
+        nd = l["NUM_DOC"]
+        d = float(l["Débito"])  if l["Débito"]  is not None else 0.0
+        c = float(l["Crédito"]) if l["Crédito"] is not None else 0.0
+        bal_doc[nd] += d - c
+        meta_doc[nd] = l  # guarda última linha para herdar desc/cc/filial
+
+    extras = []
+    for nd, delta in bal_doc.items():
+        if abs(delta) <= TOLERANCIA:
+            continue
+        lado_cp = "D" if delta < 0 else "C"
+        valor_cp = round(abs(delta), 2)
+        ref = meta_doc[nd]
+        cp = None
+        for campo in ("VL_PIS_SAP", "VL_COFINS_SAP", "VL_ICMS_SAP"):
+            cp = idx_cp.get((nd, campo))
+            if cp:
+                break
+        if not cp:
+            continue
+        extras.append({
+            "Código da Conta":    cp["cod_conta"],
+            "Descrição da Conta": cp["nome_conta"],
+            "Débito":             valor_cp if lado_cp == "D" else None,
+            "Crédito":            valor_cp if lado_cp == "C" else None,
+            "Descrição":          ref["Descrição"],
+            "Centro de Custo":    cp.get("cc") or ref["Centro de Custo"],
+            "Filial":             cp.get("filial") or ref["Filial"],
+            "NUM_DOC":            nd,
+            "CHV_NFE":            "",
+            "Imposto":            "",
+            "DELTA":              None,
+            "Sentido":            "Só SAP - Estorno",
+        })
+    linhas.extend(extras)
+
+    return pd.DataFrame(linhas)
 
 
 def _normaliza_m_para_comparacao(dfs: dict) -> list:
@@ -1326,6 +1438,7 @@ def compara_gera_diferenca(
 
     df_sped_f100 = _agregar_sped_f100(dfs)
     df_sap_f100, lc_contas_f100 = _agregar_sap_f100(df_sap)
+    sap_f120_totais = _agregar_sap_f120(df_sap)
 
     _excluir_f = {CONTA_PIS_RECUPERAR, CONTA_COFINS_RECUPERAR}
     _nome_f100 = {
@@ -1390,6 +1503,7 @@ def compara_gera_diferenca(
     df_lanc_m2 = gera_lancamentos_m215_m615(dfs)
 
     df_lanc_f120 = gera_lancamentos_f120(dfs)
+    df_lanc_f120_delta = gera_lancamentos_f120_delta(dfs, sap_f120_totais)
 
     so_sped_m    = _normaliza_m_para_comparacao(dfs)
     so_sped_f120 = _normaliza_f120_para_comparacao(dfs)
@@ -1471,6 +1585,7 @@ def compara_gera_diferenca(
         "lancamentos_m110_m510_json":        _df_para_json(df_lanc_m),
         "lancamentos_m215_m615_json":        _df_para_json(df_lanc_m2),
         "lancamentos_f120_json":             _df_para_json(df_lanc_f120),
+        "lancamentos_f120_delta_json":       _df_para_json(df_lanc_f120_delta),
         "so_sped_m_json":                    so_sped_m,
         "so_sped_f120_json":                 so_sped_f120,
         "divergencias_a100_saida_json":      _df_para_json(div_a_s),
@@ -1530,6 +1645,8 @@ def gera_lancamentos_ajuste(
                     lado_cp = "C" if lado_principal == "D" else "D"
                     contas       = list(contas) + [cp]
                     lados_ajuste = lados_ajuste + [lado_cp]
+                else:
+                    continue  # sem contrapartida → lançamento seria desbalanceado, pular
 
             for c, lado_ajuste in zip(contas, lados_ajuste):
                 linhas.append({

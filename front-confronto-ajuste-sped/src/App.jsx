@@ -128,6 +128,7 @@ export default function App() {
   const [incluirM110M510, setIncluirM110M510] = useState(false);
   const [incluirM215M615, setIncluirM215M615] = useState(false);
   const [incluirF120, setIncluirF120] = useState(false);
+  const [incluirF120Delta, setIncluirF120Delta] = useState(false);
 
   const sapRef = useRef(null);
   const spedRef = useRef(null);
@@ -238,6 +239,10 @@ export default function App() {
     ? (resultado?.lancamentos_f120 ?? []).map((l) => ({ ...l, _f120: true }))
     : [];
 
+  const lancF120Delta = incluirF120Delta
+    ? (resultado?.lancamentos_f120_delta ?? []).map((l) => ({ ...l, _f120delta: true }))
+    : [];
+
   const _buscaLanc = filtroLanc.trim().toLowerCase();
   const lancamentos = [
     ...(resultado?.lancamentos ?? []),
@@ -246,6 +251,7 @@ export default function App() {
     ...lancM110M510,
     ...lancM215M615,
     ...lancF120,
+    ...lancF120Delta,
   ].filter((l) => {
     const impostoKey = (l["Imposto"] ?? "").replace(/_D$/, "");
     if (impostosAtivos[impostoKey] !== true) return false;
@@ -738,6 +744,14 @@ export default function App() {
                       />
                       F120
                     </label>
+                    <label className="g-check app-check-f120-delta">
+                      <input
+                        type="checkbox"
+                        checked={incluirF120Delta}
+                        onChange={() => { setIncluirF120Delta((v) => !v); setPaginaLanc(1); }}
+                      />
+                      F120 Delta
+                    </label>
                   </div>
                   <div
                     className="g-cluster"
@@ -810,6 +824,14 @@ export default function App() {
                     do registro.
                   </div>
                 )}
+                {incluirF120Delta && (
+                  <div className="app-alert-f120-delta">
+                    <strong>F120 Delta — Ajuste de depreciação:</strong> diferença entre o total
+                    declarado no SPED F120 e o valor registrado no SAP nas contas{" "}
+                    <code>5.01.01.06.0003/04</code>. Db <code>5.01.01.06.x</code> / Cr{" "}
+                    <code>1.01.05.01.x</code>.
+                  </div>
+                )}
 
                 {lancamentos.length === 0 ? (
                   <p className="g-empty">
@@ -852,6 +874,7 @@ export default function App() {
                               : l._m110m510  ? "app-row-m-cred"
                               : l._m215m615  ? "app-row-m-deb"
                               : l._f120      ? "app-row-f120"
+                              : l._f120delta ? "app-row-f120-delta"
                               : ""
                             }>
                               <td>
