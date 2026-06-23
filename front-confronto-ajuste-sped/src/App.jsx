@@ -75,6 +75,24 @@ function _blocoLabel(r) {
 
 const OPCOES_POR_PAGINA = [10, 20, 50, 100];
 
+const TIPOS_ROW1 = [
+  { key: "ajuste",     label: "Ajuste",      style: null },
+  { key: "soSped",     label: "Só SPED",     style: { color: "var(--g-warn-fg)" } },
+  { key: "estornoSap", label: "Estorno SAP", style: { color: "var(--g-danger)" } },
+];
+
+const BLOCOS_ROW2 = [
+  { key: "C",           label: "C100",         checkClass: "" },
+  { key: "D",           label: "D100",         checkClass: "" },
+  { key: "C500",        label: "C500",         checkClass: "" },
+  { key: "F100",        label: "F100",         checkClass: "" },
+  { key: "A100",        label: "A100",         checkClass: "app-bloco--a100" },
+  { key: "M110_M510",   label: "M110 / M510",  checkClass: "app-check-m-cred" },
+  { key: "M215_M615",   label: "M215 / M615",  checkClass: "app-check-m-deb" },
+  { key: "F120",        label: "F120",         checkClass: "app-check-f120" },
+  { key: "Desconhecido", label: "Desconhecido", checkClass: "", style: { color: "var(--g-danger)" } },
+];
+
 function fmt(val) {
   if (val == null) return "—";
   const n = Number(val);
@@ -123,12 +141,11 @@ export default function App() {
   );
   const [filtroTexto, setFiltroTexto] = useState("");
   const [filtroLanc, setFiltroLanc] = useState("");
-  const [incluirSoSped, setIncluirSoSped] = useState(false);
-  const [incluirEstornoSap, setIncluirEstornoSap] = useState(false);
-  const [incluirM110M510, setIncluirM110M510] = useState(false);
-  const [incluirM215M615, setIncluirM215M615] = useState(false);
-  const [incluirF120, setIncluirF120] = useState(false);
-  const [incluirF120Delta, setIncluirF120Delta] = useState(false);
+  const [tiposRow1, setTiposRow1] = useState({ ajuste: true, soSped: false, estornoSap: false });
+  const [blocosRow2, setBlocosRow2] = useState({
+    C: true, D: true, C500: true, F100: true, A100: false,
+    M110_M510: false, M215_M615: false, F120: false, Desconhecido: false,
+  });
 
   const sapRef = useRef(null);
   const spedRef = useRef(null);
@@ -146,9 +163,8 @@ export default function App() {
     setPorPaginaLanc(20);
     setFiltroTexto("");
     setFiltroLanc("");
-    setIncluirM110M510(false);
-    setIncluirM215M615(false);
-    setIncluirF120(false);
+    setTiposRow1({ ajuste: true, soSped: false, estornoSap: false });
+    setBlocosRow2({ C: true, D: true, C500: true, F100: true, A100: false, M110_M510: false, M215_M615: false, F120: false, Desconhecido: false });
 
     const form = new FormData();
     form.append("planilha_sap", sapFile);
@@ -219,40 +235,18 @@ export default function App() {
     paginaComp * porPaginaComp,
   );
 
-  const lancSoSped = incluirSoSped
-    ? (resultado?.lancamentos_so_sped ?? []).map((l) => ({ ...l, _soSped: true }))
-    : [];
-
-  const lancEstornoSap = incluirEstornoSap
-    ? (resultado?.lancamentos_estorno_so_sap ?? []).map((l) => ({ ...l, _estornoSap: true }))
-    : [];
-
-  const lancM110M510 = incluirM110M510
-    ? (resultado?.lancamentos_m110_m510 ?? []).map((l) => ({ ...l, _m110m510: true }))
-    : [];
-
-  const lancM215M615 = incluirM215M615
-    ? (resultado?.lancamentos_m215_m615 ?? []).map((l) => ({ ...l, _m215m615: true }))
-    : [];
-
-  const lancF120 = incluirF120
-    ? (resultado?.lancamentos_f120 ?? []).map((l) => ({ ...l, _f120: true }))
-    : [];
-
-  const lancF120Delta = incluirF120Delta
-    ? (resultado?.lancamentos_f120_delta ?? []).map((l) => ({ ...l, _f120delta: true }))
-    : [];
-
   const _buscaLanc = filtroLanc.trim().toLowerCase();
   const lancamentos = [
-    ...(resultado?.lancamentos ?? []),
-    ...lancSoSped,
-    ...lancEstornoSap,
-    ...lancM110M510,
-    ...lancM215M615,
-    ...lancF120,
-    ...lancF120Delta,
+    ...(resultado?.lancamentos ?? []).map((l) => ({ ...l, _tipoLanc: "ajuste" })),
+    ...(resultado?.lancamentos_so_sped ?? []).map((l) => ({ ...l, _tipoLanc: "soSped", _soSped: true })),
+    ...(resultado?.lancamentos_estorno_so_sap ?? []).map((l) => ({ ...l, _tipoLanc: "estornoSap", _estornoSap: true, Bloco: l.Bloco ?? "Desconhecido" })),
+    ...(resultado?.lancamentos_m110_m510 ?? []).map((l) => ({ ...l, _tipoLanc: "ajuste", _m110m510: true })),
+    ...(resultado?.lancamentos_m215_m615 ?? []).map((l) => ({ ...l, _tipoLanc: "ajuste", _m215m615: true })),
+    ...(resultado?.lancamentos_f120 ?? []).map((l) => ({ ...l, _tipoLanc: "ajuste", _f120: true })),
+    ...(resultado?.lancamentos_f120_delta ?? []).map((l) => ({ ...l, _tipoLanc: "ajuste", _f120delta: true })),
   ].filter((l) => {
+    if (!tiposRow1[l._tipoLanc]) return false;
+    if (!blocosRow2[l.Bloco ?? "C"]) return false;
     const impostoKey = (l["Imposto"] ?? "").replace(/_D$/, "");
     if (impostosAtivos[impostoKey] !== true) return false;
     if (!_buscaLanc) return true;
@@ -274,6 +268,16 @@ export default function App() {
 
   function toggleImposto(campo) {
     setImpostosAtivos((prev) => ({ ...prev, [campo]: !prev[campo] }));
+    setPaginaLanc(1);
+  }
+
+  function toggleTipo(key) {
+    setTiposRow1((prev) => ({ ...prev, [key]: !prev[key] }));
+    setPaginaLanc(1);
+  }
+
+  function toggleBloco(key) {
+    setBlocosRow2((prev) => ({ ...prev, [key]: !prev[key] }));
     setPaginaLanc(1);
   }
 
@@ -690,68 +694,50 @@ export default function App() {
                     gap: "var(--g-space-3)",
                   }}
                 >
-                  <div
-                    className="g-cluster"
-                    style={{ gap: "var(--g-space-4)" }}
-                  >
-                    {IMPOSTOS_LANC.map(({ campo, label }) => (
-                      <label key={campo} className="g-check">
-                        <input
-                          type="checkbox"
-                          checked={impostosAtivos[campo]}
-                          onChange={() => toggleImposto(campo)}
-                        />
-                        {label}
-                      </label>
-                    ))}
-                    <label className="g-check" style={{ color: "var(--g-warn-fg)" }}>
-                      <input
-                        type="checkbox"
-                        checked={incluirSoSped}
-                        onChange={() => { setIncluirSoSped((v) => !v); setPaginaLanc(1); }}
-                      />
-                      Incluir Só SPED
-                    </label>
-                    <label className="g-check" style={{ color: "var(--g-danger)" }}>
-                      <input
-                        type="checkbox"
-                        checked={incluirEstornoSap}
-                        onChange={() => { setIncluirEstornoSap((v) => !v); setPaginaLanc(1); }}
-                      />
-                      Incluir Estorno Só SAP
-                    </label>
-                    <label className="g-check app-check-m-cred">
-                      <input
-                        type="checkbox"
-                        checked={incluirM110M510}
-                        onChange={() => { setIncluirM110M510((v) => !v); setPaginaLanc(1); }}
-                      />
-                      M110 / M510
-                    </label>
-                    <label className="g-check app-check-m-deb">
-                      <input
-                        type="checkbox"
-                        checked={incluirM215M615}
-                        onChange={() => { setIncluirM215M615((v) => !v); setPaginaLanc(1); }}
-                      />
-                      M215 / M615
-                    </label>
-                    <label className="g-check app-check-f120">
-                      <input
-                        type="checkbox"
-                        checked={incluirF120}
-                        onChange={() => { setIncluirF120((v) => !v); setPaginaLanc(1); }}
-                      />
-                      F120
-                    </label>
-                    <label className="g-check app-check-f120-delta">
-                      <input
-                        type="checkbox"
-                        checked={incluirF120Delta}
-                        onChange={() => { setIncluirF120Delta((v) => !v); setPaginaLanc(1); }}
-                      />
-                      F120 Delta
-                    </label>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+                    <div className="g-cluster" style={{ gap: "var(--g-space-4)", paddingBottom: "var(--g-space-2)", borderBottom: "1px solid var(--g-border)" }}>
+                      <span className="g-helper" style={{ fontSize: 11 }}>Imposto:</span>
+                      {IMPOSTOS_LANC.map(({ campo, label }) => (
+                        <label key={campo} className="g-check">
+                          <input
+                            type="checkbox"
+                            checked={impostosAtivos[campo]}
+                            onChange={() => toggleImposto(campo)}
+                          />
+                          {label}
+                        </label>
+                      ))}
+                    </div>
+                    <div className="g-cluster" style={{ gap: "var(--g-space-4)", padding: "var(--g-space-2) 0", borderBottom: "1px solid var(--g-border)" }}>
+                      <span className="g-helper" style={{ fontSize: 11 }}>Tipo:</span>
+                      {TIPOS_ROW1.map((t) => (
+                        <label key={t.key} className="g-check" style={t.style ?? undefined}>
+                          <input
+                            type="checkbox"
+                            checked={tiposRow1[t.key]}
+                            onChange={() => toggleTipo(t.key)}
+                          />
+                          {t.label}
+                        </label>
+                      ))}
+                    </div>
+                    <div className="g-cluster" style={{ gap: "var(--g-space-3)", paddingTop: "var(--g-space-2)" }}>
+                      <span className="g-helper" style={{ fontSize: 11 }}>Bloco:</span>
+                      {BLOCOS_ROW2.map((b) => (
+                        <label
+                          key={b.key}
+                          className={`g-check${b.checkClass ? ` ${b.checkClass}` : ""}`}
+                          style={b.style ?? undefined}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={blocosRow2[b.key]}
+                            onChange={() => toggleBloco(b.key)}
+                          />
+                          {b.label}
+                        </label>
+                      ))}
+                    </div>
                   </div>
                   <div
                     className="g-cluster"
@@ -788,7 +774,7 @@ export default function App() {
                   </div>
                 </div>
 
-                {incluirSoSped && (
+                {tiposRow1.soSped && (
                   <div className="app-alert-warn">
                     <strong>Atenção — lançamentos Só SPED:</strong> esses registros existem
                     apenas no SPED e não possuem contrapartida no SAP. Os códigos de conta
@@ -796,40 +782,33 @@ export default function App() {
                     antes de importar no SAP.
                   </div>
                 )}
-                {incluirEstornoSap && (
+                {tiposRow1.estornoSap && (
                   <div className="app-alert-err">
                     <strong>Atenção — Estorno Só SAP (DS / NS / NE):</strong> esses
                     lançamentos revertem documentos fiscais que existem no SAP mas não foram
                     incluídos no SPED. Confira cada nota antes de importar o estorno.
                   </div>
                 )}
-                {incluirM110M510 && (
+                {blocosRow2.M110_M510 && (
                   <div className="app-alert-m-cred">
                     <strong>M110 / M510 — Ajuste de crédito PIS / COFINS:</strong> lançamentos
                     avulsos gerados a partir dos registros de ajuste de crédito do Bloco M.
                     Db <code>4.01.01.01.0001</code> / Cr conta de aproveitamento.
                   </div>
                 )}
-                {incluirM215M615 && (
+                {blocosRow2.M215_M615 && (
                   <div className="app-alert-m-deb">
                     <strong>M215 / M615 — Ajuste de base PIS / COFINS:</strong> valor calculado
                     como VL_AJ_BC × alíquota (PIS 1,65 % · COFINS 7,6 %).
                     Db conta a pagar / Cr <code>4.01.01.01.0001</code>.
                   </div>
                 )}
-                {incluirF120 && (
+                {blocosRow2.F120 && (
                   <div className="app-alert-f120">
-                    <strong>F120 — Ativo imobilizado (crédito 48 meses):</strong> lançamentos
-                    avulsos de depreciação de bens do ativo. Valores VL_PIS e VL_COFINS diretos
-                    do registro.
-                  </div>
-                )}
-                {incluirF120Delta && (
-                  <div className="app-alert-f120-delta">
-                    <strong>F120 Delta — Ajuste de depreciação:</strong> diferença entre o total
-                    declarado no SPED F120 e o valor registrado no SAP nas contas{" "}
-                    <code>5.01.01.06.0003/04</code>. Db <code>5.01.01.06.x</code> / Cr{" "}
-                    <code>1.01.05.01.x</code>.
+                    <strong>F120 — Ativo imobilizado (crédito 48 meses):</strong> inclui
+                    lançamentos diretos de depreciação (VL_PIS/VL_COFINS do registro) e o
+                    delta entre o total SPED e o SAP nas contas{" "}
+                    <code>5.01.01.06.0003/04</code>.
                   </div>
                 )}
 

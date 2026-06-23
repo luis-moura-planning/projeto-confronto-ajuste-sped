@@ -1501,27 +1501,52 @@ def compara_gera_diferenca(
         if not _df.empty:
             _df["_a100"] = True
 
-    df_lanc_nf   = gera_lancamentos_ajuste(
-        pd.concat([div_s, div_t, div_c5], ignore_index=True),
-        df_sap,
-    )
+    _empty_df = pd.DataFrame()
+    df_lanc_s2   = gera_lancamentos_ajuste(div_s,  df_sap) if not div_s.empty  else _empty_df
+    df_lanc_t2   = gera_lancamentos_ajuste(div_t,  df_sap) if not div_t.empty  else _empty_df
+    df_lanc_c5_2 = gera_lancamentos_ajuste(div_c5, df_sap) if not div_c5.empty else _empty_df
     df_lanc_f100 = gera_lancamentos_ajuste_f100(div_f, lc_contas=lc_contas_f100)
-    df_lanc = pd.concat([df_lanc_nf, df_lanc_f100], ignore_index=True)
+    _div_a = pd.concat([div_a_s, div_a_e], ignore_index=True)
+    df_lanc_a100 = gera_lancamentos_ajuste(_div_a, df_sap) if not _div_a.empty else _empty_df
+    for _df, bloco in [
+        (df_lanc_s2, "C"), (df_lanc_t2, "D"), (df_lanc_c5_2, "C500"),
+        (df_lanc_f100, "F100"), (df_lanc_a100, "A100"),
+    ]:
+        if not _df.empty:
+            _df["Bloco"] = bloco
+    df_lanc = pd.concat([df_lanc_s2, df_lanc_t2, df_lanc_c5_2, df_lanc_f100, df_lanc_a100], ignore_index=True)
 
-    df_lanc_so_sped = gera_lancamentos_so_sped(
-        df_sap,
-        so_sped_e,
-        so_sped_t,
-        so_sped_f,
-        so_sped_c5,
-    )
+    df_ss_c  = gera_lancamentos_so_sped(df_sap, so_sped_e,  _empty_df, _empty_df, _empty_df)
+    df_ss_d  = gera_lancamentos_so_sped(df_sap, _empty_df, so_sped_t,  _empty_df, _empty_df)
+    df_ss_f  = gera_lancamentos_so_sped(df_sap, _empty_df, _empty_df,  so_sped_f, _empty_df)
+    df_ss_c5 = gera_lancamentos_so_sped(df_sap, _empty_df, _empty_df,  _empty_df, so_sped_c5)
+    _ss_a = pd.concat([so_sped_a_s, so_sped_a_e], ignore_index=True)
+    if not _ss_a.empty:
+        if "NUM_DOC" not in _ss_a.columns:
+            _ss_a["NUM_DOC"] = ""
+        _mask = _ss_a["NUM_DOC"].isna() | (_ss_a["NUM_DOC"].astype(str) == "")
+        if "CHV_NFSE" in _ss_a.columns:
+            _ss_a.loc[_mask, "NUM_DOC"] = _ss_a.loc[_mask, "CHV_NFSE"].fillna("")
+    df_ss_a = gera_lancamentos_so_sped(df_sap, _ss_a, _empty_df, _empty_df, _empty_df)
+    for _df, bloco in [(df_ss_c, "C"), (df_ss_d, "D"), (df_ss_f, "F100"), (df_ss_c5, "C500"), (df_ss_a, "A100")]:
+        if not _df.empty:
+            _df["Bloco"] = bloco
+    df_lanc_so_sped = pd.concat([df_ss_c, df_ss_d, df_ss_f, df_ss_c5, df_ss_a], ignore_index=True)
 
     df_lanc_m = gera_lancamentos_m110_m510(dfs)
+    if not df_lanc_m.empty:
+        df_lanc_m["Bloco"] = "M110_M510"
 
     df_lanc_m2 = gera_lancamentos_m215_m615(dfs)
+    if not df_lanc_m2.empty:
+        df_lanc_m2["Bloco"] = "M215_M615"
 
     df_lanc_f120 = gera_lancamentos_f120(dfs)
+    if not df_lanc_f120.empty:
+        df_lanc_f120["Bloco"] = "F120"
     df_lanc_f120_delta = gera_lancamentos_f120_delta(dfs, sap_f120_totais)
+    if not df_lanc_f120_delta.empty:
+        df_lanc_f120_delta["Bloco"] = "F120"
 
     so_sped_m    = _normaliza_m_para_comparacao(dfs)
     so_sped_f120 = _normaliza_f120_para_comparacao(dfs)
@@ -1563,6 +1588,8 @@ def compara_gera_diferenca(
                 ~so_sap_s["NUM_DOC"].isin(_sped_todos_num_docs)
             ].reset_index(drop=True)
     df_lanc_estorno = gera_lancamentos_estorno_so_sap(_so_sap_com_num_doc, df_sap)
+    if not df_lanc_estorno.empty:
+        df_lanc_estorno["Bloco"] = "Desconhecido"
 
     return {
         "divergencias_saida":       div_s,
