@@ -1,4 +1,5 @@
 import pandas as pd
+import openpyxl
 
 COD_SIT_EXCLUIR = {"02", "08"}
 
@@ -6,11 +7,42 @@ COD_SIT_EXCLUIR = {"02", "08"}
 def extrai_dados_sped(sped_txt: str) -> dict:
 
     layouts = {
+
+        
+
         "0000": [
             "REG", "COD_VER", "TIPO_ESCRIT", "IND_SIT_ESP", "NUM_REC_ANTERIOR",
             "DT_INI", "DT_FIN", "NOME", "CNPJ", "UF", "COD_MUN", "SUFRAMA",
             "IND_NAT_PJ", "IND_ATIV",
         ],
+
+                "A100": [
+            "REG", "IND_OPER", "IND_EMIT", "COD_PART", "COD_SIT", "SER", "SUB",
+            "NUM_DOC", "CHV_NFSE", "DT_DOC", "DT_EXE_SERV", "VL_DOC",
+            "IND_PGTO", "VL_DESC", "VL_BC_PIS", "VL_PIS", "VL_BC_COFINS",
+            "VL_COFINS", "VL_PIS_RET", "VL_COFINS_RET", "VL_ISS",
+        ],
+
+        "A110": [
+            "REG", "COD_INF", "TXT_COMPL",
+        ],
+
+        "A111": [
+            "REG", "NUM_PROC", "IND_PROC",
+        ],
+
+        "A120": [
+            "REG", "VL_TOT_SERV", "VL_BC_PIS", "VL_PIS_IMP", "DT_PAG_PIS",
+            "VL_BC_COFINS", "VL_COFINS_IMP", "DT_PAG_COFINS", "LOC_EXE_SERV",
+        ],
+
+        "A170": [
+            "REG", "NUM_ITEM", "COD_ITEM", "DESCR_COMPL", "VL_ITEM", "VL_DESC",
+            "NAT_BC_CRED", "IND_ORIG_CRED", "CST_PIS", "VL_BC_PIS", "ALIQ_PIS",
+            "VL_PIS", "CST_COFINS", "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS",
+            "COD_CTA", "COD_CCUS",
+        ],
+
         "C100": [
             "REG", "IND_OPER", "IND_EMIT", "COD_PART", "COD_MOD", "COD_SIT",
             "SER", "NUM_DOC", "CHV_NFE", "DT_DOC", "DT_E_S", "VL_DOC",
@@ -97,32 +129,7 @@ def extrai_dados_sped(sped_txt: str) -> dict:
             "DESCR_AJ_BC", "DT_REF", "COD_CTA", "CNPJ", "INFO_COMPL",
         ],
 
-        "A100": [
-            "REG", "IND_OPER", "IND_EMIT", "COD_PART", "COD_SIT", "SER", "SUB",
-            "NUM_DOC", "CHV_NFSE", "DT_DOC", "DT_EXE_SERV", "VL_DOC",
-            "IND_PGTO", "VL_DESC", "VL_BC_PIS", "VL_PIS", "VL_BC_COFINS",
-            "VL_COFINS", "VL_PIS_RET", "VL_COFINS_RET", "VL_ISS",
-        ],
 
-        "A110": [
-            "REG", "COD_INF", "TXT_COMPL",
-        ],
-
-        "A111": [
-            "REG", "NUM_PROC", "IND_PROC",
-        ],
-
-        "A120": [
-            "REG", "VL_TOT_SERV", "VL_BC_PIS", "VL_PIS_IMP", "DT_PAG_PIS",
-            "VL_BC_COFINS", "VL_COFINS_IMP", "DT_PAG_COFINS", "LOC_EXE_SERV",
-        ],
-
-        "A170": [
-            "REG", "NUM_ITEM", "COD_ITEM", "DESCR_COMPL", "VL_ITEM", "VL_DESC",
-            "NAT_BC_CRED", "IND_ORIG_CRED", "CST_PIS", "VL_BC_PIS", "ALIQ_PIS",
-            "VL_PIS", "CST_COFINS", "VL_BC_COFINS", "ALIQ_COFINS", "VL_COFINS",
-            "COD_CTA", "COD_CCUS",
-        ],
     }
 
     dados = {"0000": [], "C100": [], "C170": [], "C500": [], "C501": [], "C505": [], "D100": [], "D101": [], "D105": [], "F100": [], "F120": [], "M110": [], "M215": [], "M510": [], "M615": [], "A100": [], "A110": [], "A111": [], "A120": [], "A170": []}
