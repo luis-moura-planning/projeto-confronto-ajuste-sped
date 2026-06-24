@@ -35,10 +35,20 @@ def extrai_dados_planilha_sap(planilha_xlsx):
         df['Nº doc.'] = df['Nº doc.'].ffill()
 
         contas_filtradas = [
-            'PIS a Recolher', '( - ) PIS/PASEP', '(-) Pis s/ Depreciação',
-            '(-) PIS s/ Receitas Financeiras', 'COFINS a Recolher',
-            '( - ) COFINS', '(-) Cofins s/ Depreciação',
-            '(-) COFINS s/ Receitas Financeiras'
+            'PIS a Recuperar',
+            'COFINS a Recuperar',
+            'PIS a Recolher',
+            'COFINS a Recolher',
+            '( - ) PIS/PASEP',
+            '( - ) COFINS',
+            '(-) PIS s/ Receitas Financeiras',
+            '(-) COFINS s/ Receitas Financeiras',
+            '(-) Pis s/ Alugués',
+            '(-) Cofins s/ Aluguéis',
+            '(-) Pis s/ Energia',
+            '(-) Cofins s/ Energia',
+            '(-) Pis s/ Depreciação',
+            '(-) Cofins s/ Depreciação',
         ]
 
         df_pis_cofins = df[

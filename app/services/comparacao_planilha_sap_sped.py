@@ -184,9 +184,11 @@ def _validar_a100():
             cta_cof_cred, desc_cof_cred = '2.01.01.04.0003', 'COFINS a Recolher'
 
         # --- PIS ---
-        match_pis = sap_pis[
-            sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)
-        ]
+        match_pis = sap_pis[sap_pis['Ref.3 (Linha)'] == num_doc]
+        if match_pis.empty:
+            match_pis = sap_pis[
+                sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)
+            ]
         if not match_pis.empty:
             vl_sap_pis            = match_pis.iloc[0]['Valor']
             delta_pis, status_pis = comparacao_valores(vl_sap_pis, vl_pis_sped)
@@ -219,9 +221,11 @@ def _validar_a100():
             ))
 
         # --- COFINS ---
-        match_cofins = sap_cofins[
-            sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)
-        ]
+        match_cofins = sap_cofins[sap_cofins['Ref.3 (Linha)'] == num_doc]
+        if match_cofins.empty:
+            match_cofins = sap_cofins[
+                sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)
+            ]
         if not match_cofins.empty:
             vl_sap_cofins               = match_cofins.iloc[0]['Valor']
             delta_cofins, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
@@ -287,6 +291,10 @@ def _validar_c100():
 
         # --- PIS ---
         match_pis = sap_pis[sap_pis['Ref.3 (Linha)'] == num_doc]
+        if match_pis.empty:
+            match_pis = sap_pis[
+                sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)
+            ]
         if not match_pis.empty:
             vl_sap_pis            = match_pis.iloc[0]['Valor']
             delta_pis, status_pis = comparacao_valores(vl_sap_pis, vl_pis_sped)
@@ -320,6 +328,10 @@ def _validar_c100():
 
         # --- COFINS ---
         match_cofins = sap_cofins[sap_cofins['Ref.3 (Linha)'] == num_doc]
+        if match_cofins.empty:
+            match_cofins = sap_cofins[
+                sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)
+            ]
         if not match_cofins.empty:
             vl_sap_cofins               = match_cofins.iloc[0]['Valor']
             delta_cofins, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
@@ -438,6 +450,10 @@ def _validar_d101():
             continue
 
         match = sap_pis[sap_pis['Ref.3 (Linha)'] == num_doc]
+        if match.empty:
+            match = sap_pis[
+                sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)
+            ]
 
         if not match.empty:
             vl_sap    = match.iloc[0]['Valor']
@@ -471,6 +487,10 @@ def _validar_d105():
             continue
 
         match = sap_cofins[sap_cofins['Ref.3 (Linha)'] == num_doc]
+        if match.empty:
+            match = sap_cofins[
+                sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)
+            ]
 
         if not match.empty:
             vl_sap    = match.iloc[0]['Valor']
