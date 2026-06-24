@@ -362,7 +362,14 @@ def _validar_c501():
         chv_doce    = registro.get('CHV_DOCe', '')
         vl_pis_sped = registro.get('VL_PIS', '')
 
+        # 1º: tenta por NUM_DOC
         match = sap_pis[sap_pis['Ref.3 (Linha)'] == num_doc]
+        # 2º: fallback por valor
+        if match.empty:
+            match = sap_pis[
+                sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)
+            ]
+
         if not match.empty:
             vl_sap    = match.iloc[0]['Valor']
             _, status = comparacao_valores(vl_sap, vl_pis_sped)
@@ -391,7 +398,14 @@ def _validar_c505():
         chv_doce       = registro.get('CHV_DOCe', '')
         vl_cofins_sped = registro.get('VL_COFINS', '')
 
+        # 1º: tenta por NUM_DOC
         match = sap_cofins[sap_cofins['Ref.3 (Linha)'] == num_doc]
+        # 2º: fallback por valor
+        if match.empty:
+            match = sap_cofins[
+                sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)
+            ]
+
         if not match.empty:
             vl_sap    = match.iloc[0]['Valor']
             _, status = comparacao_valores(vl_sap, vl_cofins_sped)
