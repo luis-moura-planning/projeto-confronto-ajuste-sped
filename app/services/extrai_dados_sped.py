@@ -1,9 +1,6 @@
 import pandas as pd
 import openpyxl
 
-COD_SIT_EXCLUIR = {"02", "08"}
-
-
 def extrai_dados_sped(sped_txt: str) -> dict:
 
     layouts = {
@@ -136,18 +133,15 @@ def extrai_dados_sped(sped_txt: str) -> dict:
 
     cnpj_atual = ""
     nota_atual_chv = ""
-    nota_atual_valida = True
 
     c500_atual_chv = ""
     c500_atual_num = ""
-    c500_atual_valida = True
 
     d100_atual_chv = ""
-    d100_atual_valida = True
+    d100_atual_num = ""
 
     a100_atual_chv = ""
     a100_atual_num = ""
-    a100_atual_valida = True
 
     try:
         with open(sped_txt, "r", encoding="latin1") as arquivo:
@@ -174,53 +168,37 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                 registro = dict(zip(nomes_campos, campos))
 
                 if reg == "C100":
-                    cod_sit = registro.get("COD_SIT", "")
-                    nota_atual_valida = cod_sit not in COD_SIT_EXCLUIR
                     nota_atual_chv = registro.get("CHV_NFE", "")
-                    if not nota_atual_valida:
-                        continue
                     registro["CHV_NFE"] = nota_atual_chv
                     registro["CNPJ_ESTAB"] = cnpj_atual
                     dados["C100"].append(registro)
 
                 elif reg == "C170":
-                    if not nota_atual_valida:
-                        continue
                     registro["CHV_NFE"] = nota_atual_chv
                     registro["CNPJ_ESTAB"] = cnpj_atual
                     dados["C170"].append(registro)
 
                 elif reg == "C500":
-                    cod_sit = registro.get("COD_SIT", "")
-                    c500_atual_valida = cod_sit not in COD_SIT_EXCLUIR
                     c500_atual_chv = registro.get("CHV_DOCe", "")
                     c500_atual_num = registro.get("NUM_DOC", "")
-                    if not c500_atual_valida:
-                        continue
                     registro["CNPJ_ESTAB"] = cnpj_atual
                     dados["C500"].append(registro)
 
                 elif reg in ("C501", "C505"):
-                    if not c500_atual_valida:
-                        continue
                     registro["CHV_DOCe"] = c500_atual_chv
                     registro["NUM_DOC"] = c500_atual_num
                     registro["CNPJ_ESTAB"] = cnpj_atual
                     dados[reg].append(registro)
 
                 elif reg == "D100":
-                    cod_sit = registro.get("COD_SIT", "")
-                    d100_atual_valida = cod_sit not in COD_SIT_EXCLUIR
                     d100_atual_chv = registro.get("CHV_CTE", "")
-                    if not d100_atual_valida:
-                        continue
+                    d100_atual_num = registro.get("NUM_DOC", "")
                     registro["CNPJ_ESTAB"] = cnpj_atual
                     dados["D100"].append(registro)
 
                 elif reg in ("D101", "D105"):
-                    if not d100_atual_valida:
-                        continue
                     registro["CHV_CTE"] = d100_atual_chv
+                    registro["NUM_DOC"] = d100_atual_num
                     registro["CNPJ_ESTAB"] = cnpj_atual
                     dados[reg].append(registro)
 
@@ -237,18 +215,12 @@ def extrai_dados_sped(sped_txt: str) -> dict:
                     dados[reg].append(registro)
 
                 elif reg == "A100":
-                    cod_sit = registro.get("COD_SIT", "")
-                    a100_atual_valida = cod_sit not in COD_SIT_EXCLUIR
                     a100_atual_chv = registro.get("CHV_NFSE", "")
                     a100_atual_num = registro.get("NUM_DOC", "")
-                    if not a100_atual_valida:
-                        continue
                     registro["CNPJ_ESTAB"] = cnpj_atual
                     dados["A100"].append(registro)
 
                 elif reg in ("A110", "A111", "A120", "A170"):
-                    if not a100_atual_valida:
-                        continue
                     registro["CHV_NFSE"] = a100_atual_chv
                     registro["NUM_DOC"]  = a100_atual_num
                     registro["CNPJ_ESTAB"] = cnpj_atual
