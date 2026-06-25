@@ -151,9 +151,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 cta_cof_cred, desc_cof_cred = '2.01.01.04.0003', 'COFINS a Recolher'
 
             # --- PIS ---
-            match_pis = sap_pis[sap_pis['Ref.3 (Linha)'] == num_doc]
-            if match_pis.empty:
-                match_pis = sap_pis[sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)]
+            match_pis = sap_pis[sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)]
             if not match_pis.empty:
                 vl_sap_pis            = match_pis.iloc[0]['Valor']
                 delta_pis, status_pis = comparacao_valores(vl_sap_pis, vl_pis_sped)
@@ -186,9 +184,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 ))
 
             # --- COFINS ---
-            match_cofins = sap_cofins[sap_cofins['Ref.3 (Linha)'] == num_doc]
-            if match_cofins.empty:
-                match_cofins = sap_cofins[sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)]
+            match_cofins = sap_cofins[sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)]
             if not match_cofins.empty:
                 vl_sap_cofins               = match_cofins.iloc[0]['Valor']
                 delta_cofins, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
@@ -252,8 +248,6 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
 
             # --- PIS ---
             match_pis = sap_pis[sap_pis['Ref.3 (Linha)'] == num_doc]
-            if match_pis.empty:
-                match_pis = sap_pis[sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)]
             if not match_pis.empty:
                 vl_sap_pis            = match_pis.iloc[0]['Valor']
                 delta_pis, status_pis = comparacao_valores(vl_sap_pis, vl_pis_sped)
@@ -287,8 +281,6 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
 
             # --- COFINS ---
             match_cofins = sap_cofins[sap_cofins['Ref.3 (Linha)'] == num_doc]
-            if match_cofins.empty:
-                match_cofins = sap_cofins[sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)]
             if not match_cofins.empty:
                 vl_sap_cofins               = match_cofins.iloc[0]['Valor']
                 delta_cofins, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
@@ -566,20 +558,22 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
         for _, registro in df_bloco_f100.iterrows():
             desc           = registro.get('DESC_DOC_OPER', '')
             ind_oper       = registro.get('IND_OPER', '0')
+            cod_cta        = registro.get('COD_CTA', '')
             vl_pis_sped    = registro.get('VL_PIS', '')
             vl_cofins_sped = registro.get('VL_COFINS', '')
             filial         = registro.get('CNPJ_ESTAB', '')
             descricao      = f"F100 - {desc}"
+            cc             = 'ADMIN' if ind_oper == '1' else 'OBRAS'
 
             if ind_oper == '0':
                 cta_pis_deb,  desc_pis_deb  = '1.01.05.01.0003', 'PIS a Recuperar'
-                cta_pis_cred, desc_pis_cred = '3.01.01.03.0003', '( - ) PIS/PASEP'
+                cta_pis_cred, desc_pis_cred = cod_cta, cod_cta
                 cta_cof_deb,  desc_cof_deb  = '1.01.05.01.0004', 'COFINS a Recuperar'
-                cta_cof_cred, desc_cof_cred = '3.01.01.03.0004', '( - ) COFINS'
+                cta_cof_cred, desc_cof_cred = cod_cta, cod_cta
             else:
-                cta_pis_deb,  desc_pis_deb  = '3.01.01.03.0003', '( - ) PIS/PASEP'
+                cta_pis_deb,  desc_pis_deb  = cod_cta, cod_cta
                 cta_pis_cred, desc_pis_cred = '2.01.01.04.0002', 'PIS a Recolher'
-                cta_cof_deb,  desc_cof_deb  = '3.01.01.03.0004', '( - ) COFINS'
+                cta_cof_deb,  desc_cof_deb  = cod_cta, cod_cta
                 cta_cof_cred, desc_cof_cred = '2.01.01.04.0003', 'COFINS a Recolher'
 
             # --- PIS ---
@@ -588,12 +582,10 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 if not match_pis.empty:
                     vl_sap_pis            = match_pis.iloc[0]['Valor']
                     delta_pis, status_pis = comparacao_valores(vl_sap_pis, vl_pis_sped)
-                    cc_pis                = match_pis.iloc[0].get('Centro de Custo', '')
                 else:
                     vl_sap_pis = ''
                     delta_pis  = _parse_valor(vl_pis_sped) or 0
                     status_pis = 'so_sped'
-                    cc_pis     = ''
 
                 registros.append(gerar_registro(
                     bloco="F100", num_doc=desc, identificador=desc,
@@ -608,12 +600,12 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                     lancamentos.append(gerar_lancamento(
                         bloco="F100", codigo_conta=deb_pis, descricao_conta=ddesc_pis,
                         debito=delta_pis, credito='',
-                        descricao=descricao, centro_de_custo=cc_pis, filial=filial
+                        descricao=descricao, centro_de_custo=cc, filial=filial
                     ))
                     lancamentos.append(gerar_lancamento(
                         bloco="F100", codigo_conta=cred_pis, descricao_conta=cdesc_pis,
                         debito='', credito=delta_pis,
-                        descricao=descricao, centro_de_custo=cc_pis, filial=filial
+                        descricao=descricao, centro_de_custo=cc, filial=filial
                     ))
 
             # --- COFINS ---
@@ -622,12 +614,10 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 if not match_cofins.empty:
                     vl_sap_cofins               = match_cofins.iloc[0]['Valor']
                     delta_cofins, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
-                    cc_cofins                   = match_cofins.iloc[0].get('Centro de Custo', '')
                 else:
                     vl_sap_cofins = ''
                     delta_cofins  = _parse_valor(vl_cofins_sped) or 0
                     status_cofins = 'so_sped'
-                    cc_cofins     = ''
 
                 registros.append(gerar_registro(
                     bloco="F100", num_doc=desc, identificador=desc,
@@ -642,12 +632,12 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                     lancamentos.append(gerar_lancamento(
                         bloco="F100", codigo_conta=deb_cof, descricao_conta=ddesc_cof,
                         debito=delta_cofins, credito='',
-                        descricao=descricao, centro_de_custo=cc_cofins, filial=filial
+                        descricao=descricao, centro_de_custo=cc, filial=filial
                     ))
                     lancamentos.append(gerar_lancamento(
                         bloco="F100", codigo_conta=cred_cof, descricao_conta=cdesc_cof,
                         debito='', credito=delta_cofins,
-                        descricao=descricao, centro_de_custo=cc_cofins, filial=filial
+                        descricao=descricao, centro_de_custo=cc, filial=filial
                     ))
 
     def _validar_f120():
@@ -659,22 +649,22 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
 
         for _, registro in df_bloco_f120.iterrows():
             desc           = registro.get('DESC_BEM_IMOB', '')
-            ind_oper       = registro.get('IND_OPER', '0')
+            ind_orig_cred  = registro.get('IND_ORIG_CRED', '0')
             vl_pis_sped    = registro.get('VL_PIS', '')
             vl_cofins_sped = registro.get('VL_COFINS', '')
             filial         = registro.get('CNPJ_ESTAB', '')
             descricao      = f"F120 - {desc}"
 
-            if ind_oper == '0':
-                cta_pis_deb,  desc_pis_deb  = '1.01.05.01.0003', 'PIS a Recuperar'
-                cta_pis_cred, desc_pis_cred = '3.01.01.03.0003', '( - ) PIS/PASEP'
-                cta_cof_deb,  desc_cof_deb  = '1.01.05.01.0004', 'COFINS a Recuperar'
-                cta_cof_cred, desc_cof_cred = '3.01.01.03.0004', '( - ) COFINS'
+            if ind_orig_cred == '0':
+                cta_pis_deb,  desc_pis_deb  = '5.01.01.06.0003', '(-) Pis s/ Depreciação'
+                cta_pis_cred, desc_pis_cred = '1.01.05.01.0003', 'PIS a Recuperar'
+                cta_cof_deb,  desc_cof_deb  = '5.01.01.06.0004', '(-) Cofins s/ Depreciação'
+                cta_cof_cred, desc_cof_cred = '1.01.05.01.0004', 'COFINS a Recuperar'
             else:
-                cta_pis_deb,  desc_pis_deb  = '3.01.01.03.0003', '( - ) PIS/PASEP'
-                cta_pis_cred, desc_pis_cred = '2.01.01.04.0002', 'PIS a Recolher'
-                cta_cof_deb,  desc_cof_deb  = '3.01.01.03.0004', '( - ) COFINS'
-                cta_cof_cred, desc_cof_cred = '2.01.01.04.0003', 'COFINS a Recolher'
+                cta_pis_deb,  desc_pis_deb  = '1.01.05.01.0003', 'PIS a Recuperar'
+                cta_pis_cred, desc_pis_cred = '5.01.01.06.0003', '(-) Pis s/ Depreciação'
+                cta_cof_deb,  desc_cof_deb  = '1.01.05.01.0004', 'COFINS a Recuperar'
+                cta_cof_cred, desc_cof_cred = '5.01.01.06.0004', '(-) Cofins s/ Depreciação'
 
             # --- PIS ---
             if _parse_valor(vl_pis_sped):
@@ -682,12 +672,10 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 if not match_pis.empty:
                     vl_sap_pis            = match_pis.iloc[0]['Valor']
                     delta_pis, status_pis = comparacao_valores(vl_sap_pis, vl_pis_sped)
-                    cc_pis                = match_pis.iloc[0].get('Centro de Custo', '')
                 else:
                     vl_sap_pis = ''
                     delta_pis  = _parse_valor(vl_pis_sped) or 0
                     status_pis = 'so_sped'
-                    cc_pis     = ''
 
                 registros.append(gerar_registro(
                     bloco="F120", num_doc=desc, identificador=desc,
@@ -702,12 +690,12 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                     lancamentos.append(gerar_lancamento(
                         bloco="F120", codigo_conta=deb_pis, descricao_conta=ddesc_pis,
                         debito=delta_pis, credito='',
-                        descricao=descricao, centro_de_custo=cc_pis, filial=filial
+                        descricao=descricao, centro_de_custo='OBRAS', filial=filial
                     ))
                     lancamentos.append(gerar_lancamento(
                         bloco="F120", codigo_conta=cred_pis, descricao_conta=cdesc_pis,
                         debito='', credito=delta_pis,
-                        descricao=descricao, centro_de_custo=cc_pis, filial=filial
+                        descricao=descricao, centro_de_custo='OBRAS', filial=filial
                     ))
 
             # --- COFINS ---
@@ -716,12 +704,10 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 if not match_cofins.empty:
                     vl_sap_cofins               = match_cofins.iloc[0]['Valor']
                     delta_cofins, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
-                    cc_cofins                   = match_cofins.iloc[0].get('Centro de Custo', '')
                 else:
                     vl_sap_cofins = ''
                     delta_cofins  = _parse_valor(vl_cofins_sped) or 0
                     status_cofins = 'so_sped'
-                    cc_cofins     = ''
 
                 registros.append(gerar_registro(
                     bloco="F120", num_doc=desc, identificador=desc,
@@ -736,12 +722,12 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                     lancamentos.append(gerar_lancamento(
                         bloco="F120", codigo_conta=deb_cof, descricao_conta=ddesc_cof,
                         debito=delta_cofins, credito='',
-                        descricao=descricao, centro_de_custo=cc_cofins, filial=filial
+                        descricao=descricao, centro_de_custo='OBRAS', filial=filial
                     ))
                     lancamentos.append(gerar_lancamento(
                         bloco="F120", codigo_conta=cred_cof, descricao_conta=cdesc_cof,
                         debito='', credito=delta_cofins,
-                        descricao=descricao, centro_de_custo=cc_cofins, filial=filial
+                        descricao=descricao, centro_de_custo='OBRAS', filial=filial
                     ))
 
     def _validar_m110():
@@ -794,15 +780,15 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
 
             lancamentos.append(gerar_lancamento(
                 bloco="M215",
-                codigo_conta="2.01.01.04.0002" if ind_aj == '0' else "1.01.05.01.0003",
-                descricao_conta="PIS a Recolher" if ind_aj == '0' else "PIS a Recuperar",
+                codigo_conta="2.01.01.04.0002" if ind_aj == '0' else "4.01.01.01.0001",
+                descricao_conta="PIS a Recolher" if ind_aj == '0' else "Custo dos Produtos Vendidos",
                 debito=vl_calc, credito="",
                 descricao="M215", centro_de_custo="OBRAS", filial=cnpj
             ))
             lancamentos.append(gerar_lancamento(
                 bloco="M215",
-                codigo_conta="1.01.05.01.0003" if ind_aj == '0' else "2.01.01.04.0002",
-                descricao_conta="PIS a Recuperar" if ind_aj == '0' else "PIS a Recolher",
+                codigo_conta="4.01.01.01.0001" if ind_aj == '0' else "2.01.01.04.0002",
+                descricao_conta="Custo dos Produtos Vendidos" if ind_aj == '0' else "PIS a Recolher",
                 debito="", credito=vl_calc,
                 descricao="M215", centro_de_custo="OBRAS", filial=cnpj
             ))
@@ -857,15 +843,15 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
 
             lancamentos.append(gerar_lancamento(
                 bloco="M615",
-                codigo_conta="2.01.01.04.0003" if ind_aj == '0' else "1.01.05.01.0004",
-                descricao_conta="COFINS a Recolher" if ind_aj == '0' else "COFINS a Recuperar",
+                codigo_conta="2.01.01.04.0003" if ind_aj == '0' else "4.01.01.01.0001",
+                descricao_conta="COFINS a Recolher" if ind_aj == '0' else "Custo dos Produtos Vendidos",
                 debito=vl_calc, credito="",
                 descricao="M615", centro_de_custo="OBRAS", filial=cnpj
             ))
             lancamentos.append(gerar_lancamento(
                 bloco="M615",
-                codigo_conta="1.01.05.01.0004" if ind_aj == '0' else "2.01.01.04.0003",
-                descricao_conta="COFINS a Recuperar" if ind_aj == '0' else "COFINS a Recolher",
+                codigo_conta="4.01.01.01.0001" if ind_aj == '0' else "2.01.01.04.0003",
+                descricao_conta="Custo dos Produtos Vendidos" if ind_aj == '0' else "COFINS a Recolher",
                 debito="", credito=vl_calc,
                 descricao="M615", centro_de_custo="OBRAS", filial=cnpj
             ))
@@ -914,44 +900,60 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
 
         if not matched:
             num_doc_sap = registro.get('Nº doc.', '')
+            observacao_doc_sap = registro.get('Observações', '')
             valor_sap   = registro.get('Valor', '')
+            num_doc_str = str(num_doc_sap).strip().upper()
 
-            registros.append(gerar_registro(
-                bloco='SAP',
-                num_doc=num_doc_sap,
-                identificador=ref,
-                imposto=imposto,
-                vl_sped='',
-                vl_sap=valor_sap,
-                status='so_sap'
-            ))
+            _TIPOS_FISCAIS = ('DS', 'NS', 'NE')
+            is_documento_fiscal = any(num_doc_str.startswith(t) for t in _TIPOS_FISCAIS)
 
-            cta_deb   = registro.get('Cta.contáb./cód.PN(D)', '')
-            desc_deb  = registro.get('Cta.cont./Nome PN(D)', '')
-            cta_cred  = registro.get('Cta.contáb./cód.PN(C)', '')
-            desc_cred = registro.get('Cta.cont./Nome PN(C)', '')
-            descricao_lanc = f"Estorno SAP - {num_doc_sap}"
+            if is_documento_fiscal:
+                registros.append(gerar_registro(
+                    bloco='SAP',
+                    num_doc=num_doc_sap,
+                    identificador=ref,
+                    imposto=imposto,
+                    vl_sped='',
+                    vl_sap=valor_sap,
+                    status='so_sap'
+                ))
 
-            lancamentos.append(gerar_lancamento(
-                bloco='SAP',
-                codigo_conta=cta_cred,
-                descricao_conta=desc_cred,
-                debito=valor_sap,
-                credito='',
-                descricao=descricao_lanc,
-                centro_de_custo='',
-                filial=''
-            ))
-            lancamentos.append(gerar_lancamento(
-                bloco='SAP',
-                codigo_conta=cta_deb,
-                descricao_conta=desc_deb,
-                debito='',
-                credito=valor_sap,
-                descricao=descricao_lanc,
-                centro_de_custo='',
-                filial=''
-            ))
+                cta_deb   = registro.get('Cta.contáb./cód.PN(D)', '')
+                desc_deb  = registro.get('Cta.cont./Nome PN(D)', '')
+                cta_cred  = registro.get('Cta.contáb./cód.PN(C)', '')
+                desc_cred = registro.get('Cta.cont./Nome PN(C)', '')
+                descricao_lanc = f"Estorno SAP - {num_doc_sap} - {observacao_doc_sap}"
+
+                lancamentos.append(gerar_lancamento(
+                    bloco='SAP',
+                    codigo_conta=cta_cred,
+                    descricao_conta=desc_cred,
+                    debito=valor_sap,
+                    credito='',
+                    descricao=descricao_lanc,
+                    centro_de_custo='',
+                    filial=''
+                ))
+                lancamentos.append(gerar_lancamento(
+                    bloco='SAP',
+                    codigo_conta=cta_deb,
+                    descricao_conta=desc_deb,
+                    debito='',
+                    credito=valor_sap,
+                    descricao=descricao_lanc,
+                    centro_de_custo='',
+                    filial=''
+                ))
+            else:
+                registros.append(gerar_registro(
+                    bloco='SAP',
+                    num_doc=num_doc_sap,
+                    identificador=ref,
+                    imposto=imposto,
+                    vl_sped='',
+                    vl_sap=valor_sap,
+                    status='advertencia'
+                ))
 
     return {
         'lancamentos': [{k: _clean(v) for k, v in l.items()} for l in lancamentos],

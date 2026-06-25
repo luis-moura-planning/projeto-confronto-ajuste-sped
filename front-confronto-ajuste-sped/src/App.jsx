@@ -42,19 +42,22 @@ const STATUS_TIPO = {
   apenas_sap:  "so_sap",
   apenas_sped: "so_sped",
   sem_valor:   "ok",
+  advertencia: "advertencia",
 };
 
 const TIPO_BADGE = {
-  divergencia: "g-badge--warn",
-  so_sped:     "g-badge--danger",
-  so_sap:      "g-badge--neutral",
-  ok:          "g-badge--success",
+  divergencia:  "g-badge--warn",
+  so_sped:      "g-badge--danger",
+  so_sap:       "g-badge--neutral",
+  ok:           "g-badge--success",
+  advertencia:  "g-badge--warn",
 };
 const TIPO_LABELS = {
-  divergencia: "Divergência",
-  so_sped:     "Só SPED",
-  so_sap:      "Só SAP",
-  ok:          "OK",
+  divergencia:  "Divergência",
+  so_sped:      "Só SPED",
+  so_sap:       "Só SAP",
+  ok:           "OK",
+  advertencia:  "Aviso",
 };
 
 const IMPOSTOS_LANC = [
@@ -383,7 +386,7 @@ export default function App() {
                           <td>
                             <span className={`g-badge ${TIPO_BADGE[r._tipo]}`}>{TIPO_LABELS[r._tipo]}</span>
                           </td>
-                          <td>{r._tipo === "so_sap" ? "—" : fmt(r.vl_sped)}</td>
+                          <td>{(r._tipo === "so_sap" || r._tipo === "advertencia") ? "—" : fmt(r.vl_sped)}</td>
                           <td>{r._tipo === "so_sped" ? "—" : fmt(r.vl_sap)}</td>
                           <td className={r._delta > 0 ? "app-td-diff" : ""}>
                             {r._delta > 0 ? fmt(r._delta) : "—"}
