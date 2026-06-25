@@ -5,14 +5,12 @@ def extrai_dados_planilha_sap(planilha_xlsx):
     sheet_name = "Sheet1"
 
     try:
-        arquivo = pd.ExcelFile(planilha_xlsx)
-
-        if sheet_name not in arquivo.sheet_names:
-            raise ValueError(
-                f"Aba '{sheet_name}' não encontrada. Disponíveis: {arquivo.sheet_names}"
-            )
-
-        df = pd.read_excel(arquivo, sheet_name=sheet_name)
+        with pd.ExcelFile(planilha_xlsx) as arquivo:
+            if sheet_name not in arquivo.sheet_names:
+                raise ValueError(
+                    f"Aba '{sheet_name}' não encontrada. Disponíveis: {arquivo.sheet_names}"
+                )
+            df = pd.read_excel(arquivo, sheet_name=sheet_name)
 
         colunas = [
             'Data de lançamento', 'Nº doc.', 'Ref.3 (Linha)', 'Cta.contáb./cód.PN',
@@ -24,6 +22,16 @@ def extrai_dados_planilha_sap(planilha_xlsx):
             raise ValueError(f"Colunas ausentes na planilha: {missing}")
 
         df = df.loc[:, colunas]
+
+        def _ref_str(x):
+            if pd.isna(x):
+                return ''
+            try:
+                return str(int(float(x)))
+            except (ValueError, OverflowError):
+                return str(x).strip()
+
+        df['Ref.3 (Linha)'] = df['Ref.3 (Linha)'].apply(_ref_str)
 
         df['Nº doc.'] = df['Nº doc.'].astype("string")
 

@@ -1,6 +1,14 @@
+import math
 import pandas as pd
 from services.extrai_dados_sped import extrai_dados_sped
 from services.extrai_dados_planilha_sap import extrai_dados_planilha_sap
+
+
+def _clean(v):
+    """Converte NaN/float-inf para string vazia, evitando erros de serialização JSON."""
+    if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
+        return ''
+    return v
 
 
 df_contas = pd.DataFrame({
@@ -69,12 +77,13 @@ def comparacao_valores(valor_sap, valor_sped):
         return 0, "ok"
 
 
-def gerar_lancamento(codigo_conta='', descricao_conta='', debito='', credito='', descricao='', centro_de_custo='', filial=''):
+def gerar_lancamento(bloco='',codigo_conta='', descricao_conta='', debito='', credito='', descricao='', centro_de_custo='', filial=''):
     return {
+        'bloco': bloco,
         'codigo_da_conta': codigo_conta,
         'descricao_conta': descricao_conta,
-        'debito': debito,
-        'credito': credito,
+        'debito':  _parse_valor(debito),
+        'credito': _parse_valor(credito),
         'descricao': descricao,
         'centro_de_custo': centro_de_custo,
         'filial': filial,
@@ -87,8 +96,8 @@ def gerar_registro(bloco='', num_doc='', identificador='', imposto='', vl_sped='
         'num_doc': num_doc,
         'identificador': identificador,
         'imposto': imposto,
-        'vl_sped': vl_sped,
-        'vl_sap': vl_sap,
+        'vl_sped': _parse_valor(vl_sped),
+        'vl_sap':  _parse_valor(vl_sap),
         'status': status,
     }
 
@@ -166,12 +175,12 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 cred_pis  = cta_pis_cred if status_pis != 'estorno' else cta_pis_deb
                 cdesc_pis = desc_pis_cred if status_pis != 'estorno' else desc_pis_deb
                 lancamentos.append(gerar_lancamento(
-                    codigo_conta=deb_pis, descricao_conta=ddesc_pis,
+                    bloco="A100", codigo_conta=deb_pis, descricao_conta=ddesc_pis,
                     debito=delta_pis, credito='',
                     descricao=descricao, centro_de_custo=cc_pis, filial=filial
                 ))
                 lancamentos.append(gerar_lancamento(
-                    codigo_conta=cred_pis, descricao_conta=cdesc_pis,
+                    bloco="A100", codigo_conta=cred_pis, descricao_conta=cdesc_pis,
                     debito='', credito=delta_pis,
                     descricao=descricao, centro_de_custo=cc_pis, filial=filial
                 ))
@@ -201,12 +210,12 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 cred_cof  = cta_cof_cred if status_cofins != 'estorno' else cta_cof_deb
                 cdesc_cof = desc_cof_cred if status_cofins != 'estorno' else desc_cof_deb
                 lancamentos.append(gerar_lancamento(
-                    codigo_conta=deb_cof, descricao_conta=ddesc_cof,
+                    bloco="A100", codigo_conta=deb_cof, descricao_conta=ddesc_cof,
                     debito=delta_cofins, credito='',
                     descricao=descricao, centro_de_custo=cc_cofins, filial=filial
                 ))
                 lancamentos.append(gerar_lancamento(
-                    codigo_conta=cred_cof, descricao_conta=cdesc_cof,
+                    bloco="A100", codigo_conta=cred_cof, descricao_conta=cdesc_cof,
                     debito='', credito=delta_cofins,
                     descricao=descricao, centro_de_custo=cc_cofins, filial=filial
                 ))
@@ -266,12 +275,12 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 cred_pis  = cta_pis_cred if status_pis != 'estorno' else cta_pis_deb
                 cdesc_pis = desc_pis_cred if status_pis != 'estorno' else desc_pis_deb
                 lancamentos.append(gerar_lancamento(
-                    codigo_conta=deb_pis, descricao_conta=ddesc_pis,
+                    bloco="C100", codigo_conta=deb_pis, descricao_conta=ddesc_pis,
                     debito=delta_pis, credito='',
                     descricao=descricao, centro_de_custo=cc_pis, filial=filial
                 ))
                 lancamentos.append(gerar_lancamento(
-                    codigo_conta=cred_pis, descricao_conta=cdesc_pis,
+                    bloco="C100", codigo_conta=cred_pis, descricao_conta=cdesc_pis,
                     debito='', credito=delta_pis,
                     descricao=descricao, centro_de_custo=cc_pis, filial=filial
                 ))
@@ -301,12 +310,12 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 cred_cof  = cta_cof_cred if status_cofins != 'estorno' else cta_cof_deb
                 cdesc_cof = desc_cof_cred if status_cofins != 'estorno' else desc_cof_deb
                 lancamentos.append(gerar_lancamento(
-                    codigo_conta=deb_cof, descricao_conta=ddesc_cof,
+                    bloco="C100", codigo_conta=deb_cof, descricao_conta=ddesc_cof,
                     debito=delta_cofins, credito='',
                     descricao=descricao, centro_de_custo=cc_cofins, filial=filial
                 ))
                 lancamentos.append(gerar_lancamento(
-                    codigo_conta=cred_cof, descricao_conta=cdesc_cof,
+                    bloco="C100", codigo_conta=cred_cof, descricao_conta=cdesc_cof,
                     debito='', credito=delta_cofins,
                     descricao=descricao, centro_de_custo=cc_cofins, filial=filial
                 ))
@@ -320,23 +329,55 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
         for _, registro in df_bloco_c501.iterrows():
             num_doc     = registro.get('NUM_DOC', '')
             chv_doce    = registro.get('CHV_DOCe', '')
+            ind_oper    = registro.get('IND_OPER', '0')
             vl_pis_sped = registro.get('VL_PIS', '')
+            filial      = registro.get('CNPJ_ESTAB', '')
+            descricao   = f"C501 - {num_doc}"
+
+            if not _parse_valor(vl_pis_sped):
+                continue
+
+            if ind_oper == '0':
+                cta_deb,  desc_deb  = '1.01.05.01.0003', 'PIS a Recuperar'
+                cta_cred, desc_cred = '3.01.01.03.0003', '( - ) PIS/PASEP'
+            else:
+                cta_deb,  desc_deb  = '3.01.01.03.0003', '( - ) PIS/PASEP'
+                cta_cred, desc_cred = '2.01.01.04.0002', 'PIS a Recolher'
 
             match = sap_pis[sap_pis['Ref.3 (Linha)'] == num_doc]
             if match.empty:
                 match = sap_pis[sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)]
 
             if not match.empty:
-                vl_sap    = match.iloc[0]['Valor']
-                _, status = comparacao_valores(vl_sap, vl_pis_sped)
+                vl_sap        = match.iloc[0]['Valor']
+                delta, status = comparacao_valores(vl_sap, vl_pis_sped)
+                cc            = match.iloc[0].get('Centro de Custo', '')
             else:
-                vl_sap = ''
-                status = 'so_sped'
+                vl_sap  = ''
+                delta   = _parse_valor(vl_pis_sped) or 0
+                status  = 'so_sped'
+                cc      = ''
 
             registros.append(gerar_registro(
                 bloco="C501", num_doc=num_doc, identificador=chv_doce,
                 imposto="PIS", vl_sped=vl_pis_sped, vl_sap=vl_sap, status=status
             ))
+
+            if status in ('so_sped', 'complemento', 'estorno'):
+                d  = cta_deb  if status != 'estorno' else cta_cred
+                dd = desc_deb if status != 'estorno' else desc_cred
+                c  = cta_cred if status != 'estorno' else cta_deb
+                cd = desc_cred if status != 'estorno' else desc_deb
+                lancamentos.append(gerar_lancamento(
+                    bloco="C501", codigo_conta=d, descricao_conta=dd,
+                    debito=delta, credito='',
+                    descricao=descricao, centro_de_custo=cc, filial=filial
+                ))
+                lancamentos.append(gerar_lancamento(
+                    bloco="C501", codigo_conta=c, descricao_conta=cd,
+                    debito='', credito=delta,
+                    descricao=descricao, centro_de_custo=cc, filial=filial
+                ))
 
     def _validar_c505():
         if df_bloco_c505.empty:
@@ -347,23 +388,55 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
         for _, registro in df_bloco_c505.iterrows():
             num_doc        = registro.get('NUM_DOC', '')
             chv_doce       = registro.get('CHV_DOCe', '')
+            ind_oper       = registro.get('IND_OPER', '0')
             vl_cofins_sped = registro.get('VL_COFINS', '')
+            filial         = registro.get('CNPJ_ESTAB', '')
+            descricao      = f"C505 - {num_doc}"
+
+            if not _parse_valor(vl_cofins_sped):
+                continue
+
+            if ind_oper == '0':
+                cta_deb,  desc_deb  = '1.01.05.01.0004', 'COFINS a Recuperar'
+                cta_cred, desc_cred = '3.01.01.03.0004', '( - ) COFINS'
+            else:
+                cta_deb,  desc_deb  = '3.01.01.03.0004', '( - ) COFINS'
+                cta_cred, desc_cred = '2.01.01.04.0003', 'COFINS a Recolher'
 
             match = sap_cofins[sap_cofins['Ref.3 (Linha)'] == num_doc]
             if match.empty:
                 match = sap_cofins[sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)]
 
             if not match.empty:
-                vl_sap    = match.iloc[0]['Valor']
-                _, status = comparacao_valores(vl_sap, vl_cofins_sped)
+                vl_sap        = match.iloc[0]['Valor']
+                delta, status = comparacao_valores(vl_sap, vl_cofins_sped)
+                cc            = match.iloc[0].get('Centro de Custo', '')
             else:
-                vl_sap = ''
-                status = 'so_sped'
+                vl_sap  = ''
+                delta   = _parse_valor(vl_cofins_sped) or 0
+                status  = 'so_sped'
+                cc      = ''
 
             registros.append(gerar_registro(
                 bloco="C505", num_doc=num_doc, identificador=chv_doce,
                 imposto="COFINS", vl_sped=vl_cofins_sped, vl_sap=vl_sap, status=status
             ))
+
+            if status in ('so_sped', 'complemento', 'estorno'):
+                d  = cta_deb  if status != 'estorno' else cta_cred
+                dd = desc_deb if status != 'estorno' else desc_cred
+                c  = cta_cred if status != 'estorno' else cta_deb
+                cd = desc_cred if status != 'estorno' else desc_deb
+                lancamentos.append(gerar_lancamento(
+                    bloco="C505", codigo_conta=d, descricao_conta=dd,
+                    debito=delta, credito='',
+                    descricao=descricao, centro_de_custo=cc, filial=filial
+                ))
+                lancamentos.append(gerar_lancamento(
+                    bloco="C505", codigo_conta=c, descricao_conta=cd,
+                    debito='', credito=delta,
+                    descricao=descricao, centro_de_custo=cc, filial=filial
+                ))
 
     def _validar_d101():
         if df_bloco_d101.empty:
@@ -374,26 +447,55 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
         for _, registro in df_bloco_d101.iterrows():
             num_doc     = registro.get('NUM_DOC', '')
             chv_cte     = registro.get('CHV_CTE', '')
+            ind_oper    = registro.get('IND_OPER', '0')
             vl_pis_sped = registro.get('VL_PIS', '')
+            filial      = registro.get('CNPJ_ESTAB', '')
+            descricao   = f"D101 - {num_doc}"
 
             if not _parse_valor(vl_pis_sped):
                 continue
+
+            if ind_oper == '0':
+                cta_deb,  desc_deb  = '1.01.05.01.0003', 'PIS a Recuperar'
+                cta_cred, desc_cred = '3.01.01.03.0003', '( - ) PIS/PASEP'
+            else:
+                cta_deb,  desc_deb  = '3.01.01.03.0003', '( - ) PIS/PASEP'
+                cta_cred, desc_cred = '2.01.01.04.0002', 'PIS a Recolher'
 
             match = sap_pis[sap_pis['Ref.3 (Linha)'] == num_doc]
             if match.empty:
                 match = sap_pis[sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)]
 
             if not match.empty:
-                vl_sap    = match.iloc[0]['Valor']
-                _, status = comparacao_valores(vl_sap, vl_pis_sped)
+                vl_sap       = match.iloc[0]['Valor']
+                delta, status = comparacao_valores(vl_sap, vl_pis_sped)
+                cc            = match.iloc[0].get('Centro de Custo', '')
             else:
-                vl_sap = ''
-                status = 'so_sped'
+                vl_sap  = ''
+                delta   = _parse_valor(vl_pis_sped) or 0
+                status  = 'so_sped'
+                cc      = ''
 
             registros.append(gerar_registro(
                 bloco="D101", num_doc=num_doc, identificador=chv_cte,
                 imposto="PIS", vl_sped=vl_pis_sped, vl_sap=vl_sap, status=status
             ))
+
+            if status in ('so_sped', 'complemento', 'estorno'):
+                d = cta_deb  if status != 'estorno' else cta_cred
+                dd = desc_deb if status != 'estorno' else desc_cred
+                c = cta_cred if status != 'estorno' else cta_deb
+                cd = desc_cred if status != 'estorno' else desc_deb
+                lancamentos.append(gerar_lancamento(
+                    bloco="D101", codigo_conta=d, descricao_conta=dd,
+                    debito=delta, credito='',
+                    descricao=descricao, centro_de_custo=cc, filial=filial
+                ))
+                lancamentos.append(gerar_lancamento(
+                    bloco="D101", codigo_conta=c, descricao_conta=cd,
+                    debito='', credito=delta,
+                    descricao=descricao, centro_de_custo=cc, filial=filial
+                ))
 
     def _validar_d105():
         if df_bloco_d105.empty:
@@ -404,26 +506,55 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
         for _, registro in df_bloco_d105.iterrows():
             num_doc        = registro.get('NUM_DOC', '')
             chv_cte        = registro.get('CHV_CTE', '')
+            ind_oper       = registro.get('IND_OPER', '0')
             vl_cofins_sped = registro.get('VL_COFINS', '')
+            filial         = registro.get('CNPJ_ESTAB', '')
+            descricao      = f"D105 - {num_doc}"
 
             if not _parse_valor(vl_cofins_sped):
                 continue
+
+            if ind_oper == '0':
+                cta_deb,  desc_deb  = '1.01.05.01.0004', 'COFINS a Recuperar'
+                cta_cred, desc_cred = '3.01.01.03.0004', '( - ) COFINS'
+            else:
+                cta_deb,  desc_deb  = '3.01.01.03.0004', '( - ) COFINS'
+                cta_cred, desc_cred = '2.01.01.04.0003', 'COFINS a Recolher'
 
             match = sap_cofins[sap_cofins['Ref.3 (Linha)'] == num_doc]
             if match.empty:
                 match = sap_cofins[sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)]
 
             if not match.empty:
-                vl_sap    = match.iloc[0]['Valor']
-                _, status = comparacao_valores(vl_sap, vl_cofins_sped)
+                vl_sap        = match.iloc[0]['Valor']
+                delta, status = comparacao_valores(vl_sap, vl_cofins_sped)
+                cc            = match.iloc[0].get('Centro de Custo', '')
             else:
-                vl_sap = ''
-                status = 'so_sped'
+                vl_sap  = ''
+                delta   = _parse_valor(vl_cofins_sped) or 0
+                status  = 'so_sped'
+                cc      = ''
 
             registros.append(gerar_registro(
                 bloco="D105", num_doc=num_doc, identificador=chv_cte,
                 imposto="COFINS", vl_sped=vl_cofins_sped, vl_sap=vl_sap, status=status
             ))
+
+            if status in ('so_sped', 'complemento', 'estorno'):
+                d = cta_deb  if status != 'estorno' else cta_cred
+                dd = desc_deb if status != 'estorno' else desc_cred
+                c = cta_cred if status != 'estorno' else cta_deb
+                cd = desc_cred if status != 'estorno' else desc_deb
+                lancamentos.append(gerar_lancamento(
+                    bloco="D105", codigo_conta=d, descricao_conta=dd,
+                    debito=delta, credito='',
+                    descricao=descricao, centro_de_custo=cc, filial=filial
+                ))
+                lancamentos.append(gerar_lancamento(
+                    bloco="D105", codigo_conta=c, descricao_conta=cd,
+                    debito='', credito=delta,
+                    descricao=descricao, centro_de_custo=cc, filial=filial
+                ))
 
     def _validar_f100():
         if df_bloco_f100.empty:
@@ -434,34 +565,90 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
 
         for _, registro in df_bloco_f100.iterrows():
             desc           = registro.get('DESC_DOC_OPER', '')
+            ind_oper       = registro.get('IND_OPER', '0')
             vl_pis_sped    = registro.get('VL_PIS', '')
             vl_cofins_sped = registro.get('VL_COFINS', '')
+            filial         = registro.get('CNPJ_ESTAB', '')
+            descricao      = f"F100 - {desc}"
 
-            match_pis = sap_pis[sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)]
-            if not match_pis.empty:
-                vl_sap_pis    = match_pis.iloc[0]['Valor']
-                _, status_pis = comparacao_valores(vl_sap_pis, vl_pis_sped)
+            if ind_oper == '0':
+                cta_pis_deb,  desc_pis_deb  = '1.01.05.01.0003', 'PIS a Recuperar'
+                cta_pis_cred, desc_pis_cred = '3.01.01.03.0003', '( - ) PIS/PASEP'
+                cta_cof_deb,  desc_cof_deb  = '1.01.05.01.0004', 'COFINS a Recuperar'
+                cta_cof_cred, desc_cof_cred = '3.01.01.03.0004', '( - ) COFINS'
             else:
-                vl_sap_pis = ''
-                status_pis = 'so_sped'
+                cta_pis_deb,  desc_pis_deb  = '3.01.01.03.0003', '( - ) PIS/PASEP'
+                cta_pis_cred, desc_pis_cred = '2.01.01.04.0002', 'PIS a Recolher'
+                cta_cof_deb,  desc_cof_deb  = '3.01.01.03.0004', '( - ) COFINS'
+                cta_cof_cred, desc_cof_cred = '2.01.01.04.0003', 'COFINS a Recolher'
 
-            registros.append(gerar_registro(
-                bloco="F100", num_doc=desc, identificador=desc,
-                imposto="PIS", vl_sped=vl_pis_sped, vl_sap=vl_sap_pis, status=status_pis
-            ))
+            # --- PIS ---
+            if _parse_valor(vl_pis_sped):
+                match_pis = sap_pis[sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)]
+                if not match_pis.empty:
+                    vl_sap_pis            = match_pis.iloc[0]['Valor']
+                    delta_pis, status_pis = comparacao_valores(vl_sap_pis, vl_pis_sped)
+                    cc_pis                = match_pis.iloc[0].get('Centro de Custo', '')
+                else:
+                    vl_sap_pis = ''
+                    delta_pis  = _parse_valor(vl_pis_sped) or 0
+                    status_pis = 'so_sped'
+                    cc_pis     = ''
 
-            match_cofins = sap_cofins[sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)]
-            if not match_cofins.empty:
-                vl_sap_cofins    = match_cofins.iloc[0]['Valor']
-                _, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
-            else:
-                vl_sap_cofins = ''
-                status_cofins = 'so_sped'
+                registros.append(gerar_registro(
+                    bloco="F100", num_doc=desc, identificador=desc,
+                    imposto="PIS", vl_sped=vl_pis_sped, vl_sap=vl_sap_pis, status=status_pis
+                ))
 
-            registros.append(gerar_registro(
-                bloco="F100", num_doc=desc, identificador=desc,
-                imposto="COFINS", vl_sped=vl_cofins_sped, vl_sap=vl_sap_cofins, status=status_cofins
-            ))
+                if status_pis in ('so_sped', 'complemento', 'estorno'):
+                    deb_pis   = cta_pis_deb  if status_pis != 'estorno' else cta_pis_cred
+                    ddesc_pis = desc_pis_deb if status_pis != 'estorno' else desc_pis_cred
+                    cred_pis  = cta_pis_cred if status_pis != 'estorno' else cta_pis_deb
+                    cdesc_pis = desc_pis_cred if status_pis != 'estorno' else desc_pis_deb
+                    lancamentos.append(gerar_lancamento(
+                        bloco="F100", codigo_conta=deb_pis, descricao_conta=ddesc_pis,
+                        debito=delta_pis, credito='',
+                        descricao=descricao, centro_de_custo=cc_pis, filial=filial
+                    ))
+                    lancamentos.append(gerar_lancamento(
+                        bloco="F100", codigo_conta=cred_pis, descricao_conta=cdesc_pis,
+                        debito='', credito=delta_pis,
+                        descricao=descricao, centro_de_custo=cc_pis, filial=filial
+                    ))
+
+            # --- COFINS ---
+            if _parse_valor(vl_cofins_sped):
+                match_cofins = sap_cofins[sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)]
+                if not match_cofins.empty:
+                    vl_sap_cofins               = match_cofins.iloc[0]['Valor']
+                    delta_cofins, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
+                    cc_cofins                   = match_cofins.iloc[0].get('Centro de Custo', '')
+                else:
+                    vl_sap_cofins = ''
+                    delta_cofins  = _parse_valor(vl_cofins_sped) or 0
+                    status_cofins = 'so_sped'
+                    cc_cofins     = ''
+
+                registros.append(gerar_registro(
+                    bloco="F100", num_doc=desc, identificador=desc,
+                    imposto="COFINS", vl_sped=vl_cofins_sped, vl_sap=vl_sap_cofins, status=status_cofins
+                ))
+
+                if status_cofins in ('so_sped', 'complemento', 'estorno'):
+                    deb_cof   = cta_cof_deb  if status_cofins != 'estorno' else cta_cof_cred
+                    ddesc_cof = desc_cof_deb if status_cofins != 'estorno' else desc_cof_cred
+                    cred_cof  = cta_cof_cred if status_cofins != 'estorno' else cta_cof_deb
+                    cdesc_cof = desc_cof_cred if status_cofins != 'estorno' else desc_cof_deb
+                    lancamentos.append(gerar_lancamento(
+                        bloco="F100", codigo_conta=deb_cof, descricao_conta=ddesc_cof,
+                        debito=delta_cofins, credito='',
+                        descricao=descricao, centro_de_custo=cc_cofins, filial=filial
+                    ))
+                    lancamentos.append(gerar_lancamento(
+                        bloco="F100", codigo_conta=cred_cof, descricao_conta=cdesc_cof,
+                        debito='', credito=delta_cofins,
+                        descricao=descricao, centro_de_custo=cc_cofins, filial=filial
+                    ))
 
     def _validar_f120():
         if df_bloco_f120.empty:
@@ -472,34 +659,90 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
 
         for _, registro in df_bloco_f120.iterrows():
             desc           = registro.get('DESC_BEM_IMOB', '')
+            ind_oper       = registro.get('IND_OPER', '0')
             vl_pis_sped    = registro.get('VL_PIS', '')
             vl_cofins_sped = registro.get('VL_COFINS', '')
+            filial         = registro.get('CNPJ_ESTAB', '')
+            descricao      = f"F120 - {desc}"
 
-            match_pis = sap_pis[sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)]
-            if not match_pis.empty:
-                vl_sap_pis    = match_pis.iloc[0]['Valor']
-                _, status_pis = comparacao_valores(vl_sap_pis, vl_pis_sped)
+            if ind_oper == '0':
+                cta_pis_deb,  desc_pis_deb  = '1.01.05.01.0003', 'PIS a Recuperar'
+                cta_pis_cred, desc_pis_cred = '3.01.01.03.0003', '( - ) PIS/PASEP'
+                cta_cof_deb,  desc_cof_deb  = '1.01.05.01.0004', 'COFINS a Recuperar'
+                cta_cof_cred, desc_cof_cred = '3.01.01.03.0004', '( - ) COFINS'
             else:
-                vl_sap_pis = ''
-                status_pis = 'so_sped'
+                cta_pis_deb,  desc_pis_deb  = '3.01.01.03.0003', '( - ) PIS/PASEP'
+                cta_pis_cred, desc_pis_cred = '2.01.01.04.0002', 'PIS a Recolher'
+                cta_cof_deb,  desc_cof_deb  = '3.01.01.03.0004', '( - ) COFINS'
+                cta_cof_cred, desc_cof_cred = '2.01.01.04.0003', 'COFINS a Recolher'
 
-            registros.append(gerar_registro(
-                bloco="F120", num_doc=desc, identificador=desc,
-                imposto="PIS", vl_sped=vl_pis_sped, vl_sap=vl_sap_pis, status=status_pis
-            ))
+            # --- PIS ---
+            if _parse_valor(vl_pis_sped):
+                match_pis = sap_pis[sap_pis['Valor'].apply(_parse_valor) == _parse_valor(vl_pis_sped)]
+                if not match_pis.empty:
+                    vl_sap_pis            = match_pis.iloc[0]['Valor']
+                    delta_pis, status_pis = comparacao_valores(vl_sap_pis, vl_pis_sped)
+                    cc_pis                = match_pis.iloc[0].get('Centro de Custo', '')
+                else:
+                    vl_sap_pis = ''
+                    delta_pis  = _parse_valor(vl_pis_sped) or 0
+                    status_pis = 'so_sped'
+                    cc_pis     = ''
 
-            match_cofins = sap_cofins[sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)]
-            if not match_cofins.empty:
-                vl_sap_cofins    = match_cofins.iloc[0]['Valor']
-                _, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
-            else:
-                vl_sap_cofins = ''
-                status_cofins = 'so_sped'
+                registros.append(gerar_registro(
+                    bloco="F120", num_doc=desc, identificador=desc,
+                    imposto="PIS", vl_sped=vl_pis_sped, vl_sap=vl_sap_pis, status=status_pis
+                ))
 
-            registros.append(gerar_registro(
-                bloco="F120", num_doc=desc, identificador=desc,
-                imposto="COFINS", vl_sped=vl_cofins_sped, vl_sap=vl_sap_cofins, status=status_cofins
-            ))
+                if status_pis in ('so_sped', 'complemento', 'estorno'):
+                    deb_pis   = cta_pis_deb  if status_pis != 'estorno' else cta_pis_cred
+                    ddesc_pis = desc_pis_deb if status_pis != 'estorno' else desc_pis_cred
+                    cred_pis  = cta_pis_cred if status_pis != 'estorno' else cta_pis_deb
+                    cdesc_pis = desc_pis_cred if status_pis != 'estorno' else desc_pis_deb
+                    lancamentos.append(gerar_lancamento(
+                        bloco="F120", codigo_conta=deb_pis, descricao_conta=ddesc_pis,
+                        debito=delta_pis, credito='',
+                        descricao=descricao, centro_de_custo=cc_pis, filial=filial
+                    ))
+                    lancamentos.append(gerar_lancamento(
+                        bloco="F120", codigo_conta=cred_pis, descricao_conta=cdesc_pis,
+                        debito='', credito=delta_pis,
+                        descricao=descricao, centro_de_custo=cc_pis, filial=filial
+                    ))
+
+            # --- COFINS ---
+            if _parse_valor(vl_cofins_sped):
+                match_cofins = sap_cofins[sap_cofins['Valor'].apply(_parse_valor) == _parse_valor(vl_cofins_sped)]
+                if not match_cofins.empty:
+                    vl_sap_cofins               = match_cofins.iloc[0]['Valor']
+                    delta_cofins, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
+                    cc_cofins                   = match_cofins.iloc[0].get('Centro de Custo', '')
+                else:
+                    vl_sap_cofins = ''
+                    delta_cofins  = _parse_valor(vl_cofins_sped) or 0
+                    status_cofins = 'so_sped'
+                    cc_cofins     = ''
+
+                registros.append(gerar_registro(
+                    bloco="F120", num_doc=desc, identificador=desc,
+                    imposto="COFINS", vl_sped=vl_cofins_sped, vl_sap=vl_sap_cofins, status=status_cofins
+                ))
+
+                if status_cofins in ('so_sped', 'complemento', 'estorno'):
+                    deb_cof   = cta_cof_deb  if status_cofins != 'estorno' else cta_cof_cred
+                    ddesc_cof = desc_cof_deb if status_cofins != 'estorno' else desc_cof_cred
+                    cred_cof  = cta_cof_cred if status_cofins != 'estorno' else cta_cof_deb
+                    cdesc_cof = desc_cof_cred if status_cofins != 'estorno' else desc_cof_deb
+                    lancamentos.append(gerar_lancamento(
+                        bloco="F120", codigo_conta=deb_cof, descricao_conta=ddesc_cof,
+                        debito=delta_cofins, credito='',
+                        descricao=descricao, centro_de_custo=cc_cofins, filial=filial
+                    ))
+                    lancamentos.append(gerar_lancamento(
+                        bloco="F120", codigo_conta=cred_cof, descricao_conta=cdesc_cof,
+                        debito='', credito=delta_cofins,
+                        descricao=descricao, centro_de_custo=cc_cofins, filial=filial
+                    ))
 
     def _validar_m110():
         if df_bloco_M110.empty:
@@ -518,12 +761,14 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
             ))
 
             lancamentos.append(gerar_lancamento(
+                bloco="M110",
                 codigo_conta="4.01.01.01.0001" if ind_aj == '0' else "1.01.05.01.0003",
                 descricao_conta="Custo dos Produtos Vendidos" if ind_aj == '0' else "PIS a Recuperar",
                 debito=vl_aj, credito="",
                 descricao="M110", centro_de_custo="OBRAS", filial=cnpj
             ))
             lancamentos.append(gerar_lancamento(
+                bloco="M110",
                 codigo_conta="1.01.05.01.0003" if ind_aj == '0' else "4.01.01.01.0001",
                 descricao_conta="PIS a Recuperar" if ind_aj == '0' else "Custo dos Produtos Vendidos",
                 debito="", credito=vl_aj,
@@ -548,12 +793,14 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
             ))
 
             lancamentos.append(gerar_lancamento(
+                bloco="M215",
                 codigo_conta="2.01.01.04.0002" if ind_aj == '0' else "1.01.05.01.0003",
                 descricao_conta="PIS a Recolher" if ind_aj == '0' else "PIS a Recuperar",
                 debito=vl_calc, credito="",
                 descricao="M215", centro_de_custo="OBRAS", filial=cnpj
             ))
             lancamentos.append(gerar_lancamento(
+                bloco="M215",
                 codigo_conta="1.01.05.01.0003" if ind_aj == '0' else "2.01.01.04.0002",
                 descricao_conta="PIS a Recuperar" if ind_aj == '0' else "PIS a Recolher",
                 debito="", credito=vl_calc,
@@ -577,12 +824,14 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
             ))
 
             lancamentos.append(gerar_lancamento(
+                bloco="M510",
                 codigo_conta="4.01.01.01.0001" if ind_aj == '0' else "1.01.05.01.0004",
                 descricao_conta="Custo dos Produtos Vendidos" if ind_aj == '0' else "COFINS a Recuperar",
                 debito=vl_aj, credito="",
                 descricao="M510", centro_de_custo="OBRAS", filial=cnpj
             ))
             lancamentos.append(gerar_lancamento(
+                bloco="M510",
                 codigo_conta="1.01.05.01.0004" if ind_aj == '0' else "4.01.01.01.0001",
                 descricao_conta="COFINS a Recuperar" if ind_aj == '0' else "Custo dos Produtos Vendidos",
                 debito="", credito=vl_aj,
@@ -607,12 +856,14 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
             ))
 
             lancamentos.append(gerar_lancamento(
+                bloco="M615",
                 codigo_conta="2.01.01.04.0003" if ind_aj == '0' else "1.01.05.01.0004",
                 descricao_conta="COFINS a Recolher" if ind_aj == '0' else "COFINS a Recuperar",
                 debito=vl_calc, credito="",
                 descricao="M615", centro_de_custo="OBRAS", filial=cnpj
             ))
             lancamentos.append(gerar_lancamento(
+                bloco="M615",
                 codigo_conta="1.01.05.01.0004" if ind_aj == '0' else "2.01.01.04.0003",
                 descricao_conta="COFINS a Recuperar" if ind_aj == '0' else "COFINS a Recolher",
                 debito="", credito=vl_calc,
@@ -682,6 +933,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
             descricao_lanc = f"Estorno SAP - {num_doc_sap}"
 
             lancamentos.append(gerar_lancamento(
+                bloco='SAP',
                 codigo_conta=cta_cred,
                 descricao_conta=desc_cred,
                 debito=valor_sap,
@@ -691,6 +943,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 filial=''
             ))
             lancamentos.append(gerar_lancamento(
+                bloco='SAP',
                 codigo_conta=cta_deb,
                 descricao_conta=desc_deb,
                 debito='',
@@ -700,4 +953,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 filial=''
             ))
 
-    return {'lancamentos': lancamentos, 'registros': registros}
+    return {
+        'lancamentos': [{k: _clean(v) for k, v in l.items()} for l in lancamentos],
+        'registros':   [{k: _clean(v) for k, v in r.items()} for r in registros],
+    }
