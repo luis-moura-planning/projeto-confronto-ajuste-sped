@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
+import { compararPlanilhaSapSped } from "./services/comparacaoApi";
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 
@@ -147,20 +148,11 @@ export default function App() {
     setTiposLanc({ ajuste: true, estornoSap: false });
     setBlocosAtivos(null);
 
-    const form = new FormData();
-    form.append("planilha_sap", sapFile);
-    form.append("sped_contribuicoes", spedFile);
-
     try {
-      const res = await fetch("/api/comparar/compara_planilha_sped", {
-        method: "POST",
-        body: form,
-      });
-      const data = await res.json();
-      if (!res.ok) setErro(data.detail ?? "Erro ao processar arquivos.");
-      else setResultado(data);
-    } catch {
-      setErro("Falha na comunicação com o servidor.");
+      const data = await compararPlanilhaSapSped(sapFile, spedFile);
+      setResultado(data);
+    } catch (error) {
+      setErro(error.message || "Falha na comunicação com o servidor.");
     } finally {
       setLoading(false);
     }
@@ -200,6 +192,12 @@ export default function App() {
         .toLowerCase()
         .includes(_busca) ||
       String(r.imposto ?? "")
+        .toLowerCase()
+        .includes(_busca) ||
+      String(r.vl_sped ?? "")
+        .toLowerCase()
+        .includes(_busca) ||
+      String(r.vl_sap ?? "")
         .toLowerCase()
         .includes(_busca)
     );
