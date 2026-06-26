@@ -63,6 +63,9 @@ def _parse_valor(v):
         s = s.replace('.', '').replace(',', '.')
     return float(s)
 
+def converte_valor_sped_str_to_float(coluna):
+    return coluna.str.replace('.', '').str.replace(',', '.').astype(float)
+
 
 def comparacao_valores(valor_sap, valor_sped):
     valor_sap = _parse_valor(valor_sap)
@@ -84,6 +87,36 @@ def comparacao_valores(valor_sap, valor_sped):
     else:
         return 0, "ok"
 
+def comparacao_f100_f120(bloco, df_sped, df_sap, descricao_sped, descricao_sap):
+    bloco = bloco.lower()
+    if bloco not in ("f100", "f120"):
+        return "Bloco não suportado, apenas F100 e F120"
+    coluna_descricao_sped = "DESC_DOC_OPER" if bloco == "f100" else"DESC_BEM_IMOB"
+
+    #Filtro de dados SPED
+    df_a_comparar_sped = df_sped[df_sped[coluna_descricao_sped] == descricao_sped]
+    df_a_comparar_sped[['VL_PIS', 'VL_COFINS']] = df_a_comparar_sped[['VL_PIS', 'VL_COFINS']].apply(converte_valor_sped_str_to_float)
+    df_a_comparar_sped = df_a_comparar_sped.groupby(coluna_descricao_sped, as_index=False)[['VL_PIS', 'VL_COFINS']].sum()
+
+    #Filtro e transformação de dados SAP
+    df_a_comparar_sap = df_sap[df_sap['Observações'] == descricao_sap].copy()
+    df_a_comparar_sap['Valor'] = df_a_comparar_sap['Valor'].apply(_parse_valor)
+    df_a_comparar_sap = df_a_comparar_sap.pivot_table(
+        index="Observações",
+        columns="Imposto",
+        values="Valor",
+        aggfunc="sum"
+    ).rename(columns={
+        "PIS": "VL_PIS",
+        "COFINS": "VL_COFINS"
+    }).reset_index()
+
+    #Realiza a comparação do PIS e COFINS
+    comparacao_pis = comparacao_valores(df_a_comparar_sped['VL_PIS'].iloc[0], df_a_comparar_sap['VL_PIS'].iloc[0])
+    comparacao_cofins = comparacao_valores(df_a_comparar_sped['VL_COFINS'].iloc[0], df_a_comparar_sap['VL_PIS'].iloc[0])
+
+
+    return comparacao_pis, comparacao_cofins
 
 def gerar_lancamento(bloco='',codigo_conta='', descricao_conta='', debito='', credito='', descricao='', centro_de_custo='', filial=''):
     return {
