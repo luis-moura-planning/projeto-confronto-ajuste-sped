@@ -137,7 +137,9 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
             vl_pis_sped    = registro.get('VL_PIS', '')
             vl_cofins_sped = registro.get('VL_COFINS', '')
             filial         = registro.get('CNPJ_ESTAB', '')
+            descricao      = registro.get('Observação')
             descricao      = f"A100 - {num_doc}"
+            
 
             if ind_oper == '0':
                 cta_pis_deb,  desc_pis_deb  = '1.01.05.01.0003', 'PIS a Recuperar'
@@ -285,6 +287,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 vl_sap_cofins               = match_cofins.iloc[0]['Valor']
                 delta_cofins, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
                 cc_cofins                   = match_cofins.iloc[0].get('Centro de Custo', '')
+                
             else:
                 vl_sap_cofins = ''
                 delta_cofins  = _parse_valor(vl_cofins_sped) or 0
@@ -923,6 +926,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                 cta_cred  = registro.get('Cta.contáb./cód.PN(C)', '')
                 desc_cred = registro.get('Cta.cont./Nome PN(C)', '')
                 descricao_lanc = f"Estorno SAP - {num_doc_sap} - {observacao_doc_sap}"
+                centro_de_custo = registro.get('Centro de Custo(D)') if registro.get('Centro de Custo(D)', '') != '' else registro.get('Centro de Custo(C)', '')
 
                 lancamentos.append(gerar_lancamento(
                     bloco='SAP',
@@ -931,7 +935,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                     debito=valor_sap,
                     credito='',
                     descricao=descricao_lanc,
-                    centro_de_custo='',
+                    centro_de_custo=centro_de_custo,
                     filial=''
                 ))
                 lancamentos.append(gerar_lancamento(
@@ -941,7 +945,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
                     debito='',
                     credito=valor_sap,
                     descricao=descricao_lanc,
-                    centro_de_custo='',
+                    centro_de_custo=centro_de_custo,
                     filial=''
                 ))
             else:

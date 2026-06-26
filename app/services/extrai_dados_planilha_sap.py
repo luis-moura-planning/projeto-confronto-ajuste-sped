@@ -72,7 +72,8 @@ def extrai_dados_planilha_sap(planilha_xlsx):
             'Cta.cont./Nome PN' : 'Cta.cont./Nome PN(D)',
             'Débito (MC)' : 'Débito (MC)(D)',
             'Crédito (MC)': 'Crédito (MC)(D)',
-            'Observações' : 'Observações(D)'
+            'Observações' : 'Observações(D)',
+            'Centro de Custo' : 'Centro de Custo(D)'
         })
 
         df_pis_cofins_credito = df_pis_cofins.loc[df_pis_cofins['Crédito (MC)'].notna()]
@@ -84,7 +85,8 @@ def extrai_dados_planilha_sap(planilha_xlsx):
             'Cta.cont./Nome PN' : 'Cta.cont./Nome PN(C)',
             'Débito (MC)' : 'Débito (MC)(C)',
             'Crédito (MC)': 'Crédito (MC)(C)',
-            'Observações' : 'Observações(C)'
+            'Observações' : 'Observações(C)',
+            'Centro de Custo' : 'Centro de Custo(C)'
         })
 
         df_pis_cofins = pd.merge(
@@ -114,15 +116,17 @@ def extrai_dados_planilha_sap(planilha_xlsx):
         )
         
         df_pis_cofins = df_pis_cofins[[
-            'Data de lançamento(D)', 
-            'Nº doc.(D)', 
-            'Ref.3 (Linha)(D)', 
-            'Cta.contáb./cód.PN(D)', 
+            'Data de lançamento(D)',
+            'Nº doc.(D)',
+            'Ref.3 (Linha)(D)',
+            'Cta.contáb./cód.PN(D)',
             'Cta.cont./Nome PN(D)',
             'Débito (MC)(D)',
-            'Cta.contáb./cód.PN(C)', 
+            'Centro de Custo(D)',
+            'Cta.contáb./cód.PN(C)',
             'Cta.cont./Nome PN(C)',
             'Crédito (MC)(C)',
+            'Centro de Custo(C)',
             'Observações(D)'
         ]]
 
