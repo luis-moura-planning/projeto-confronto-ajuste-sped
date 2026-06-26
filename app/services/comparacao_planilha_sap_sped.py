@@ -47,6 +47,14 @@ df_contas = pd.DataFrame({
 })
 
 
+def _cc_from_row(row):
+    for col in ('Centro de Custo(D)', 'Centro de Custo(C)'):
+        v = row.get(col)
+        if v and not pd.isna(v):
+            return v
+    return ''
+
+
 def _parse_valor(v):
     if pd.isna(v) or v == '':
         return None
@@ -157,7 +165,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
             if not match_pis.empty:
                 vl_sap_pis            = match_pis.iloc[0]['Valor']
                 delta_pis, status_pis = comparacao_valores(vl_sap_pis, vl_pis_sped)
-                cc_pis                = match_pis.iloc[0].get('Centro de Custo', '')
+                cc_pis                = _cc_from_row(match_pis.iloc[0])
             else:
                 vl_sap_pis = ''
                 delta_pis  = _parse_valor(vl_pis_sped) or 0
@@ -190,7 +198,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
             if not match_cofins.empty:
                 vl_sap_cofins               = match_cofins.iloc[0]['Valor']
                 delta_cofins, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
-                cc_cofins                   = match_cofins.iloc[0].get('Centro de Custo', '')
+                cc_cofins                   = _cc_from_row(match_cofins.iloc[0])
             else:
                 vl_sap_cofins = ''
                 delta_cofins  = _parse_valor(vl_cofins_sped) or 0
@@ -253,7 +261,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
             if not match_pis.empty:
                 vl_sap_pis            = match_pis.iloc[0]['Valor']
                 delta_pis, status_pis = comparacao_valores(vl_sap_pis, vl_pis_sped)
-                cc_pis                = match_pis.iloc[0].get('Centro de Custo', '')
+                cc_pis                = _cc_from_row(match_pis.iloc[0])
             else:
                 vl_sap_pis = ''
                 delta_pis  = _parse_valor(vl_pis_sped) or 0
@@ -286,7 +294,7 @@ def compara_gera_diferenca(planilha_sap_path, sped_path):
             if not match_cofins.empty:
                 vl_sap_cofins               = match_cofins.iloc[0]['Valor']
                 delta_cofins, status_cofins = comparacao_valores(vl_sap_cofins, vl_cofins_sped)
-                cc_cofins                   = match_cofins.iloc[0].get('Centro de Custo', '')
+                cc_cofins                   = _cc_from_row(match_cofins.iloc[0])
                 
             else:
                 vl_sap_cofins = ''

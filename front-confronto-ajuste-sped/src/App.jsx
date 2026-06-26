@@ -67,7 +67,7 @@ const IMPOSTOS_LANC = [
 
 const TIPOS_LANC = [
   { key: "ajuste",      label: "Ajuste",      style: null },
-  { key: "estornoSap",  label: "Estorno SAP",  style: { color: "var(--g-danger)" } },
+  { key: "estornoSap",  label: "Apenas SAP",   style: { color: "var(--g-danger)" } },
 ];
 
 const OPCOES_POR_PAGINA = [10, 20, 50, 100];
@@ -466,7 +466,7 @@ export default function App() {
 
                 {tiposLanc.estornoSap && (
                   <div className="app-alert-err">
-                    <strong>Atenção — Estorno SAP:</strong> esses lançamentos revertem registros que existem no SAP mas não constam no SPED. Verifique cada documento antes de importar.
+                    <strong>Atenção — Apenas SAP:</strong> esses lançamentos existem no SAP mas não constam no SPED. Verifique cada documento antes de importar.
                   </div>
                 )}
 
