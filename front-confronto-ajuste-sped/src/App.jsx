@@ -109,6 +109,7 @@ function exportarXLSX(lancamentos) {
 // ── componente principal ─────────────────────────────────────────────────────
 
 export default function App() {
+  const [modalTutorial, setModalTutorial] = useState(false);
   const [sapFile, setSapFile] = useState(null);
   const [spedFile, setSpedFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -317,7 +318,68 @@ export default function App() {
         <span className="g-helper g-hidden-sm">
           Comparação de lançamentos contábeis
         </span>
+        <button
+          className="g-btn g-btn--sm"
+          style={{ marginLeft: "auto" }}
+          onClick={() => setModalTutorial(true)}
+        >
+          Como Baixar
+        </button>
       </nav>
+
+      {modalTutorial && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.55)",
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setModalTutorial(false);
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 8,
+              width: "90vw",
+              maxWidth: 1100,
+              height: "88vh",
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+              boxShadow: "0 8px 40px rgba(0,0,0,0.25)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "12px 16px",
+                borderBottom: "1px solid var(--g-border)",
+              }}
+            >
+              <span style={{ fontWeight: 600 }}>Como Baixar o Diário</span>
+              <button
+                className="g-btn g-btn--sm"
+                onClick={() => setModalTutorial(false)}
+              >
+                Fechar ×
+              </button>
+            </div>
+            <iframe
+              src="/tutorial.html"
+              style={{ flex: 1, border: "none", width: "100%" }}
+              title="Tutorial - Como Baixar o Diário"
+            />
+          </div>
+        </div>
+      )}
 
       <main
         className="g-container"
