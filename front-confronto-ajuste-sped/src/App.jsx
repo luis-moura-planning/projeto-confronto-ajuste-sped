@@ -180,6 +180,8 @@ export default function App() {
   const linhasFiltradas = todasLinhas.filter((r) => {
     if (filtro === "divergencia") {
       if (r._tipo !== "complemento" && r._tipo !== "estorno") return false;
+    } else if (filtro === "so_sap") {
+      if (r._tipo !== "so_sap" && r._tipo !== "advertencia") return false;
     } else if (filtro !== "todos" && r._tipo !== filtro) return false;
     if (!_busca) return true;
     return (
@@ -323,7 +325,7 @@ export default function App() {
           style={{ marginLeft: "auto" }}
           onClick={() => setModalTutorial(true)}
         >
-          Como Baixar
+          Como Baixar Planilha SAP
         </button>
       </nav>
 
