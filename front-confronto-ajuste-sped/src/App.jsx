@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import "./App.css";
 import { compararPlanilhaSapSped } from "./services/comparacaoApi";
+import videoTutorial from "./videos/tutorial_confronto_sap_sped_central_irrigacao.mp4";
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 
@@ -110,6 +111,7 @@ function exportarXLSX(lancamentos) {
 
 export default function App() {
   const [modalTutorial, setModalTutorial] = useState(false);
+  const [modalVideo, setModalVideo] = useState(false);
   const [sapFile, setSapFile] = useState(null);
   const [spedFile, setSpedFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -315,18 +317,26 @@ export default function App() {
               <line x1="14" y1="12" x2="16" y2="12" opacity=".6" />
             </g>
           </svg>
-          Confronto SAP × SPED
+          Confronto SAP × SPED Central Irrigação
         </div>
-        <span className="g-helper g-hidden-sm">
-          Comparação de lançamentos contábeis
-        </span>
-        <button
-          className="g-btn g-btn--sm"
-          style={{ marginLeft: "auto" }}
-          onClick={() => setModalTutorial(true)}
+
+        <div
+          className="g-cluster"
+          style={{ marginLeft: "auto", gap: "var(--g-space-2)" }}
         >
-          Como Baixar Planilha SAP
-        </button>
+          <button
+            className="g-btn g-btn--lg"
+            onClick={() => setModalTutorial(true)}
+          >
+            📄 Como Baixar Planilha SAP
+          </button>
+          <button
+            className="g-btn g-btn--lg"
+            onClick={() => setModalVideo(true)}
+          >
+            🎬 Vídeo Tutorial
+          </button>
+        </div>
       </nav>
 
       {modalTutorial && (
@@ -378,6 +388,62 @@ export default function App() {
               src="/tutorial.html"
               style={{ flex: 1, border: "none", width: "100%" }}
               title="Tutorial - Como Baixar o Diário"
+            />
+          </div>
+        </div>
+      )}
+
+      {modalVideo && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.7)",
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setModalVideo(false);
+          }}
+        >
+          <div
+            style={{
+              background: "#000",
+              borderRadius: 8,
+              width: "90vw",
+              maxWidth: 960,
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+              boxShadow: "0 8px 40px rgba(0,0,0,0.5)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "10px 14px",
+                background: "#111",
+              }}
+            >
+              <span style={{ fontWeight: 600, color: "#fff", fontSize: 14 }}>
+                Vídeo Tutorial
+              </span>
+              <button
+                className="g-btn g-btn--sm"
+                onClick={() => setModalVideo(false)}
+              >
+                Fechar ×
+              </button>
+            </div>
+            <video
+              src={videoTutorial}
+              controls
+              autoPlay
+              style={{ width: "100%", display: "block", maxHeight: "80vh" }}
             />
           </div>
         </div>
