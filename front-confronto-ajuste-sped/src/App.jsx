@@ -940,6 +940,19 @@ export default function App() {
                   </p>
                 ) : (
                   <>
+                    <div
+                      style={{
+                        background: "#fffbe6",
+                        border: "1px solid #ffe58f",
+                        borderRadius: 6,
+                        padding: "10px 14px",
+                        color: "#7a5f00",
+                        fontSize: 14,
+                        fontWeight: 500,
+                      }}
+                    >
+                      ⚠️ Aviso: Verifique todos os lançamentos antes de importá-los para o sistema SAP.
+                    </div>
                     <BarraPaginacao
                       pagina={paginaLanc}
                       total={totalPagsLanc}
